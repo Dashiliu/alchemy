@@ -1,0 +1,5 @@
+com/dfire/platform/connectors/elasticsearch/JsonRowStringSchema.class
+com/dfire/platform/connectors/hbase/HbaseTableSink$HBaseOutputFormat.class
+com/dfire/platform/connectors/elasticsearch/ElasticsearchTableSink.class
+com/dfire/platform/connectors/hbase/HbaseTableSink.class
+com/dfire/platform/connectors/elasticsearch/ElasticsearchTableFunction.class

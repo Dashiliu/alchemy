@@ -1,0 +1,4 @@
+/Users/dongbinglin/Code/platform/stream/stream-connectors/src/main/java/com/dfire/platform/connectors/elasticsearch/JsonRowStringSchema.java
+/Users/dongbinglin/Code/platform/stream/stream-connectors/src/main/java/com/dfire/platform/connectors/elasticsearch/ElasticsearchTableSink.java
+/Users/dongbinglin/Code/platform/stream/stream-connectors/src/main/java/com/dfire/platform/connectors/hbase/HbaseTableSink.java
+/Users/dongbinglin/Code/platform/stream/stream-connectors/src/main/java/com/dfire/platform/connectors/elasticsearch/ElasticsearchTableFunction.java

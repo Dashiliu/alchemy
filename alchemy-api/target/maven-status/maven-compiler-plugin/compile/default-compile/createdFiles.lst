@@ -1,0 +1,12 @@
+com/dfire/platform/api/function/StreamTableFunction.class
+com/dfire/platform/api/sink/HbaseInvoker.class
+com/dfire/platform/api/function/table/Collect.class
+com/dfire/platform/api/util/RandomUtils.class
+com/dfire/platform/api/function/scalar/FlinkAllScalarFunction.class
+com/dfire/platform/api/util/GroovyCompiler.class
+com/dfire/platform/api/sink/RedisInvoker.class
+com/dfire/platform/api/function/StreamAggregateFunction.class
+com/dfire/platform/api/function/StreamScalarFunction.class
+com/dfire/platform/api/function/Function.class
+com/dfire/platform/api/function/table/FlinkAllTableFunction.class
+com/dfire/platform/api/function/aggregate/FlinkAllAggregateFunction.class

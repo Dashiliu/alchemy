@@ -1,0 +1,4 @@
+web/cluster/FlinkClusterTest.class
+web/cluster/StreamExecutionEnvironmentTest.class
+web/descriptor/TestFunction.class
+web/descriptor/UdfDescriptorTest.class
