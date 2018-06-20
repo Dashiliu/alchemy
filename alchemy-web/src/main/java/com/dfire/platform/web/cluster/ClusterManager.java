@@ -3,6 +3,7 @@ package com.dfire.platform.web.cluster;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import com.dfire.platform.web.cluster.request.Request;
 import com.dfire.platform.web.cluster.response.Response;
+import com.dfire.platform.web.common.ClusterType;
 import com.dfire.platform.web.common.ResultMessage;
 
 /**
@@ -53,7 +55,7 @@ public class ClusterManager {
     }
 
     public Response send(Request message) {
-        Cluster cluster = nameClusters.get(message.getClusterName());
+        Cluster cluster = nameClusters.get(message.getCluster());
         if (cluster == null) {
             return new Response(ResultMessage.CLUSTER_NOT_EXIST.getMsg());
         }
@@ -63,6 +65,15 @@ public class ClusterManager {
             LOGGER.error("cluster send message fail", e);
             return new Response(e.getMessage());
         }
+    }
+
+    public ClusterType getClusterType(String clusterName) {
+        Cluster cluster = nameClusters.get(clusterName);
+        return cluster == null ? null : cluster.clusterType();
+    }
+
+    public Set<String> clusters() {
+        return nameClusters.keySet();
     }
 
 }

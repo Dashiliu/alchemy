@@ -16,6 +16,7 @@ import org.apache.flink.table.sources.wmstrategies.BoundedOutOfOrderTimestamps;
 import org.apache.flink.util.Preconditions;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import com.dfire.platform.web.common.ClusterType;
@@ -29,6 +30,7 @@ import com.dfire.platform.web.util.PropertiesUtils;
  * @author congbai
  * @date 03/06/2018
  */
+@Component
 public class KafkaSourceDescriptor extends SourceDescriptor {
 
     private String topic;
@@ -79,6 +81,11 @@ public class KafkaSourceDescriptor extends SourceDescriptor {
 
     public void setProperties(Map<String, String> properties) {
         this.properties = properties;
+    }
+
+    @Override
+    public String getContentType() {
+        return "kafkaSource";
     }
 
     @Override

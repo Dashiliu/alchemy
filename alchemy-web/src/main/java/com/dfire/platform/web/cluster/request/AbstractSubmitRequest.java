@@ -4,39 +4,29 @@ package com.dfire.platform.web.cluster.request;
  * @author congbai
  * @date 01/06/2018
  */
-public abstract class AbstractSubmitRequest implements FlinkRequest {
+public abstract class AbstractSubmitRequest implements FlinkRequest, SubmitRequest {
 
-    private String clusterName;
+    private String cluster;
 
-    private String jarPath;
-
-    private int parallelism = 1;
+    private String jobName;
 
     private boolean test;
 
     @Override
-    public String getClusterName() {
-        return clusterName;
+    public String getCluster() {
+        return cluster;
     }
 
-    public void setClusterName(String clusterName) {
-        this.clusterName = clusterName;
+    public void setCluster(String cluster) {
+        this.cluster = cluster;
     }
 
-    public String getJarPath() {
-        return jarPath;
+    public String getJobName() {
+        return jobName;
     }
 
-    public void setJarPath(String jarPath) {
-        this.jarPath = jarPath;
-    }
-
-    public int getParallelism() {
-        return parallelism;
-    }
-
-    public void setParallelism(int parallelism) {
-        this.parallelism = parallelism;
+    public void setJobName(String jobName) {
+        this.jobName = jobName;
     }
 
     @Override

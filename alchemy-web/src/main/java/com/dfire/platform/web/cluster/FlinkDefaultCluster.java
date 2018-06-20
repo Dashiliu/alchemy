@@ -8,8 +8,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.dfire.platform.web.cluster.response.ListJobFlinkResponse;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.flink.api.common.JobID;
 import org.apache.flink.api.common.JobSubmissionResult;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.client.program.ClusterClient;
@@ -36,11 +38,9 @@ import org.slf4j.LoggerFactory;
 import com.dfire.platform.api.function.aggregate.FlinkAllAggregateFunction;
 import com.dfire.platform.api.function.scalar.FlinkAllScalarFunction;
 import com.dfire.platform.api.function.table.FlinkAllTableFunction;
-import com.dfire.platform.web.cluster.request.JarSubmitRequest;
-import com.dfire.platform.web.cluster.request.Request;
-import com.dfire.platform.web.cluster.request.SqlSubmitRequest;
+import com.dfire.platform.web.cluster.request.*;
 import com.dfire.platform.web.cluster.response.Response;
-import com.dfire.platform.web.cluster.response.SubmitResponse;
+import com.dfire.platform.web.cluster.response.SubmitFlinkResponse;
 import com.dfire.platform.web.common.ClusterType;
 import com.dfire.platform.web.common.Constants;
 import com.dfire.platform.web.common.ResultMessage;
@@ -66,6 +66,11 @@ public class FlinkDefaultCluster implements Cluster {
     }
 
     @Override
+    public ClusterType clusterType() {
+        return ClusterType.FLINK;
+    }
+
+    @Override
     public void start(ClusterInfo clusterInfo) {
         this.globalClassPath = clusterInfo.getGlobalClassPath();
         Configuration configuration = new Configuration();
@@ -87,67 +92,85 @@ public class FlinkDefaultCluster implements Cluster {
 
     @Override
     public Response send(Request message) throws Exception {
-        if (message instanceof SqlSubmitRequest) {
-            return sendSqlSubmitRequest((SqlSubmitRequest)message);
-        } else if (message instanceof JarSubmitRequest) {
-            return sendJarSubmitRequest((JarSubmitRequest)message);
+        if (message instanceof SqlSubmitFlinkRequest) {
+            return sendSqlSubmitRequest((SqlSubmitFlinkRequest)message);
+        } else if (message instanceof JarSubmitFlinkRequest) {
+            return sendJarSubmitRequest((JarSubmitFlinkRequest)message);
+        } else if (message instanceof CancelFlinkRequest) {
+            return cancelJob((CancelFlinkRequest)message);
+        } else if (message instanceof ListJobFlinkRequest) {
+            return listJob((ListJobFlinkRequest)message);
         } else {
             throw new UnsupportedOperationException("unknow message type:" + message.getClass().getName());
         }
     }
 
-    private Response sendJarSubmitRequest(JarSubmitRequest message) throws Exception {
+    private Response listJob(ListJobFlinkRequest message) throws Exception {
+        return new ListJobFlinkResponse(true,clusterClient.listJobs().get());
+    }
+
+    private Response cancelJob(CancelFlinkRequest message) throws Exception {
+        clusterClient.cancel(JobID.fromByteArray(message.getJobID().getBytes()));
+        return new Response(true);
+    }
+
+    private Response sendJarSubmitRequest(JarSubmitFlinkRequest message) throws Exception {
         if (message.isTest()) {
             throw new UnsupportedOperationException();
         }
-        LOGGER.trace("start submit jar request,entryClass:{}", message.getEntryClass());
+        LOGGER.trace("start submit jar request,entryClass:{}", message.getJarInfoDescriptor().getEntryClass());
         try {
-            PackagedProgram program = new PackagedProgram(new File(message.getJarPath()), message.getEntryClass(),
-                message.getProgramArgs());
+            PackagedProgram program = new PackagedProgram(new File(message.getJarInfoDescriptor().getJarPath()),
+                message.getJarInfoDescriptor().getEntryClass(), message.getJarInfoDescriptor().getProgramArgs());
             ClassLoader classLoader = program.getUserCodeClassLoader();
 
             Optimizer optimizer = new Optimizer(new DataStatistics(), new DefaultCostEstimator(), new Configuration());
-            FlinkPlan plan = ClusterClient.getOptimizedPlan(optimizer, program, message.getParallelism());
+            FlinkPlan plan
+                = ClusterClient.getOptimizedPlan(optimizer, program, message.getJarInfoDescriptor().getParallelism());
             // set up the execution environment
-            List<URL> jarFiles = createPath(message.getJarPath());
+            List<URL> jarFiles = createPath(message.getJarInfoDescriptor().getJarPath());
             JobSubmissionResult submissionResult = clusterClient.run(plan, jarFiles, createGlobalPath(), classLoader);
             LOGGER.trace(" submit jar request sucess,jobId:{}", submissionResult.getJobID());
-            return new SubmitResponse(true, submissionResult.getJobID().toString());
+            return new SubmitFlinkResponse(true, submissionResult.getJobID().toString());
         } catch (Exception e) {
             String term = e.getMessage() == null ? "." : (": " + e.getMessage());
             LOGGER.error(" submit jar request fail", e);
-            return new SubmitResponse(term);
+            return new SubmitFlinkResponse(term);
         }
     }
 
-    private Response sendSqlSubmitRequest(SqlSubmitRequest message) throws Exception {
-        LOGGER.trace("start submit sql request,jobName:{},sql:{}", message.getJobName(), message.getSql());
+    private Response sendSqlSubmitRequest(SqlSubmitFlinkRequest message) throws Exception {
+        LOGGER.trace("start submit sql request,jobName:{},sql:{}", message.getJobName(),
+            message.getSqlInfoDescriptor().getSql());
         if (CollectionUtils.isEmpty(message.getInputs())) {
-            return new SubmitResponse(ResultMessage.SOURCE_EMPTY.getMsg());
+            return new SubmitFlinkResponse(ResultMessage.SOURCE_EMPTY.getMsg());
         }
         if (CollectionUtils.isEmpty(message.getOutputs())) {
-            return new SubmitResponse(ResultMessage.SINK_EMPTY.getMsg());
+            return new SubmitFlinkResponse(ResultMessage.SINK_EMPTY.getMsg());
         }
-        if (StringUtils.isEmpty(message.getSql())) {
-            return new SubmitResponse(ResultMessage.SQL_EMPTY.getMsg());
+        if (StringUtils.isEmpty(message.getSqlInfoDescriptor().getSql())) {
+            return new SubmitFlinkResponse(ResultMessage.SQL_EMPTY.getMsg());
         }
         final StreamExecutionEnvironment execEnv = StreamExecutionEnvironment.createLocalEnvironment();
-        execEnv.setParallelism(message.getParallelism());
+        execEnv.setParallelism(message.getSqlInfoDescriptor().getParallelism());
         execEnv.setRestartStrategy(RestartStrategies.fixedDelayRestart(
-            PropertiesUtils.getProperty(message.getRestartAttempts(), Constants.RESTART_ATTEMPTS),
-            PropertiesUtils.getProperty(message.getDelayBetweenAttempts(), Constants.DELAY_BETWEEN_ATTEMPTS)));
-        if (message.getCheckpointingInterval() != null) {
-            execEnv.enableCheckpointing(message.getCheckpointingInterval());
+            PropertiesUtils.getProperty(message.getSqlInfoDescriptor().getRestartAttempts(),
+                Constants.RESTART_ATTEMPTS),
+            PropertiesUtils.getProperty(message.getSqlInfoDescriptor().getDelayBetweenAttempts(),
+                Constants.DELAY_BETWEEN_ATTEMPTS)));
+        if (message.getSqlInfoDescriptor().getCheckpointingInterval() != null) {
+            execEnv.enableCheckpointing(message.getSqlInfoDescriptor().getCheckpointingInterval());
         }
         StreamTableEnvironment env = StreamTableEnvironment.getTableEnvironment(execEnv);
-        if (StringUtils.isNotEmpty(message.getTimeCharacteristic())) {
-            execEnv.setStreamTimeCharacteristic(TimeCharacteristic.valueOf(message.getTimeCharacteristic()));
+        if (StringUtils.isNotEmpty(message.getSqlInfoDescriptor().getTimeCharacteristic())) {
+            execEnv.setStreamTimeCharacteristic(
+                TimeCharacteristic.valueOf(message.getSqlInfoDescriptor().getTimeCharacteristic()));
         } else {
             execEnv.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime);
         }
         message.getInputs().forEach(consumer -> {
             try {
-                TableSource tableSource = consumer.transform(ClusterType.FLINK);
+                TableSource tableSource = consumer.transform(clusterType());
                 env.registerTableSource(consumer.getName(), tableSource);
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -157,7 +180,7 @@ public class FlinkDefaultCluster implements Cluster {
             message.getUserDefineFunctions().forEach(consumer -> {
                 Object udf = null;
                 try {
-                    udf = consumer.transform(ClusterType.FLINK);
+                    udf = consumer.transform(clusterType());
                     if (udf instanceof FlinkAllTableFunction) {
                         env.registerFunction(consumer.getName(), (FlinkAllTableFunction)udf);
                     } else if (udf instanceof FlinkAllAggregateFunction) {
@@ -173,10 +196,10 @@ public class FlinkDefaultCluster implements Cluster {
 
             });
         }
-        Table table = env.sqlQuery(message.getSql());
+        Table table = env.sqlQuery(message.getSqlInfoDescriptor().getSql());
         message.getOutputs().forEach(consumer -> {
             try {
-                table.writeToSink(consumer.transform(ClusterType.FLINK));
+                table.writeToSink(consumer.transform(clusterType()));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -187,18 +210,18 @@ public class FlinkDefaultCluster implements Cluster {
         }
         StreamGraph streamGraph = execEnv.getStreamGraph();
         streamGraph.setJobName(message.getJobName());
-        List<URL> jarFiles = createPath(message.getJarPath());
+        List<URL> jarFiles = createPath(message.getSqlInfoDescriptor().getJarPath());
         ClassLoader usercodeClassLoader
             = JobWithJars.buildUserCodeClassLoader(jarFiles, createGlobalPath(), getClass().getClassLoader());
         try {
             JobSubmissionResult submissionResult
                 = clusterClient.run(streamGraph, jarFiles, Collections.emptyList(), usercodeClassLoader);
             LOGGER.trace(" submit sql request success,jobId:{}", submissionResult.getJobID());
-            return new SubmitResponse(true, submissionResult.getJobID().toString());
+            return new SubmitFlinkResponse(true, submissionResult.getJobID().toString());
         } catch (Exception e) {
             String term = e.getMessage() == null ? "." : (": " + e.getMessage());
             LOGGER.error(" submit sql request fail", e);
-            return new SubmitResponse(term);
+            return new SubmitFlinkResponse(term);
         }
     }
 

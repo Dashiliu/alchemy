@@ -4,6 +4,7 @@ import java.lang.reflect.Type;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import com.dfire.platform.api.function.StreamAggregateFunction;
@@ -22,9 +23,10 @@ import com.dfire.platform.web.common.ReadMode;
  * @author congbai
  * @date 01/06/2018
  */
+@Component
 public class UdfDescriptor implements Descriptor {
 
-    private ReadMode readMode = ReadMode.CODE;
+    private int readMode = ReadMode.CODE.getMode();
 
     private String name;
 
@@ -39,11 +41,11 @@ public class UdfDescriptor implements Descriptor {
         Type type = clazz.getGenericSuperclass();
     }
 
-    public ReadMode getReadMode() {
+    public int getReadMode() {
         return readMode;
     }
 
-    public void setReadMode(ReadMode readMode) {
+    public void setReadMode(int readMode) {
         this.readMode = readMode;
     }
 
@@ -54,6 +56,11 @@ public class UdfDescriptor implements Descriptor {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String getContentType() {
+        return "udf";
     }
 
     @Override

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.DisposableBean;
 
 import com.dfire.platform.web.cluster.request.Request;
 import com.dfire.platform.web.cluster.response.Response;
+import com.dfire.platform.web.common.ClusterType;
 
 /**
  * @author congbai
@@ -12,6 +13,8 @@ import com.dfire.platform.web.cluster.response.Response;
 public interface Cluster extends DisposableBean {
 
     String name();
+
+    ClusterType clusterType();
 
     void start(ClusterInfo clusterInfo);
 

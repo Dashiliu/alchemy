@@ -24,14 +24,11 @@ public class AcJob {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "cluster")
+    private String cluster;
+
     @Column(name = "submit_mode")
     private int submitMode;
-
-    @Column(name = "job_id")
-    private String jobId;
-
-    @Column(name = "job_name")
-    private String jobName;
 
     @Column(name = "status")
     private int status;
@@ -69,28 +66,20 @@ public class AcJob {
         this.name = name;
     }
 
+    public String getCluster() {
+        return cluster;
+    }
+
+    public void setCluster(String cluster) {
+        this.cluster = cluster;
+    }
+
     public int getSubmitMode() {
         return submitMode;
     }
 
     public void setSubmitMode(int submitMode) {
         this.submitMode = submitMode;
-    }
-
-    public String getJobId() {
-        return jobId;
-    }
-
-    public void setJobId(String jobId) {
-        this.jobId = jobId;
-    }
-
-    public String getJobName() {
-        return jobName;
-    }
-
-    public void setJobName(String jobName) {
-        this.jobName = jobName;
     }
 
     public int getStatus() {

@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import com.dfire.platform.web.cluster.ClusterInfo;
 import com.dfire.platform.web.cluster.FlinkDefaultCluster;
-import com.dfire.platform.web.cluster.request.SqlSubmitRequest;
+import com.dfire.platform.web.cluster.request.SqlSubmitFlinkRequest;
 import com.dfire.platform.web.cluster.response.Response;
 import com.dfire.platform.web.common.Field;
 import com.dfire.platform.web.common.ReadMode;
@@ -49,7 +49,7 @@ public class FlinkClusterTest {
 
     @Test
     public void sendScalarSql() throws Exception {
-        SqlSubmitRequest sqlSubmitRequest = createSqlRequest(createScalarInputs(), createScalarUdfs(),
+        SqlSubmitFlinkRequest sqlSubmitRequest = createSqlRequest(createScalarInputs(), createScalarUdfs(),
             createEsOutputs(), "select scalarF(id) as id,CURRENT_DATE as createTime from kafka_table_test",
             "flinkClusterTest-ScalarSQL");
         Response resp = this.cluster.send(sqlSubmitRequest);
@@ -58,7 +58,7 @@ public class FlinkClusterTest {
 
     @Test
     public void sendTableSql() throws Exception {
-        SqlSubmitRequest sqlSubmitRequest
+        SqlSubmitFlinkRequest sqlSubmitRequest
             = createSqlRequest(createTableInputs(), createTableUdfs(), createHbaseOutputs(),
                 "SELECT s as body,id FROM kafka_table_test, LATERAL TABLE(tableF(id,999999988889)) as T(s)",
                 "flinkClusterTest-TableSQL");
@@ -68,7 +68,7 @@ public class FlinkClusterTest {
 
     @Test
     public void sendAggreSql() throws Exception {
-        SqlSubmitRequest sqlSubmitRequest = createSqlRequest(createAggreInputs(), createAggreUdfs(),
+        SqlSubmitFlinkRequest sqlSubmitRequest = createSqlRequest(createAggreInputs(), createAggreUdfs(),
             createKafkaOutputs(),
             "select aggreF(id) as id from kafka_table_test GROUP BY HOP(ptime, INTERVAL '10' SECOND, INTERVAL '1' SECOND)",
             "flinkClusterTest-AggreSQL");
@@ -76,14 +76,14 @@ public class FlinkClusterTest {
         assert resp.isSuccess();
     }
 
-    private SqlSubmitRequest createSqlRequest(List<SourceDescriptor> inputs, List<UdfDescriptor> udfs,
+    private SqlSubmitFlinkRequest createSqlRequest(List<SourceDescriptor> inputs, List<UdfDescriptor> udfs,
         List<SinkDescriptor> outputs, String sql, String jobName) {
-        SqlSubmitRequest sqlSubmitRequest = new SqlSubmitRequest();
+        SqlSubmitFlinkRequest sqlSubmitRequest = new SqlSubmitFlinkRequest();
         sqlSubmitRequest.setCheckpointingInterval(10000L);
         sqlSubmitRequest.setJobName(jobName);
         sqlSubmitRequest.setJarPath(
             "/Users/dongbinglin/Code/platform/stream/stream-connectors/target/stream-connectors-1.0-SNAPSHOT.jar");
-        sqlSubmitRequest.setClusterName("test");
+        sqlSubmitRequest.setCluster("test");
         sqlSubmitRequest.setInputs(inputs);
         sqlSubmitRequest.setUserDefineFunctions(udfs);
         sqlSubmitRequest.setOutputs(outputs);

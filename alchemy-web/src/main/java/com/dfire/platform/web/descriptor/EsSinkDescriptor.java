@@ -1,5 +1,6 @@
 package com.dfire.platform.web.descriptor;
 
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import com.dfire.platform.connectors.elasticsearch.ElasticsearchTableSink;
@@ -9,6 +10,7 @@ import com.dfire.platform.web.common.ClusterType;
  * @author congbai
  * @date 03/06/2018
  */
+@Component
 public class EsSinkDescriptor extends SinkDescriptor {
 
     private String address;
@@ -49,6 +51,11 @@ public class EsSinkDescriptor extends SinkDescriptor {
 
     public void setBufferSize(int bufferSize) {
         this.bufferSize = bufferSize;
+    }
+
+    @Override
+    public String getContentType() {
+        return "esSink";
     }
 
     @Override

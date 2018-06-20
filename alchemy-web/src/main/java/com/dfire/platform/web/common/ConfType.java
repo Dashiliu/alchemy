@@ -6,7 +6,7 @@ package com.dfire.platform.web.common;
  */
 public enum ConfType {
 
-    JAR(0), SOURCE(1), UDF(2), SINK(3), BASE(4)
+    JAR(0), SOURCE(1), UDF(2), SINK(3), SQL(4)
 
     ;
 
@@ -14,5 +14,18 @@ public enum ConfType {
 
     ConfType(int type) {
         this.type = type;
+    }
+
+    public static ConfType fromType(int type) {
+        for (ConfType b : values()) {
+            if (b != null && b.getType() == type) {
+                return b;
+            }
+        }
+        return null;
+    }
+
+    public int getType() {
+        return type;
     }
 }

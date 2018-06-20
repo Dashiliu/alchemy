@@ -27,6 +27,9 @@ public class AcJobConf {
     @Column(name = "type")
     private int type;
 
+    @Column(name = "is_valid")
+    private int isValid;
+
     @Column(name = "create_time")
     private Date createTime = null;
 
@@ -63,6 +66,14 @@ public class AcJobConf {
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public int getIsValid() {
+        return isValid;
+    }
+
+    public void setIsValid(int isValid) {
+        this.isValid = isValid;
     }
 
     public Date getCreateTime() {

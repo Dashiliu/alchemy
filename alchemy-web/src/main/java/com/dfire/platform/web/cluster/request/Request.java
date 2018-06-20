@@ -8,7 +8,7 @@ package com.dfire.platform.web.cluster.request;
  */
 public interface Request {
 
-    String getClusterName();
+    String getCluster();
 
     boolean isTest();
 }

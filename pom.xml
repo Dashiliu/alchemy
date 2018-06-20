@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.dfire</groupId>
-        <artifactId>parent-all</artifactId>
-        <version>1.0.3</version>
+        <artifactId>spring-boot-parent</artifactId>
+        <groupId>com.2dfire.spring.boot</groupId>
+        <version>1.5.10-2.RELEASE</version>
     </parent>
 
     <groupId>com.dfire.platform</groupId>
@@ -30,11 +30,24 @@
         <scala.version>2.11.11</scala.version>
         <common-lang3.version>3.4</common-lang3.version>
         <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
         <groovy.version>2.4.11</groovy.version>
-        <springboot.version>1.5.7.RELEASE</springboot.version>
         <fastjson.version>1.2.37</fastjson.version>
         <redis.version>1.4.0</redis.version>
+        <lombok.version>1.16.18</lombok.version>
+        <fastjson.versoiin>1.2.46</fastjson.versoiin>
+        <p3c.pmd.version>1.3.0</p3c.pmd.version>
+        <spring.boot.version>1.5.7.RELEASE</spring.boot.version>
+        <protostuff.version>1.4.4</protostuff.version>
+        <gson.version>2.8.2</gson.version>
+        <HikariCP.versoin>2.6.0</HikariCP.versoin>
+        <disruptor.version>3.3.6</disruptor.version>
+        <commons-lang3.version>3.5</commons-lang3.version>
+        <guava.version>21.0</guava.version>
+        <mysql.version>5.1.44</mysql.version>
+        <disconf.version>2.6.35</disconf.version>
+        <flame.version>1.0.5</flame.version>
+        <dfire.springboot.versoin>1.2.0</dfire.springboot.versoin>
+        <springboot.druid.verson>1.1.6</springboot.druid.verson>
     </properties>
 
     <dependencies>
@@ -121,22 +134,82 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter</artifactId>
-                <version>${springboot.version}</version>
+                <version>${spring.boot.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-web</artifactId>
-                <version>${springboot.version}</version>
+                <version>${spring.boot.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-configuration-processor</artifactId>
-                <version>${springboot.version}</version>
+                <version>${spring.boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid-spring-boot-starter</artifactId>
+                <version>${springboot.druid.verson}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-data-jpa</artifactId>
-                <version>${springboot.version}</version>
+                <version>${spring.boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baidu.disconf</groupId>
+                <artifactId>disconf-client</artifactId>
+                <version>${disconf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>${gson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.versoiin}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.dfire.soa</groupId>
+                <artifactId>flame-client</artifactId>
+                <version>${flame.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.zaxxer</groupId>
+                <artifactId>HikariCP</artifactId>
+                <version>${HikariCP.versoin}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.protostuff</groupId>
+                <artifactId>protostuff-core</artifactId>
+                <version>${protostuff.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.protostuff</groupId>
+                <artifactId>protostuff-runtime</artifactId>
+                <version>${protostuff.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.2dfire.spring.boot</groupId>
+                <artifactId>spring-boot-starter-monitor</artifactId>
+                <version>${dfire.springboot.versoin}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -176,7 +249,7 @@
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
-                    <version>${springboot.version}</version>
+                    <version>${spring.boot.version}</version>
                     <executions>
                         <execution>
                             <goals>

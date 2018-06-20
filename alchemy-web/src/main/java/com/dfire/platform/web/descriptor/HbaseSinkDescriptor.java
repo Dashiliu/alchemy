@@ -1,5 +1,6 @@
 package com.dfire.platform.web.descriptor;
 
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import com.dfire.platform.api.sink.HbaseInvoker;
@@ -11,9 +12,10 @@ import com.dfire.platform.web.common.ReadMode;
  * @author congbai
  * @date 03/06/2018
  */
+@Component
 public class HbaseSinkDescriptor extends SinkDescriptor {
 
-    private ReadMode readMode = ReadMode.CODE;
+    private int readMode = ReadMode.CODE.getMode();
 
     private String zookeeper;
 
@@ -67,11 +69,11 @@ public class HbaseSinkDescriptor extends SinkDescriptor {
         this.bufferSize = bufferSize;
     }
 
-    public ReadMode getReadMode() {
+    public int getReadMode() {
         return readMode;
     }
 
-    public void setReadMode(ReadMode readMode) {
+    public void setReadMode(int readMode) {
         this.readMode = readMode;
     }
 
@@ -81,6 +83,11 @@ public class HbaseSinkDescriptor extends SinkDescriptor {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    @Override
+    public String getContentType() {
+        return "hbaseSink";
     }
 
     @Override

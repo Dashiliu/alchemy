@@ -1,14 +1,15 @@
 package com.dfire.platform.web.descriptor;
 
+import org.springframework.stereotype.Component;
+
 /**
  * 提交sql job的基本信息
  *
  * @author congbai
  * @date 01/06/2018
  */
+@Component
 public class SqlInfoDescriptor extends BasicDescriptor {
-
-    private String clusterName;
 
     private String jarPath;
 
@@ -24,18 +25,14 @@ public class SqlInfoDescriptor extends BasicDescriptor {
 
     private String sql;
 
+    @Override
+    public String getContentType() {
+        return "sql";
+    }
 
     @Override
     public void validate() throws Exception {
         //// TODO: 2018/6/8
-    }
-
-    public String getClusterName() {
-        return clusterName;
-    }
-
-    public void setClusterName(String clusterName) {
-        this.clusterName = clusterName;
     }
 
     public String getJarPath() {

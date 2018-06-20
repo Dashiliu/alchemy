@@ -1,12 +1,25 @@
 package com.dfire.platform.web.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import com.dfire.platform.web.service.dto.JobDTO;
+import com.dfire.platform.web.web.vm.JobVM;
+
 /**
+ * 对job的增删改查
+ * 
  * @author congbai
  * @date 2018/6/8
  */
 public interface JobService {
 
-    void save();
+    void save(JobVM jobVM);
 
+    Page<JobDTO> list(Pageable pageable);
+
+    void updateStatus(Long id, int status);
+
+    void delete(Long id);
 
 }

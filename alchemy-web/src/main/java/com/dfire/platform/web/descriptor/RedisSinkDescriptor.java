@@ -1,5 +1,6 @@
 package com.dfire.platform.web.descriptor;
 
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import com.dfire.platform.web.common.ClusterType;
@@ -9,6 +10,7 @@ import com.dfire.platform.web.common.Constants;
  * @author congbai
  * @date 03/06/2018
  */
+@Component
 public class RedisSinkDescriptor extends SinkDescriptor {
 
     private String sentinels;
@@ -69,6 +71,11 @@ public class RedisSinkDescriptor extends SinkDescriptor {
 
     public void setThread(Integer thread) {
         this.thread = thread;
+    }
+
+    @Override
+    public String getContentType() {
+        return "redisSink";
     }
 
     @Override

@@ -6,9 +6,9 @@ package com.dfire.platform.web.cluster.response;
  */
 public class Response {
 
-    private boolean success;
+    protected boolean success;
 
-    private String message;
+    protected String message;
 
     public Response(boolean success) {
         this.success = success;

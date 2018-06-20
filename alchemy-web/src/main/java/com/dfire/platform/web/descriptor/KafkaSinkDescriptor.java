@@ -7,6 +7,7 @@ import java.util.Properties;
 import org.apache.flink.streaming.connectors.kafka.Kafka010JsonTableSink;
 import org.apache.flink.util.Preconditions;
 import org.apache.kafka.clients.CommonClientConfigs;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import com.dfire.platform.web.common.ClusterType;
@@ -16,6 +17,7 @@ import com.dfire.platform.web.util.PropertiesUtils;
  * @author congbai
  * @date 06/06/2018
  */
+@Component
 public class KafkaSinkDescriptor extends SinkDescriptor {
 
     private String topic;
@@ -46,6 +48,11 @@ public class KafkaSinkDescriptor extends SinkDescriptor {
 
     public void setProperties(Map<String, String> properties) {
         this.properties = properties;
+    }
+
+    @Override
+    public String getContentType() {
+        return "kafkaSink";
     }
 
     @Override

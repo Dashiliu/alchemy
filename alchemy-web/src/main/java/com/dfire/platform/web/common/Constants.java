@@ -46,4 +46,16 @@ public class Constants {
      */
     public static final int REDIS_MAX_THREAD_SIZE = 20;
 
+    public static final String SUBMIT_LOCK_PREFIX = "al:submit:lock:";
+
+    public static final int SUBMIT_LOCK_TIME = 300;
+
+    public static final String STATUS_KEY = "al:status";
+
+    public static final int STATUS_TIME = 24 * 60 * 60;
+
+    public static final String STATUS_LOCK_PREFIX = "al:status:lock:";
+
+    public static final int STATUS_LOCK_TIME = 300;
+
 }

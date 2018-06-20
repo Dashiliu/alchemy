@@ -10,6 +10,8 @@ public interface Descriptor {
 
     String getName();
 
+    String getContentType();
+
     <T> T transform(ClusterType clusterType) throws Exception;
 
     void validate() throws Exception;
