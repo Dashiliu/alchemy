@@ -1,5 +1,7 @@
-com/dfire/platform/connectors/elasticsearch/JsonRowStringSchema.class
-com/dfire/platform/connectors/hbase/HbaseTableSink$HBaseOutputFormat.class
-com/dfire/platform/connectors/elasticsearch/ElasticsearchTableSink.class
-com/dfire/platform/connectors/hbase/HbaseTableSink.class
-com/dfire/platform/connectors/elasticsearch/ElasticsearchTableFunction.class
+com/dfire/platform/alchemy/connectors/hbase/HbaseTableSink.class
+com/dfire/platform/alchemy/connectors/hbase/HBaseOutputFormat.class
+com/dfire/platform/alchemy/connectors/redis/RedisSinkFunction.class
+com/dfire/platform/alchemy/connectors/elasticsearch/JsonRowStringSchema.class
+com/dfire/platform/alchemy/connectors/redis/RedisTableSink.class
+com/dfire/platform/alchemy/connectors/elasticsearch/ElasticsearchTableSink.class
+com/dfire/platform/alchemy/connectors/elasticsearch/ElasticsearchTableFunction.class

@@ -2,7 +2,7 @@ package web.descriptor;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.dfire.platform.api.function.StreamScalarFunction;
+import com.dfire.platform.alchemy.api.function.StreamScalarFunction;
 
 /**
  * @author congbai

@@ -6,11 +6,11 @@ import java.lang.reflect.InvocationTargetException;
 import org.apache.flink.table.functions.FunctionContext;
 import org.junit.Test;
 
-import com.dfire.platform.api.function.aggregate.FlinkAllAggregateFunction;
-import com.dfire.platform.api.function.scalar.FlinkAllScalarFunction;
-import com.dfire.platform.web.common.ClusterType;
-import com.dfire.platform.web.common.ReadMode;
-import com.dfire.platform.web.descriptor.UdfDescriptor;
+import com.dfire.platform.alchemy.api.function.aggregate.FlinkAllAggregateFunction;
+import com.dfire.platform.alchemy.api.function.scalar.FlinkAllScalarFunction;
+import com.dfire.platform.alchemy.web.common.ClusterType;
+import com.dfire.platform.alchemy.web.common.ReadMode;
+import com.dfire.platform.alchemy.web.descriptor.UdfDescriptor;
 
 /**
  * @author congbai
@@ -32,7 +32,7 @@ public class UdfDescriptorTest {
     @Test
     public void transformCode() throws Exception {
         UdfDescriptor udfDescriptor = new UdfDescriptor();
-        udfDescriptor.setReadMode(ReadMode.CODE);
+        udfDescriptor.setReadMode(ReadMode.CODE.getMode());
         udfDescriptor.setName("transformCode");
         udfDescriptor.setValue("import com.dfire.platform.api.function.StreamScalarFunction;\n" + "\n" + "/**\n"
             + " * @author congbai\n" + " * @date 06/06/2018\n" + " */\n"
@@ -48,7 +48,7 @@ public class UdfDescriptorTest {
     @Test
     public void transformClass() throws Exception {
         UdfDescriptor udfDescriptor = new UdfDescriptor();
-        udfDescriptor.setReadMode(ReadMode.JAR);
+        udfDescriptor.setReadMode(ReadMode.JAR.getMode());
         udfDescriptor.setName("transformCode");
         udfDescriptor.setValue("web.descriptor.TestFunction");
         FlinkAllAggregateFunction udf = udfDescriptor.transform(ClusterType.FLINK);

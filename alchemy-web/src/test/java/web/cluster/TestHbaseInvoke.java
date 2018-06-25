@@ -1,6 +1,6 @@
 package web.cluster;
 
-import com.dfire.platform.api.sink.HbaseInvoker;
+import com.dfire.platform.alchemy.api.sink.HbaseInvoker;
 
 /**
  * @author congbai

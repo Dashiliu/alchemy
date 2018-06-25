@@ -4,20 +4,20 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.dfire.platform.alchemy.web.descriptor.*;
 import org.apache.flink.runtime.jobmanager.HighAvailabilityMode;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.dfire.platform.web.cluster.ClusterInfo;
-import com.dfire.platform.web.cluster.FlinkDefaultCluster;
-import com.dfire.platform.web.cluster.request.SqlSubmitFlinkRequest;
-import com.dfire.platform.web.cluster.response.Response;
-import com.dfire.platform.web.common.Field;
-import com.dfire.platform.web.common.ReadMode;
-import com.dfire.platform.web.common.Table;
-import com.dfire.platform.web.common.TimeAttribute;
-import com.dfire.platform.web.descriptor.*;
+import com.dfire.platform.alchemy.web.cluster.ClusterInfo;
+import com.dfire.platform.alchemy.web.cluster.FlinkDefaultCluster;
+import com.dfire.platform.alchemy.web.cluster.request.SqlSubmitFlinkRequest;
+import com.dfire.platform.alchemy.web.cluster.response.Response;
+import com.dfire.platform.alchemy.web.common.Field;
+import com.dfire.platform.alchemy.web.common.ReadMode;
+import com.dfire.platform.alchemy.web.common.Table;
+import com.dfire.platform.alchemy.web.common.TimeAttribute;
 
 /**
  * @author congbai
@@ -77,18 +77,21 @@ public class FlinkClusterTest {
     }
 
     private SqlSubmitFlinkRequest createSqlRequest(List<SourceDescriptor> inputs, List<UdfDescriptor> udfs,
-        List<SinkDescriptor> outputs, String sql, String jobName) {
+                                                   List<SinkDescriptor> outputs, String sql, String jobName) {
         SqlSubmitFlinkRequest sqlSubmitRequest = new SqlSubmitFlinkRequest();
-        sqlSubmitRequest.setCheckpointingInterval(10000L);
-        sqlSubmitRequest.setJobName(jobName);
-        sqlSubmitRequest.setJarPath(
+        SqlInfoDescriptor sqlInfoDescriptor=new SqlInfoDescriptor();
+        sqlInfoDescriptor.setCheckpointingInterval(10000L);
+        sqlInfoDescriptor.setParallelism(1);
+        sqlInfoDescriptor.setSql(sql);
+        sqlInfoDescriptor.setJarPath(
             "/Users/dongbinglin/Code/platform/stream/stream-connectors/target/stream-connectors-1.0-SNAPSHOT.jar");
+        sqlSubmitRequest.setSqlInfoDescriptor(sqlInfoDescriptor);
+        sqlSubmitRequest.setJobName(jobName);
         sqlSubmitRequest.setCluster("test");
         sqlSubmitRequest.setInputs(inputs);
         sqlSubmitRequest.setUserDefineFunctions(udfs);
         sqlSubmitRequest.setOutputs(outputs);
-        sqlSubmitRequest.setParallelism(1);
-        sqlSubmitRequest.setSql(sql);
+
         sqlSubmitRequest.setTest(true);
         return sqlSubmitRequest;
     }
@@ -164,12 +167,12 @@ public class FlinkClusterTest {
         List<UdfDescriptor> udfs = new ArrayList<>(1);
         UdfDescriptor udfDescriptor = new UdfDescriptor();
         udfDescriptor.setName("scalarF");
-        udfDescriptor.setValue("import com.dfire.platform.api.function.StreamScalarFunction;\n" + "\n" + "/**\n"
+        udfDescriptor.setValue("import com.dfire.platform.alchemy.api.function.StreamScalarFunction;\n" + "\n" + "/**\n"
             + " * @author congbai\n" + " * @date 06/06/2018\n" + " */\n"
             + "public class TestFunction implements StreamScalarFunction<String> {\n" + "\n" + "    @Override\n"
             + "    public  String invoke(Object... args) {\n" + "        String result=2222;\n"
             + "        return  String.valueOf(result);\n" + "    }\n" + "}\n");
-        udfDescriptor.setReadMode(ReadMode.CODE);
+        udfDescriptor.setReadMode(ReadMode.CODE.getMode());
         udfs.add(udfDescriptor);
         return udfs;
     }
@@ -178,12 +181,12 @@ public class FlinkClusterTest {
         List<UdfDescriptor> udfs = new ArrayList<>(1);
         UdfDescriptor udfDescriptor = new UdfDescriptor();
         udfDescriptor.setName("tableF");
-        udfDescriptor.setValue("import com.dfire.platform.api.function.StreamTableFunction;\n" + "\n" + "/**\n"
+        udfDescriptor.setValue("import com.dfire.platform.alchemy.api.function.StreamTableFunction;\n" + "\n" + "/**\n"
             + " * @author congbai\n" + " * @date 06/06/2018\n" + " */\n"
             + "public class TestTableFunction extends StreamTableFunction<String> {\n" + "\n" + "\n" + "    @Override\n"
             + "    public void invoke(Object... args) {\n" + "        for(Object arg:args){\n"
             + "            collect(String.valueOf(arg));\n" + "        }\n" + "    }\n" + "}\n");
-        udfDescriptor.setReadMode(ReadMode.CODE);
+        udfDescriptor.setReadMode(ReadMode.CODE.getMode());
         udfs.add(udfDescriptor);
         return udfs;
     }
@@ -193,7 +196,7 @@ public class FlinkClusterTest {
         UdfDescriptor udfDescriptor = new UdfDescriptor();
         udfDescriptor.setName("aggreF");
         udfDescriptor.setValue("import java.util.ArrayList;\n" + "import java.util.List;\n" + "\n"
-            + "import com.dfire.platform.api.function.StreamAggregateFunction;\n" + "\n" + "/**\n"
+            + "import com.dfire.platform.alchemy.api.function.StreamAggregateFunction;\n" + "\n" + "/**\n"
             + " * @author congbai\n" + " * @date 06/06/2018\n" + " */\n"
             + "public class TestAggreFunction implements StreamAggregateFunction<String, List, Integer> {\n" + "\n"
             + "    @Override\n" + "    public List createAccumulator() {\n" + "        return new ArrayList();\n"
@@ -201,7 +204,7 @@ public class FlinkClusterTest {
             + "        accumulator.add(value);\n" + "    }\n" + "\n" + "    @Override\n"
             + "    public Integer getValue(List accumulator) {\n" + "        return accumulator.size();\n" + "    }\n"
             + "}\n");
-        udfDescriptor.setReadMode(ReadMode.CODE);
+        udfDescriptor.setReadMode(ReadMode.CODE.getMode());
         udfs.add(udfDescriptor);
         return udfs;
     }
@@ -237,7 +240,7 @@ public class FlinkClusterTest {
         sinkDescriptor.setNode("/hbase-unsecure");
         sinkDescriptor.setTableName("flink-test");
         sinkDescriptor.setZookeeper("10.1.22.21:2181,10.1.22.22:2181,10.1.22.23:2181");
-        sinkDescriptor.setReadMode(ReadMode.JAR);
+        sinkDescriptor.setReadMode(ReadMode.JAR.getMode());
         sinkDescriptor.setValue("web.cluster.TestHbaseInvoke");
         // sinkDescriptor.setValue("import com.dfire.platform.api.sink.HbaseInvoker;\n" +
         // "\n" +

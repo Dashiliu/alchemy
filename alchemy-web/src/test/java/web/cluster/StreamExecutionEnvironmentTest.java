@@ -29,8 +29,8 @@ import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.junit.Test;
 
-import com.dfire.platform.api.function.aggregate.FlinkAllAggregateFunction;
-import com.dfire.platform.web.util.PropertiesUtils;
+import com.dfire.platform.alchemy.api.function.aggregate.FlinkAllAggregateFunction;
+import com.dfire.platform.alchemy.web.util.PropertiesUtils;
 
 /**
  * @author congbai

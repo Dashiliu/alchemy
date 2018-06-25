@@ -3,7 +3,7 @@ package web.descriptor;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.dfire.platform.api.function.StreamAggregateFunction;
+import com.dfire.platform.alchemy.api.function.StreamAggregateFunction;
 
 /**
  * @author congbai

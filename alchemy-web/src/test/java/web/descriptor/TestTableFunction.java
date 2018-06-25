@@ -1,6 +1,6 @@
 package web.descriptor;
 
-import com.dfire.platform.api.function.StreamTableFunction;
+import com.dfire.platform.alchemy.api.function.StreamTableFunction;
 
 /**
  * @author congbai
