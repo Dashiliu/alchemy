@@ -16,6 +16,7 @@ import { AlchemyAppRoutingModule } from './app-routing.module';
 import { AlchemyHomeModule } from './home/home.module';
 import { AlchemyAccountModule } from './account/account.module';
 import { AlchemyEntityModule } from './entities/entity.module';
+import { CodemirrorModule } from 'ng2-codemirror';
 // jhipster-needle-angular-add-module-import JHipster will add new module here
 import { JhiMainComponent, NavbarComponent, FooterComponent, PageRibbonComponent, ErrorComponent } from './layouts';
 
@@ -28,7 +29,8 @@ import { JhiMainComponent, NavbarComponent, FooterComponent, PageRibbonComponent
         AlchemyCoreModule,
         AlchemyHomeModule,
         AlchemyAccountModule,
-        AlchemyEntityModule
+        AlchemyEntityModule,
+        CodemirrorModule
         // jhipster-needle-angular-add-module JHipster will add new module here
     ],
     declarations: [JhiMainComponent, NavbarComponent, ErrorComponent, PageRibbonComponent, FooterComponent],

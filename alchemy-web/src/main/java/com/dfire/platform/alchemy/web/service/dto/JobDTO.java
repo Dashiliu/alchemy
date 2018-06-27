@@ -8,17 +8,15 @@ import java.util.Date;
  */
 public class JobDTO {
 
-    private String id;
+    private Long id;
 
-    private String acServiceId;
+    private Long acServiceId;
 
     private String name;
 
     private int submitMode;
 
-    private String jobId;
-
-    private String jobName;
+    private String cluster;
 
     private int status;
 
@@ -26,19 +24,19 @@ public class JobDTO {
 
     private Date updateTime;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public String getAcServiceId() {
+    public Long getAcServiceId() {
         return acServiceId;
     }
 
-    public void setAcServiceId(String acServiceId) {
+    public void setAcServiceId(Long acServiceId) {
         this.acServiceId = acServiceId;
     }
 
@@ -50,6 +48,14 @@ public class JobDTO {
         this.name = name;
     }
 
+    public String getCluster() {
+        return cluster;
+    }
+
+    public void setCluster(String cluster) {
+        this.cluster = cluster;
+    }
+
     public int getSubmitMode() {
         return submitMode;
     }
@@ -58,21 +64,6 @@ public class JobDTO {
         this.submitMode = submitMode;
     }
 
-    public String getJobId() {
-        return jobId;
-    }
-
-    public void setJobId(String jobId) {
-        this.jobId = jobId;
-    }
-
-    public String getJobName() {
-        return jobName;
-    }
-
-    public void setJobName(String jobName) {
-        this.jobName = jobName;
-    }
 
     public int getStatus() {
         return status;

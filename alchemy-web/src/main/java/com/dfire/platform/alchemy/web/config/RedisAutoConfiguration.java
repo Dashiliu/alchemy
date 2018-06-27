@@ -35,7 +35,7 @@ public class RedisAutoConfiguration {
         this.properties = properties;
     }
 
-    @Bean
+    @Bean(initMethod = "init")
     public ICacheService cacheService() {
         RedisSentinelService redisSentinelService = new RedisSentinelService();
         redisSentinelService.setDatabase(properties.getDatabase());

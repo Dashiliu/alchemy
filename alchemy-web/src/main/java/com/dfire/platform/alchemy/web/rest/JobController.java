@@ -1,22 +1,26 @@
 package com.dfire.platform.alchemy.web.rest;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.dfire.platform.alchemy.web.repository.AcServiceRepository;
+import com.dfire.platform.alchemy.web.rest.util.HeaderUtil;
+import com.dfire.platform.alchemy.web.rest.util.PaginationUtil;
 import com.dfire.platform.alchemy.web.rest.vm.JobVM;
 import com.dfire.platform.alchemy.web.service.JobService;
 import com.dfire.platform.alchemy.web.service.dto.JobDTO;
-import com.twodfire.share.result.Result;
-import com.twodfire.share.result.ResultSupport;
-import com.twodfire.share.util.ResultUtil;
-
-import io.swagger.annotations.ApiParam;
 
 /**
  * @author congbai
@@ -37,30 +41,28 @@ public class JobController {
         this.jobService = jobService;
     }
 
-    @PostMapping("/job")
-    @ResponseBody
-    public Result create(@Valid @RequestBody JobVM jobVM) {
+    @PostMapping("/jobs")
+    public ResponseEntity<JobDTO> createJob(@Valid @RequestBody JobVM jobVM) throws URISyntaxException {
         LOGGER.debug("REST request to save job : {}", jobVM);
+
         jobService.save(jobVM);
-        return ResultUtil.defaultResult();
+        return ResponseEntity.created(new URI("/api/jobs/")).headers(HeaderUtil.createAlert("A job is created ", null))
+            .build();
+
     }
 
-    @GetMapping("/job")
-    @ResponseBody
-    public Result<JobDTO> getAllJobs(@ApiParam Pageable pageable) {
+    @GetMapping("/jobs")
+    public ResponseEntity<List<JobDTO>> getAllJobs(Pageable pageable) {
         final Page<JobDTO> page = jobService.list(pageable);
-        ResultSupport resultSupport = new ResultSupport();
-        resultSupport.setModel(page.getContent());
-        resultSupport.setTotalRecord(Integer.parseInt(String.valueOf(page.getTotalElements())));
-        return resultSupport;
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/jobs");
+        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
 
-    @DeleteMapping("/job/{id}")
-    @ResponseBody
-    public Result deleteService(@PathVariable Long id) {
-        LOGGER.debug("REST request to delete job : {}", id);
+    @DeleteMapping("/jobs/{id}")
+    public ResponseEntity<Void> deleteJob(@PathVariable Long id) {
+        LOGGER.debug("REST request to delete Job: {}", id);
         jobService.delete(id);
-        return ResultUtil.defaultResult();
+        return ResponseEntity.ok().headers(HeaderUtil.createAlert("A job is deleted  ", null)).build();
     }
 
 }

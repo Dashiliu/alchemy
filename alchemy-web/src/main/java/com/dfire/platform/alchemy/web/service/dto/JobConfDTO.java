@@ -8,7 +8,7 @@ import java.util.Date;
  */
 public class JobConfDTO {
 
-    private String id;
+    private Long id;
 
     private String acJobId;
 
@@ -20,11 +20,11 @@ public class JobConfDTO {
 
     private Date updateTime;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

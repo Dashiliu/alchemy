@@ -4,6 +4,9 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+
 import org.springframework.boot.actuate.audit.AuditEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,8 +15,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.dfire.platform.alchemy.web.common.Status;
+import com.dfire.platform.alchemy.web.rest.util.HeaderUtil;
 import com.dfire.platform.alchemy.web.rest.util.PaginationUtil;
+import com.dfire.platform.alchemy.web.rest.vm.JobFailVM;
 import com.dfire.platform.alchemy.web.service.AuditEventService;
+import com.dfire.platform.alchemy.web.service.ClusterJobService;
+import com.dfire.platform.alchemy.web.service.JobFailService;
+import com.dfire.platform.alchemy.web.service.JobService;
 
 import io.github.jhipster.web.util.ResponseUtil;
 
@@ -26,8 +35,18 @@ public class AuditResource {
 
     private final AuditEventService auditEventService;
 
-    public AuditResource(AuditEventService auditEventService) {
+    private final ClusterJobService submitService;
+
+    private final JobService jobService;
+
+    private final JobFailService jobFailService;
+
+    public AuditResource(AuditEventService auditEventService, ClusterJobService submitService, JobService jobService,
+        JobFailService jobFailService) {
         this.auditEventService = auditEventService;
+        this.submitService = submitService;
+        this.jobService = jobService;
+        this.jobFailService = jobFailService;
     }
 
     /**
@@ -70,5 +89,20 @@ public class AuditResource {
     @GetMapping("/{id:.+}")
     public ResponseEntity<AuditEvent> get(@PathVariable Long id) {
         return ResponseUtil.wrapOrNotFound(auditEventService.find(id));
+    }
+
+    @GetMapping(value = "/pass", params = {"acJobId"})
+    @ResponseBody
+    public ResponseEntity<Void> pass(@RequestParam(value = "acJobId") @NotEmpty Long acJobId) {
+        this.jobService.updateStatus(acJobId, Status.AUDIT_PASS.getStatus());
+        this.submitService.submit(acJobId);
+        return ResponseEntity.ok().headers(HeaderUtil.createAlert("A job is passed  ", null)).build();
+    }
+
+    @PostMapping(value = "/fail")
+    @ResponseBody
+    public ResponseEntity<Void> fail(@Valid @RequestBody JobFailVM auditVM) {
+        this.jobFailService.save(auditVM);
+        return ResponseEntity.ok().headers(HeaderUtil.createAlert("A job is failed  ", null)).build();
     }
 }

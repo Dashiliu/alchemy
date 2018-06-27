@@ -27,7 +27,7 @@ import com.dfire.platform.alchemy.web.service.dto.UserDTO;
 import com.dfire.platform.alchemy.web.service.util.RandomUtil;
 
 /**
- * Service class for managing users.
+ * Service class for managing jobs.
  */
 @Service
 @Transactional
@@ -228,7 +228,7 @@ public class UserService {
     }
 
     /**
-     * Not activated users should be automatically deleted after 3 days.
+     * Not activated jobs should be automatically deleted after 3 days.
      * <p>
      * This is scheduled to get fired everyday, at 01:00 (am).
      */

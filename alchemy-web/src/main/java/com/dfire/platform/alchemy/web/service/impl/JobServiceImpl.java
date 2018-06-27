@@ -82,8 +82,10 @@ public class JobServiceImpl implements JobService {
         acJob.setAcServiceId(jobVM.getAcServiceId() == null ? DEFAUL_SERVICE_ID : jobVM.getAcServiceId());
         acJob.setCreateTime(new Date());
         acJob.setName(jobVM.getName());
+        acJob.setCluster("");
         acJob.setStatus(Status.UN_FIX.getStatus());
         acJob.setSubmitMode(jobVM.getSubmitMode());
+        acJob.setIsValid(Valid.VALID.getValid());
         return acJob;
     }
 

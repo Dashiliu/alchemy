@@ -124,7 +124,12 @@ public class FlinkDefaultCluster implements Cluster {
         try {
             PackagedProgram program = new PackagedProgram(new File(message.getJarInfoDescriptor().getJarPath()),
                 message.getJarInfoDescriptor().getEntryClass(), message.getJarInfoDescriptor().getProgramArgs());
-            ClassLoader classLoader = program.getUserCodeClassLoader();
+            ClassLoader classLoader = null;
+            try {
+                classLoader = program.getUserCodeClassLoader();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             Optimizer optimizer = new Optimizer(new DataStatistics(), new DefaultCostEstimator(), new Configuration());
             FlinkPlan plan

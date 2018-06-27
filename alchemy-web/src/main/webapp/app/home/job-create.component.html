@@ -1,0 +1,35 @@
+<div class="row justify-content-center">
+    <div class="col-8">
+        <form name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm">
+            <h2 id="myUserLabel">
+                Create a Job
+            </h2>
+            <div>
+                <jhi-alert-error></jhi-alert-error>
+
+                <div class="form-group" >
+                    <label class="form-control-label">任务名称</label>
+                    <input type="text" class="form-control" name="name" #loginInput="ngModel"
+                        [(ngModel)]="job.name" required minlength="1" maxlength="50" pattern="^[A-Za-z0-9-]*$">
+
+
+                <div class="form-group">
+                    <label>提交方式</label>
+                    <select class="form-control"  name="mode" [(ngModel)]="job.submitMode">
+                        <option *ngFor="let mode of modes" [value]="mode.value">{{mode.label}}</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <button type="button" class="btn btn-secondary" (click)="previousState()">
+                    <fa-icon [icon]="'ban'"></fa-icon>&nbsp;<span
+                   >Cancel</span>
+                </button>
+                <button type="submit" [disabled]="editForm.form.invalid" class="btn btn-primary">
+                    <fa-icon [icon]="'save'"></fa-icon>&nbsp;<span>Save</span>
+                </button>
+            </div>
+            </div>
+        </form>
+    </div>
+</div>

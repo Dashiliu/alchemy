@@ -74,6 +74,7 @@ public class JobConfServiceImpl implements JobConfService {
         acJobConf.setAcJobId(jobConfVM.getAcJobId());
         acJobConf.setContent(jobConfVM.getContent());
         acJobConf.setCreateTime(new Date());
+        acJobConf.setIsValid(Valid.VALID.getValid());
         return acJobConf;
     }
 
@@ -107,10 +108,11 @@ public class JobConfServiceImpl implements JobConfService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<JobConfDTO> findByType(int type) {
+    public List<JobConfDTO> findByType(Long jobiD, int type) {
         LOGGER.trace("start find JobConf,type:{}", type);
         AcJobConf query = new AcJobConf();
         query.setIsValid(Valid.VALID.getValid());
+        query.setAcJobId(jobiD);
         query.setType(type);
         List<AcJobConf> acJobConfs
             = this.jobConfRepository.findAll(Example.of(query), new Sort(Sort.Direction.DESC, "update_time"));
@@ -127,6 +129,7 @@ public class JobConfServiceImpl implements JobConfService {
         return jobConfDTOs;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<JobConfDTO> findAll() {
         LOGGER.trace("start find  all JobConf");

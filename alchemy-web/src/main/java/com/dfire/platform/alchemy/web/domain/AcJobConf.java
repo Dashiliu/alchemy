@@ -25,10 +25,10 @@ public class AcJobConf {
     private String content;
 
     @Column(name = "type")
-    private int type;
+    private Integer type;
 
     @Column(name = "is_valid")
-    private int isValid;
+    private Integer isValid;
 
     @Column(name = "create_time")
     private Date createTime = null;
@@ -60,19 +60,19 @@ public class AcJobConf {
         this.content = content;
     }
 
-    public int getType() {
+    public Integer getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(Integer type) {
         this.type = type;
     }
 
-    public int getIsValid() {
+    public Integer getIsValid() {
         return isValid;
     }
 
-    public void setIsValid(int isValid) {
+    public void setIsValid(Integer isValid) {
         this.isValid = isValid;
     }
 

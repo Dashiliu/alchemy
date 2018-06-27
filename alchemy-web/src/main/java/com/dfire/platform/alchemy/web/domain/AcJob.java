@@ -28,13 +28,13 @@ public class AcJob {
     private String cluster;
 
     @Column(name = "submit_mode")
-    private int submitMode;
+    private Integer submitMode;
 
     @Column(name = "status")
-    private int status;
+    private Integer status;
 
     @Column(name = "is_valid")
-    private int isValid;
+    private Integer isValid;
 
     @Column(name = "create_time")
     private Date createTime = null;
@@ -74,27 +74,27 @@ public class AcJob {
         this.cluster = cluster;
     }
 
-    public int getSubmitMode() {
+    public Integer getSubmitMode() {
         return submitMode;
     }
 
-    public void setSubmitMode(int submitMode) {
+    public void setSubmitMode(Integer submitMode) {
         this.submitMode = submitMode;
     }
 
-    public int getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 
-    public int getIsValid() {
+    public Integer getIsValid() {
         return isValid;
     }
 
-    public void setIsValid(int isValid) {
+    public void setIsValid(Integer isValid) {
         this.isValid = isValid;
     }
 

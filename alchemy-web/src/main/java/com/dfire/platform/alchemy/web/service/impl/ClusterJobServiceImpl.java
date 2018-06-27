@@ -355,7 +355,7 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
                     updateJobStatusIfHasLock();
                     return;
                 }
-                // 如果存在，判断值是否大于本地值：
+                // 如3果存在，判断值是否大于本地值：
                 // 大于或等于本地值，将本地值更新为redis的值，放弃这次的执行权
                 // 小于本地值，抢占执行的权利
                 long longValue = Long.valueOf(String.valueOf(value));
@@ -366,8 +366,8 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
                 }
 
             } catch (Exception e) {
-                shutDown.set(true);
-                LOGGER.info("The thread {} is interrupted", Thread.currentThread().getName());
+                 shutDown.set(true);
+                LOGGER.error("The thread {} is interrupted", Thread.currentThread().getName(),e);
             }
         }
 

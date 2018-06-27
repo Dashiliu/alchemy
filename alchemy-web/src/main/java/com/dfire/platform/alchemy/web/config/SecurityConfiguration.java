@@ -85,6 +85,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .headers().frameOptions().disable().and().sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
             .antMatchers("/api/register").permitAll().antMatchers("/api/activate").permitAll()
+            .antMatchers("/api/jobs/**").permitAll().antMatchers("/api/confs/**").permitAll()
             .antMatchers("/api/authenticate").permitAll().antMatchers("/api/account/reset-password/init").permitAll()
             .antMatchers("/api/account/reset-password/finish").permitAll().antMatchers("/api/**").authenticated()
             .antMatchers("/management/health").permitAll().antMatchers("/management/info").permitAll()

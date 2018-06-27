@@ -10,7 +10,7 @@ public class JobVM {
 
     private Long acServiceId;
 
-    @Pattern(regexp = "[a-zA-Z]")
+    @Pattern(regexp = "^[A-Za-z0-9-]*$")
     private String name;
 
     private int submitMode;
