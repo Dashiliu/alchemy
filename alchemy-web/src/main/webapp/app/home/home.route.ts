@@ -28,7 +28,7 @@ export const HOME_ROUTE: Routes = [
         }
     },
     {
-        path: 'confs/:jobId/list',
+        path: 'confs/:jobId/info',
         component: ConfComponent,
         data: {
             pageTitle: 'JobConf'

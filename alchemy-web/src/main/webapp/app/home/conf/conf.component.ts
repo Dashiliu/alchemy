@@ -1,6 +1,4 @@
 import { Component } from '@angular/core';
-
-import { ConfDeleteComponent } from './conf-delete-dialog.component';
 import { MenuItem } from 'primeng/components/common/menuitem';
 
 @Component({
