@@ -22,4 +22,5 @@ public interface JobService {
 
     void delete(Long id);
 
+    JobDTO findById(Long id);
 }

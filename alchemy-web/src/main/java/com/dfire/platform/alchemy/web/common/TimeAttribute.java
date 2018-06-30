@@ -6,43 +6,24 @@ package com.dfire.platform.alchemy.web.common;
  */
 public class TimeAttribute {
 
-    private String timeCharacteristic;
+    private Timestamps timestamps;
 
-    private String attribute;
+    private Watermarks watermarks;
 
-    private boolean exist;
+    public Timestamps getTimestamps() {
 
-    private long maxOutOfOrderness;
-
-    public String getTimeCharacteristic() {
-        return timeCharacteristic;
+        return timestamps;
     }
 
-    public void setTimeCharacteristic(String timeCharacteristic) {
-        this.timeCharacteristic = timeCharacteristic;
+    public void setTimestamps(Timestamps timestamps) {
+        this.timestamps = timestamps;
     }
 
-    public String getAttribute() {
-        return attribute;
+    public Watermarks getWatermarks() {
+        return watermarks;
     }
 
-    public void setAttribute(String attribute) {
-        this.attribute = attribute;
-    }
-
-    public boolean isExist() {
-        return exist;
-    }
-
-    public void setExist(boolean exist) {
-        this.exist = exist;
-    }
-
-    public long getMaxOutOfOrderness() {
-        return maxOutOfOrderness;
-    }
-
-    public void setMaxOutOfOrderness(long maxOutOfOrderness) {
-        this.maxOutOfOrderness = maxOutOfOrderness;
+    public void setWatermarks(Watermarks watermarks) {
+        this.watermarks = watermarks;
     }
 }

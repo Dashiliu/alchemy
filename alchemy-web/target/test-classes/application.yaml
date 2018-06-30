@@ -1,0 +1,40 @@
+table:
+    parallelism: 10
+    checkpointingInterval: 5
+    sql: select * from  TaxiRides
+    sources:
+      - name: TaxiRides
+        schema:
+          - name: rideId
+            type: LONG
+          - name: lon
+            type: FLOAT
+          - name: lat
+            type: FLOAT
+          - name: rowTime
+            type: TIMESTAMP
+            rowtime:
+              timestamps:
+                type: "from-field"
+                from: "rideTime"
+              watermarks:
+                type: "periodic-bounded"
+                delay: "60000"
+        connector:
+          property-version: 1
+          type: kafka
+          version: 0.11
+          topic: TaxiRides
+          startup-mode: earliest-offset
+          properties:
+            - key: zookeeper.connect
+              value: localhost:2181
+            - key: bootstrap.servers
+              value: localhost:9092
+            - key: group.id
+              value: testGroup
+        format:
+          property-version: 1
+          type: json
+          schema: "ROW(rideId LONG, lon FLOAT, lat FLOAT, rideTime TIMESTAMP)"
+

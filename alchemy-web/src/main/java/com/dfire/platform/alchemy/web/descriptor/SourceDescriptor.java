@@ -1,32 +1,43 @@
 package com.dfire.platform.alchemy.web.descriptor;
 
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.map.HashedMap;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.typeutils.TypeExtractor;
+import org.apache.flink.streaming.connectors.kafka.Kafka010JsonTableSource;
+import org.apache.flink.table.api.TableSchema;
+import org.apache.flink.table.sources.tsextractors.ExistingField;
+import org.apache.flink.table.sources.tsextractors.StreamRecordTimestamp;
+import org.apache.flink.table.sources.tsextractors.TimestampExtractor;
+import org.apache.flink.table.sources.wmstrategies.BoundedOutOfOrderTimestamps;
+import org.apache.flink.table.sources.wmstrategies.WatermarkStrategy;
 import org.springframework.util.Assert;
 
-import com.dfire.platform.alchemy.web.common.Table;
-import com.dfire.platform.alchemy.web.common.TimeAttribute;
+import com.dfire.platform.alchemy.web.bind.BindPropertiesFactory;
+import com.dfire.platform.alchemy.web.common.*;
+import com.dfire.platform.alchemy.web.util.DescriptorUtils;
+import com.dfire.platform.alchemy.web.util.PropertiesUtils;
 
 /**
  * @author congbai
  * @date 02/06/2018
  */
-public abstract class SourceDescriptor implements Descriptor {
+public class SourceDescriptor implements CoreDescriptor {
 
     private String name;
 
-    private TimeAttribute timeAttribute;
+    private List<Field> input;
 
-    private Table input;
+    private List<Field> schema;
 
-    private Table output;
+    private Map<String, Object> connector;
 
-    @Override
-    public void validate() throws Exception {
-        Assert.notNull(name, "table的名称不能为空");
-        Assert.notNull(output, "table字段不能为空");
-        Assert.notEmpty(output.getFields(), "table字段不能为空");
-        Assert.notNull(timeAttribute, "table时间属性不能为空");
-        Assert.hasText(timeAttribute.getAttribute(), "table时间属性不能为空");
-    }
+    private volatile ConnectorDescriptor connectorDescriptor;
+
+    private FormatDescriptor format;
 
     @Override
     public String getName() {
@@ -37,27 +48,144 @@ public abstract class SourceDescriptor implements Descriptor {
         this.name = name;
     }
 
-    public TimeAttribute getTimeAttribute() {
-        return timeAttribute;
+    @Override
+    public <T> T transform(ClusterType clusterType) throws Exception {
+        if (ClusterType.FLINK.equals(clusterType)) {
+            return transformFlink();
+        }
+        throw new UnsupportedOperationException("unknow clusterType:" + clusterType);
     }
 
-    public void setTimeAttribute(TimeAttribute timeAttribute) {
-        this.timeAttribute = timeAttribute;
-    }
-
-    public Table getInput() {
+    public List<Field> getInput() {
         return input;
     }
 
-    public void setInput(Table input) {
+    public void setInput(List<Field> input) {
         this.input = input;
     }
 
-    public Table getOutput() {
-        return output;
+    public List<Field> getSchema() {
+        return schema;
     }
 
-    public void setOutput(Table output) {
-        this.output = output;
+    public void setSchema(List<Field> schema) {
+        this.schema = schema;
     }
+
+    public Map<String, Object> getConnector() {
+        return connector;
+    }
+
+    public void setConnector(Map<String, Object> connector) {
+        this.connector = connector;
+    }
+
+    public ConnectorDescriptor getConnectorDescriptor() {
+        if (this.connectorDescriptor == null) {
+            synchronized (this) {
+                if (this.connector == null) {
+                    return this.connectorDescriptor;
+                }
+                Object type = this.connector.get(Constants.DESCRIPTOR_TYPE_KEY);
+                if (type == null) {
+                    return this.connectorDescriptor;
+                }
+                ConnectorDescriptor connectorDescriptor
+                    = DescriptorUtils.find(String.valueOf(type), ConnectorDescriptor.class);
+                if (connectorDescriptor == null) {
+                    return this.connectorDescriptor;
+                }
+                try {
+                    this.connectorDescriptor = connectorDescriptor.getClass().newInstance();
+                    BindPropertiesFactory.bindPropertiesToTarget(connectorDescriptor, "",
+                        PropertiesUtils.createProperties(this.connector));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return connectorDescriptor;
+    }
+
+    public void setConnectorDescriptor(ConnectorDescriptor connectorDescriptor) {
+        this.connectorDescriptor = connectorDescriptor;
+    }
+
+    public FormatDescriptor getFormat() {
+        return format;
+    }
+
+    public void setFormat(FormatDescriptor format) {
+        this.format = format;
+    }
+
+    @Override
+    public String getType() {
+        return Constants.TYPE_VALUE_SOURCE;
+    }
+
+    @Override
+    public void validate() throws Exception {
+        Assert.notNull(name, "table的名称不能为空");
+        Assert.notNull(schema, "table字段不能为空");
+        Assert.isTrue(schema.size() > 0, "table字段不能为空");
+        connectorDescriptor.validate();
+    }
+
+    private <T> T transformFlink() throws Exception {
+        if (this.connectorDescriptor instanceof KafkaConnectorDescriptor) {
+            return buildKafkaSource();
+        }
+        return null;
+    }
+
+    private <T> T buildKafkaSource() throws ClassNotFoundException {
+        KafkaConnectorDescriptor descriptor = (KafkaConnectorDescriptor)this.connectorDescriptor;
+        Kafka010JsonTableSource.Builder builder = Kafka010JsonTableSource.builder();
+        builder.forTopic(descriptor.getTopic());
+        createSchema(this.schema, builder);
+        Map<String, Object> prop = new HashedMap();
+        for (Object value : descriptor.getProperties().values()) {
+            if (value instanceof Map) {
+                prop.putAll((Map<? extends String, ?>)value);
+            }
+        }
+        if (StartupMode.EARLIEST.getMode().equals(descriptor.getStartupMode())) {
+            builder.fromEarliest();
+        }
+        builder.withKafkaProperties(PropertiesUtils.createProperties(prop));
+        return (T)builder.build();
+    }
+
+    private void createSchema(List<Field> schema, Kafka010JsonTableSource.Builder builder)
+        throws ClassNotFoundException {
+        if (CollectionUtils.isEmpty(schema)) {
+            return;
+        }
+
+        String[] columnNames = new String[schema.size()];
+        TypeInformation[] columnTypes = new TypeInformation[schema.size()];
+        for (int i = 0; i < schema.size(); i++) {
+            columnNames[i] = schema.get(i).getName();
+            columnTypes[i] = TypeExtractor.createTypeInfo(Class.forName(schema.get(i).getType()));
+            if (schema.get(i).isProctime()) {
+                builder.withProctimeAttribute(schema.get(0).getName());
+            } else {
+                TimeAttribute timeAttribute = schema.get(0).getRowtime();
+                if (timeAttribute == null) {
+                    continue;
+                }
+                TimestampExtractor timestampExtractor
+                    = Timestamps.Type.FIELD.getType().equals(timeAttribute.getTimestamps().getType())
+                        ? new ExistingField(timeAttribute.getTimestamps().getFrom()) : new StreamRecordTimestamp();
+                WatermarkStrategy watermarkStrategy
+                    = Watermarks.Type.PERIODIC_BOUNDED.getType().equals(timeAttribute.getWatermarks().getType())
+                        ? new BoundedOutOfOrderTimestamps(timeAttribute.getWatermarks().getDelay()) : null;
+                builder.withRowtimeAttribute(schema.get(0).getName(), timestampExtractor, watermarkStrategy);
+            }
+        }
+        TableSchema tableSchema = new TableSchema(columnNames, columnTypes);
+        builder.withSchema(tableSchema);
+    }
+
 }

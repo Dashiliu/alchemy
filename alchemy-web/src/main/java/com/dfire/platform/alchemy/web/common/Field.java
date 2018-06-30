@@ -10,11 +10,31 @@ public class Field {
 
     private String type;
 
+    private TimeAttribute rowtime;
+
+    private boolean proctime;
+
     public Field() {}
 
     public Field(String name, String type) {
         this.name = name;
         this.type = type;
+    }
+
+    public TimeAttribute getRowtime() {
+        return rowtime;
+    }
+
+    public void setRowtime(TimeAttribute rowtime) {
+        this.rowtime = rowtime;
+    }
+
+    public boolean isProctime() {
+        return proctime;
+    }
+
+    public void setProctime(boolean proctime) {
+        this.proctime = proctime;
     }
 
     public String getName() {

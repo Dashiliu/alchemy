@@ -1,7 +1,5 @@
 package com.dfire.platform.alchemy.web.descriptor;
 
-import java.lang.reflect.Type;
-
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.springframework.stereotype.Component;
@@ -15,6 +13,7 @@ import com.dfire.platform.alchemy.api.function.scalar.FlinkAllScalarFunction;
 import com.dfire.platform.alchemy.api.function.table.FlinkAllTableFunction;
 import com.dfire.platform.alchemy.api.util.GroovyCompiler;
 import com.dfire.platform.alchemy.web.common.ClusterType;
+import com.dfire.platform.alchemy.web.common.Constants;
 import com.dfire.platform.alchemy.web.common.ReadMode;
 
 /**
@@ -24,7 +23,7 @@ import com.dfire.platform.alchemy.web.common.ReadMode;
  * @date 01/06/2018
  */
 @Component
-public class UdfDescriptor implements Descriptor {
+public class UdfDescriptor implements CoreDescriptor {
 
     private int readMode = ReadMode.CODE.getMode();
 
@@ -34,12 +33,6 @@ public class UdfDescriptor implements Descriptor {
      * 如果是code读取方式，value就是代码内容 ；如果是jar包方式，则是className
      */
     private String value;
-
-    public static void main(String[] args) {
-
-        Class clazz = FlinkAllScalarFunction.class;
-        Type type = clazz.getGenericSuperclass();
-    }
 
     public int getReadMode() {
         return readMode;
@@ -59,16 +52,16 @@ public class UdfDescriptor implements Descriptor {
     }
 
     @Override
-    public String getContentType() {
-        return "udf";
-    }
-
-    @Override
     public <T> T transform(ClusterType clusterType) throws Exception {
         if (ClusterType.FLINK.equals(clusterType)) {
             return transformFlink();
         }
         throw new UnsupportedOperationException("unknow clusterType:" + clusterType);
+    }
+
+    @Override
+    public String getType() {
+        return Constants.TYPE_VALUE_UDF;
     }
 
     @Override

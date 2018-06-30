@@ -1,9 +1,6 @@
 /* after changing this file run 'npm run webpack:build' */
 /* tslint:disable */
 import '../content/css/vendor.css';
-
-// Imports all fontawesome core and solid icons
-
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
     faUser,
@@ -39,6 +36,8 @@ import {
     faTasks,
     faHome
 } from '@fortawesome/free-solid-svg-icons';
+
+// Imports all fontawesome core and solid icons
 
 // Adds the SVG icon to the library so you can use it in your page
 library.add(faUser);

@@ -6,6 +6,7 @@ import org.springframework.util.Assert;
 import com.dfire.platform.alchemy.api.sink.HbaseInvoker;
 import com.dfire.platform.alchemy.connectors.hbase.HbaseTableSink;
 import com.dfire.platform.alchemy.web.common.ClusterType;
+import com.dfire.platform.alchemy.web.common.Constants;
 import com.dfire.platform.alchemy.web.common.ReadMode;
 
 /**
@@ -14,6 +15,8 @@ import com.dfire.platform.alchemy.web.common.ReadMode;
  */
 @Component
 public class HbaseSinkDescriptor extends SinkDescriptor {
+
+    private String name;
 
     private int readMode = ReadMode.CODE.getMode();
 
@@ -28,6 +31,15 @@ public class HbaseSinkDescriptor extends SinkDescriptor {
     private long bufferSize;
 
     private String value;
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public String getZookeeper() {
         return zookeeper;
@@ -86,11 +98,6 @@ public class HbaseSinkDescriptor extends SinkDescriptor {
     }
 
     @Override
-    public String getContentType() {
-        return "hbaseSink";
-    }
-
-    @Override
     public <T> T transform(ClusterType clusterType) throws Exception {
         if (ReadMode.CODE.equals(this.readMode)) {
             return (T)new HbaseTableSink(this.zookeeper, this.node, this.tableName, this.family, this.bufferSize,
@@ -109,5 +116,10 @@ public class HbaseSinkDescriptor extends SinkDescriptor {
         Assert.notNull(tableName, "hbase的表名不能为空");
         Assert.notNull(family, "hbase的family不能为空");
         Assert.notNull(value, "hbase的获取rowKey和column的逻辑不能为空");
+    }
+
+    @Override
+    public String getType() {
+        return Constants.SINK_TYPE_VALUE_HBASE;
     }
 }

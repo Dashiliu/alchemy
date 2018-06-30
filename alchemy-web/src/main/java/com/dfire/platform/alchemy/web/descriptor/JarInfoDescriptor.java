@@ -2,12 +2,14 @@ package com.dfire.platform.alchemy.web.descriptor;
 
 import org.springframework.stereotype.Component;
 
+import com.dfire.platform.alchemy.web.common.Constants;
+
 /**
  * @author congbai
  * @date 2018/6/8
  */
 @Component
-public class JarInfoDescriptor extends BasicDescriptor {
+public class JarInfoDescriptor implements Descriptor {
 
     private String jarPath;
 
@@ -63,8 +65,8 @@ public class JarInfoDescriptor extends BasicDescriptor {
     }
 
     @Override
-    public String getContentType() {
-        return "jarInfo";
+    public String getType() {
+        return Constants.TYPE_VALUE_JAR;
     }
 
     @Override

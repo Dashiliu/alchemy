@@ -13,6 +13,8 @@ import com.dfire.platform.alchemy.web.common.Constants;
 @Component
 public class RedisSinkDescriptor extends SinkDescriptor {
 
+    private String name;
+
     private String sentinels;
 
     private String master;
@@ -24,6 +26,15 @@ public class RedisSinkDescriptor extends SinkDescriptor {
     private Integer queueSize;
 
     private Integer thread;
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public String getSentinels() {
         return sentinels;
@@ -74,12 +85,8 @@ public class RedisSinkDescriptor extends SinkDescriptor {
     }
 
     @Override
-    public String getContentType() {
-        return "redisSink";
-    }
-
-    @Override
     public <T> T transform(ClusterType clusterType) throws Exception {
+        //// TODO: 2018/6/30
         return null;
     }
 
@@ -97,5 +104,10 @@ public class RedisSinkDescriptor extends SinkDescriptor {
         if (thread != null && thread.intValue() > Constants.REDIS_MAX_THREAD_SIZE) {
             throw new IllegalArgumentException("redis最大消费线程是：" + Constants.REDIS_MAX_THREAD_SIZE);
         }
+    }
+
+    @Override
+    public String getType() {
+        return Constants.SINK_TYPE_VALUE_REDIS;
     }
 }

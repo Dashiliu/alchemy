@@ -74,6 +74,18 @@ public class JobServiceImpl implements JobService {
         this.jobRepository.saveAndFlush(acJob.get());
     }
 
+    @Override
+    public JobDTO findById(Long id) {
+        Optional<AcJob> acJob = this.jobRepository.findById(id);
+        if (acJob.isPresent()) {
+            JobDTO job = new JobDTO();
+            BeanUtils.copyProperties(acJob.get(), job);
+            return job;
+        } else {
+            return null;
+        }
+    }
+
     private AcJob createJob(JobVM jobVM) {
         Preconditions.checkNotNull(jobVM.getName(), "job name can't be null");
         Preconditions.checkNotNull(jobVM.getSubmitMode(), "job submitMode can't be null");

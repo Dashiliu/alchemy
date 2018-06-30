@@ -3,7 +3,10 @@ package com.dfire.platform.alchemy.web.service.impl;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -20,6 +23,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import com.dfire.platform.alchemy.web.bind.BindPropertiesFactory;
 import com.dfire.platform.alchemy.web.cluster.ClusterManager;
 import com.dfire.platform.alchemy.web.cluster.request.JarSubmitFlinkRequest;
 import com.dfire.platform.alchemy.web.cluster.request.ListJobFlinkRequest;
@@ -30,7 +34,9 @@ import com.dfire.platform.alchemy.web.cluster.response.Response;
 import com.dfire.platform.alchemy.web.cluster.response.SubmitFlinkResponse;
 import com.dfire.platform.alchemy.web.common.*;
 import com.dfire.platform.alchemy.web.config.Flame;
-import com.dfire.platform.alchemy.web.descriptor.*;
+import com.dfire.platform.alchemy.web.descriptor.DescriptorManager;
+import com.dfire.platform.alchemy.web.descriptor.JarInfoDescriptor;
+import com.dfire.platform.alchemy.web.descriptor.TableDescriptor;
 import com.dfire.platform.alchemy.web.domain.AcJob;
 import com.dfire.platform.alchemy.web.domain.AcJobConf;
 import com.dfire.platform.alchemy.web.domain.AcJobHistory;
@@ -154,6 +160,8 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
                     shutDown.set(true);
                     LOGGER.info("The thread {} is interrupted", Thread.currentThread().getName());
                     break;
+                } catch (Throwable e) {
+                    LOGGER.error("The thread {} has exception", Thread.currentThread().getName(), e);
                 }
             }
         }
@@ -197,6 +205,8 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
                 } else {
                     updateJobStatus(acJob.get(), Status.FAILED.getStatus());
                 }
+            } catch (Exception e) {
+                LOGGER.error("submitRequest,id:{}", id, e);
             } finally {
                 cacheService.del(key);
             }
@@ -217,7 +227,8 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
             jobHistoryRepository.save(acJobHistory);
         }
 
-        private SubmitRequest createSubmitRequest(AcJob acJob, List<AcJobConf> jobConfs, ClusterType clusterType) {
+        private SubmitRequest createSubmitRequest(AcJob acJob, List<AcJobConf> jobConfs, ClusterType clusterType)
+            throws Exception {
             SubmitRequest submitRequest = null;
             if (SubmitMode.SQL.getMode() == acJob.getSubmitMode()) {
                 if (ClusterType.FLINK.equals(clusterType)) {
@@ -240,7 +251,7 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
                 LOGGER.warn("job hasn't jar conf,acJobId:{},acJobConfId:{}", acJob.getId(), acJobConf.getId());
                 return null;
             }
-            JarInfoDescriptor descriptor = createDescriptor(acJobConf, JarInfoDescriptor.class);
+            JarInfoDescriptor descriptor = buildJar(acJobConf, JarInfoDescriptor.class);
             downLoadJarIfNeed(descriptor);
             jarSubmitFlinkRequest.setJarInfoDescriptor(descriptor);
             return jarSubmitFlinkRequest;
@@ -287,48 +298,43 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
             }
         }
 
-        private SqlSubmitFlinkRequest createSqlSubmitFlinkRequest(AcJob acJob, List<AcJobConf> jobConfs) {
+        private SqlSubmitFlinkRequest createSqlSubmitFlinkRequest(AcJob acJob, List<AcJobConf> jobConfs)
+            throws Exception {
             SqlSubmitFlinkRequest sqlSubmitFlinkRequest = new SqlSubmitFlinkRequest();
             sqlSubmitFlinkRequest.setCluster(acJob.getCluster());
             sqlSubmitFlinkRequest.setJobName(acJob.getName());
-            List<SourceDescriptor> inputs = new ArrayList<>(jobConfs.size());
-            List<UdfDescriptor> userDefineFunctions = new ArrayList<>(jobConfs.size());
-            List<SinkDescriptor> outputs = new ArrayList<>(jobConfs.size());
+            TableDescriptor tableDescriptor = new TableDescriptor();
+            sqlSubmitFlinkRequest.setTableDescriptor(tableDescriptor);
             for (AcJobConf acJobConf : jobConfs) {
                 switch (ConfType.fromType(acJobConf.getType())) {
                     case SQL:
-                        SqlInfoDescriptor descriptor = createDescriptor(acJobConf, SqlInfoDescriptor.class);
-                        sqlSubmitFlinkRequest.setSqlInfoDescriptor(descriptor);
+                        bindSql(acJobConf, tableDescriptor);
                         break;
-                    case SOURCE:
-                        SourceDescriptor sourceDescriptor = createDescriptor(acJobConf, null);
-                        inputs.add(sourceDescriptor);
-                        break;
-                    case UDF:
-                        UdfDescriptor udfDescriptor = createDescriptor(acJobConf, null);
-                        userDefineFunctions.add(udfDescriptor);
-                        break;
-                    case SINK:
-                        SinkDescriptor sinkDescriptor = createDescriptor(acJobConf, null);
-                        outputs.add(sinkDescriptor);
+                    case CONFIG:
+                        bindConfig(acJobConf, tableDescriptor);
                         break;
                     default:
                         // nothing to do
                 }
             }
-            sqlSubmitFlinkRequest.setInputs(inputs);
-            sqlSubmitFlinkRequest.setUserDefineFunctions(userDefineFunctions);
-            sqlSubmitFlinkRequest.setOutputs(outputs);
             return sqlSubmitFlinkRequest;
         }
 
-        private <T> T createDescriptor(AcJobConf acJobConf, Class<? extends T> clazz) {
-            DescriptorData descriptorData = JsonUtils.fromJson(acJobConf.getContent(), DescriptorData.class);
-            if (clazz == null) {
-                Descriptor prototype = descriptorManager.getByContentType(descriptorData.getContentType());
-                clazz = (Class<? extends T>)prototype.getClass();
-            }
-            return JsonUtils.fromJson(descriptorData.getDescriptor(), clazz);
+        private void bindConfig(AcJobConf acJobConf, TableDescriptor tableDescriptor) throws Exception {
+            Content content = JsonUtils.fromJson(acJobConf.getContent(), Content.class);
+            BindPropertiesFactory.bindPropertiesToTarget(tableDescriptor, Constants.BIND_PREFIX_TABLE,
+                content.getConfig());
+            tableDescriptor.setCodes(content.getCode());
+        }
+
+        private void bindSql(AcJobConf acJobConf, TableDescriptor tableDescriptor) {
+            Content content = JsonUtils.fromJson(acJobConf.getContent(), Content.class);
+            tableDescriptor.setSql(content.getConfig());
+        }
+
+        private <T> T buildJar(AcJobConf acJobConf, Class<? extends T> clazz) {
+            Content content = JsonUtils.fromJson(acJobConf.getContent(), Content.class);
+            return JsonUtils.fromJson(content.getConfig(), clazz);
         }
 
         private List<AcJobConf> findJobConf(Long id) {
@@ -366,8 +372,7 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
                 }
 
             } catch (Exception e) {
-                 shutDown.set(true);
-                LOGGER.error("The thread {} is interrupted", Thread.currentThread().getName(),e);
+                LOGGER.error("The thread {} has exception", Thread.currentThread().getName(), e);
             }
         }
 
@@ -387,7 +392,7 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
                     for (JobStatusMessage jobStatusMessage : flinkResponse.getJobStatusMessages()) {
                         List<AcJobHistory> acJobHistorys
                             = jobHistoryRepository.findByClusterJobId(jobStatusMessage.getJobId().toString(),
-                                new PageRequest(0, 1, new Sort(Sort.Direction.DESC, "update_time")));
+                                new PageRequest(0, 1, new Sort(Sort.Direction.DESC, "updateTime")));
                         if (CollectionUtils.isEmpty(acJobHistorys)) {
                             LOGGER.warn("flink Job doesn't have relation Job,jobID:{}", jobStatusMessage.getJobId());
                             continue;

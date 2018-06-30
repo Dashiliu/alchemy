@@ -58,6 +58,12 @@ public class JobController {
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
 
+    @GetMapping("/jobs/{id}")
+    public ResponseEntity<JobDTO> getJob(@PathVariable Long id) {
+        final JobDTO jobDTO = jobService.findById(id);
+        return new ResponseEntity<>(jobDTO, HeaderUtil.createAlert("A job is deleted  ", null), HttpStatus.OK);
+    }
+
     @DeleteMapping("/jobs/{id}")
     public ResponseEntity<Void> deleteJob(@PathVariable Long id) {
         LOGGER.debug("REST request to delete Job: {}", id);

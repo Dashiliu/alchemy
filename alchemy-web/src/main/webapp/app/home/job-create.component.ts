@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-
 import { User, UserService } from 'app/core';
-import { Job } from './job.model';
+import { Job } from './model/job.model';
 import { JobService } from './job.service';
 
 @Component({

@@ -2,11 +2,14 @@ package com.dfire.platform.alchemy.web.cluster;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -45,6 +48,7 @@ import com.dfire.platform.alchemy.web.cluster.response.SubmitFlinkResponse;
 import com.dfire.platform.alchemy.web.common.ClusterType;
 import com.dfire.platform.alchemy.web.common.Constants;
 import com.dfire.platform.alchemy.web.common.ResultMessage;
+import com.dfire.platform.alchemy.web.descriptor.Descriptor;
 import com.dfire.platform.alchemy.web.util.PropertiesUtils;
 
 /**
@@ -57,6 +61,10 @@ public class FlinkDefaultCluster implements Cluster {
     private static final Logger LOGGER = LoggerFactory.getLogger(FlinkDefaultCluster.class);
 
     private static final String NAME = "flink_default";
+
+    private static final String MATCH_CODE = "^\\${[1-9]{1,2}}$";
+
+    private static final String REPLACE_CODE = "[^\\d]+";
 
     private ClusterClient clusterClient;
 
@@ -148,34 +156,33 @@ public class FlinkDefaultCluster implements Cluster {
 
     private Response sendSqlSubmitRequest(SqlSubmitFlinkRequest message) throws Exception {
         LOGGER.trace("start submit sql request,jobName:{},sql:{}", message.getJobName(),
-            message.getSqlInfoDescriptor().getSql());
-        if (CollectionUtils.isEmpty(message.getInputs())) {
+            message.getTableDescriptor().getSql());
+        if (CollectionUtils.isEmpty(message.getTableDescriptor().getSources())) {
             return new SubmitFlinkResponse(ResultMessage.SOURCE_EMPTY.getMsg());
         }
-        if (CollectionUtils.isEmpty(message.getOutputs())) {
+        if (CollectionUtils.isEmpty(message.getTableDescriptor().getSinkDescriptors())) {
             return new SubmitFlinkResponse(ResultMessage.SINK_EMPTY.getMsg());
         }
-        if (StringUtils.isEmpty(message.getSqlInfoDescriptor().getSql())) {
+        if (StringUtils.isEmpty(message.getTableDescriptor().getSql())) {
             return new SubmitFlinkResponse(ResultMessage.SQL_EMPTY.getMsg());
         }
         final StreamExecutionEnvironment execEnv = StreamExecutionEnvironment.createLocalEnvironment();
-        execEnv.setParallelism(message.getSqlInfoDescriptor().getParallelism());
+        execEnv.setParallelism(message.getTableDescriptor().getParallelism());
         execEnv.setRestartStrategy(RestartStrategies.fixedDelayRestart(
-            PropertiesUtils.getProperty(message.getSqlInfoDescriptor().getRestartAttempts(),
-                Constants.RESTART_ATTEMPTS),
-            PropertiesUtils.getProperty(message.getSqlInfoDescriptor().getDelayBetweenAttempts(),
+            PropertiesUtils.getProperty(message.getTableDescriptor().getRestartAttempts(), Constants.RESTART_ATTEMPTS),
+            PropertiesUtils.getProperty(message.getTableDescriptor().getDelayBetweenAttempts(),
                 Constants.DELAY_BETWEEN_ATTEMPTS)));
-        if (message.getSqlInfoDescriptor().getCheckpointingInterval() != null) {
-            execEnv.enableCheckpointing(message.getSqlInfoDescriptor().getCheckpointingInterval());
+        if (message.getTableDescriptor().getCheckpointingInterval() != null) {
+            execEnv.enableCheckpointing(message.getTableDescriptor().getCheckpointingInterval());
         }
         StreamTableEnvironment env = StreamTableEnvironment.getTableEnvironment(execEnv);
-        if (StringUtils.isNotEmpty(message.getSqlInfoDescriptor().getTimeCharacteristic())) {
+        if (StringUtils.isNotEmpty(message.getTableDescriptor().getTimeCharacteristic())) {
             execEnv.setStreamTimeCharacteristic(
-                TimeCharacteristic.valueOf(message.getSqlInfoDescriptor().getTimeCharacteristic()));
+                TimeCharacteristic.valueOf(message.getTableDescriptor().getTimeCharacteristic()));
         } else {
             execEnv.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime);
         }
-        message.getInputs().forEach(consumer -> {
+        message.getTableDescriptor().getSources().forEach(consumer -> {
             try {
                 TableSource tableSource = consumer.transform(clusterType());
                 env.registerTableSource(consumer.getName(), tableSource);
@@ -183,17 +190,18 @@ public class FlinkDefaultCluster implements Cluster {
                 throw new RuntimeException(e);
             }
         });
-        if (CollectionUtils.isNotEmpty(message.getUserDefineFunctions())) {
-            message.getUserDefineFunctions().forEach(consumer -> {
+        if (CollectionUtils.isNotEmpty(message.getTableDescriptor().getUdfs())) {
+            message.getTableDescriptor().getUdfs().forEach(udfDescriptor -> {
                 Object udf = null;
                 try {
-                    udf = consumer.transform(clusterType());
+                    replaceCodeValue(message, udfDescriptor);
+                    udf = udfDescriptor.transform(clusterType());
                     if (udf instanceof FlinkAllTableFunction) {
-                        env.registerFunction(consumer.getName(), (FlinkAllTableFunction)udf);
+                        env.registerFunction(udfDescriptor.getName(), (FlinkAllTableFunction)udf);
                     } else if (udf instanceof FlinkAllAggregateFunction) {
-                        env.registerFunction(consumer.getName(), (FlinkAllAggregateFunction)udf);
+                        env.registerFunction(udfDescriptor.getName(), (FlinkAllAggregateFunction)udf);
                     } else if (udf instanceof FlinkAllScalarFunction) {
-                        env.registerFunction(consumer.getName(), (FlinkAllScalarFunction)udf);
+                        env.registerFunction(udfDescriptor.getName(), (FlinkAllScalarFunction)udf);
                     } else {
                         LOGGER.warn("Unknown UDF {} was found.", udf.getClass().getName());
                     }
@@ -203,10 +211,11 @@ public class FlinkDefaultCluster implements Cluster {
 
             });
         }
-        Table table = env.sqlQuery(message.getSqlInfoDescriptor().getSql());
-        message.getOutputs().forEach(consumer -> {
+        Table table = env.sqlQuery(message.getTableDescriptor().getSql());
+        message.getTableDescriptor().getSinkDescriptors().forEach(sinkDescriptor -> {
             try {
-                table.writeToSink(consumer.transform(clusterType()));
+                replaceCodeValue(message, sinkDescriptor);
+                table.writeToSink(sinkDescriptor.transform(clusterType()));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -217,7 +226,7 @@ public class FlinkDefaultCluster implements Cluster {
         }
         StreamGraph streamGraph = execEnv.getStreamGraph();
         streamGraph.setJobName(message.getJobName());
-        List<URL> jarFiles = createPath(message.getSqlInfoDescriptor().getJarPath());
+        List<URL> jarFiles = createPath(message.getTableDescriptor().getJarPath());
         ClassLoader usercodeClassLoader
             = JobWithJars.buildUserCodeClassLoader(jarFiles, createGlobalPath(), getClass().getClassLoader());
         try {
@@ -229,6 +238,30 @@ public class FlinkDefaultCluster implements Cluster {
             String term = e.getMessage() == null ? "." : (": " + e.getMessage());
             LOGGER.error(" submit sql request fail", e);
             return new SubmitFlinkResponse(term);
+        }
+    }
+
+    private void replaceCodeValue(SqlSubmitFlinkRequest message, Descriptor descriptor) throws Exception {
+        Class clazz = descriptor.getClass();
+        Field[] fs = clazz.getDeclaredFields();
+        for (int i = 0; i < fs.length; i++) {
+            Field field = fs[i];
+            // 设置些属性是可以访问的
+            field.setAccessible(true);
+            // 得到此属性的值
+            Object val = field.get(descriptor);
+            if (val == null) {
+                continue;
+            }
+            if (val instanceof String) {
+                String value = (String)val;
+                if (value.matches(MATCH_CODE)) {
+                    Pattern pattern = Pattern.compile(REPLACE_CODE);
+                    Matcher matcher = pattern.matcher(value);
+                    Integer index = Integer.valueOf(matcher.replaceAll("").trim());
+                    field.set(descriptor, message.getTableDescriptor().getCodes().get(index));
+                }
+            }
         }
     }
 

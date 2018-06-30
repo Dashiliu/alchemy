@@ -12,7 +12,7 @@ import javax.persistence.Table;
  * @date 11/11/2017
  */
 @Entity
-@Table(name = "ac_service")
+@Table(name = "ac_job_conf")
 public class AcJobConf {
 
     @Id

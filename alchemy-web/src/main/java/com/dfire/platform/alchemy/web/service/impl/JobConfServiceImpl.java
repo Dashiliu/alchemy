@@ -11,12 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import com.dfire.platform.alchemy.web.common.DescriptorData;
-import com.dfire.platform.alchemy.web.common.Status;
-import com.dfire.platform.alchemy.web.common.Valid;
+import com.dfire.platform.alchemy.web.bind.BindPropertiesFactory;
+import com.dfire.platform.alchemy.web.common.*;
 import com.dfire.platform.alchemy.web.config.Flame;
-import com.dfire.platform.alchemy.web.descriptor.Descriptor;
 import com.dfire.platform.alchemy.web.descriptor.DescriptorManager;
+import com.dfire.platform.alchemy.web.descriptor.TableDescriptor;
 import com.dfire.platform.alchemy.web.domain.AcJob;
 import com.dfire.platform.alchemy.web.domain.AcJobConf;
 import com.dfire.platform.alchemy.web.repository.AcJobConfRepository;
@@ -72,7 +71,7 @@ public class JobConfServiceImpl implements JobConfService {
         acJobConf.setId(jobConfVM.getId() == null ? flame.nextId() : jobConfVM.getId());
         acJobConf.setType(jobConfVM.getType());
         acJobConf.setAcJobId(jobConfVM.getAcJobId());
-        acJobConf.setContent(jobConfVM.getContent());
+        acJobConf.setContent(JsonUtils.toJson(jobConfVM.getContent()));
         acJobConf.setCreateTime(new Date());
         acJobConf.setIsValid(Valid.VALID.getValid());
         return acJobConf;
@@ -82,13 +81,16 @@ public class JobConfServiceImpl implements JobConfService {
         Preconditions.checkNotNull(jobConfVM.getAcJobId(), "jobId can't be null");
         Preconditions.checkNotNull(jobConfVM.getType(), "type can't be null");
         Preconditions.checkNotNull(jobConfVM.getContent(), "content can't be null");
-        DescriptorData descriptorData = JsonUtils.fromJson(jobConfVM.getContent(), DescriptorData.class);
-        Descriptor prototype = descriptorManager.getByContentType(descriptorData.getContentType());
-        Descriptor descriptor = JsonUtils.fromJson(descriptorData.getDescriptor(), prototype.getClass());
-        try {
-            descriptor.validate();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        Content content = jobConfVM.getContent();
+        if (ConfType.CONFIG.getType() == jobConfVM.getType()) {
+            try {
+                TableDescriptor tableDescriptor = new TableDescriptor();
+                BindPropertiesFactory.bindPropertiesToTarget(tableDescriptor, Constants.BIND_PREFIX_TABLE,
+                    content.getConfig());
+                tableDescriptor.validate();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -108,41 +110,66 @@ public class JobConfServiceImpl implements JobConfService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<JobConfDTO> findByType(Long jobiD, int type) {
-        LOGGER.trace("start find JobConf,type:{}", type);
+    public List<JobConfDTO> findByType(Long jobId, int type) {
+        LOGGER.trace("start find JobConf,jobId:{},type:{}", jobId, type);
         AcJobConf query = new AcJobConf();
         query.setIsValid(Valid.VALID.getValid());
-        query.setAcJobId(jobiD);
+        query.setAcJobId(jobId);
         query.setType(type);
         List<AcJobConf> acJobConfs
-            = this.jobConfRepository.findAll(Example.of(query), new Sort(Sort.Direction.DESC, "update_time"));
+            = this.jobConfRepository.findAll(Example.of(query), new Sort(Sort.Direction.DESC, "updateTime"));
         if (CollectionUtils.isEmpty(acJobConfs)) {
             LOGGER.trace("JobConf is empty,type:{}", type);
             return Collections.emptyList();
         }
         List<JobConfDTO> jobConfDTOs = new ArrayList<>(acJobConfs.size());
         for (AcJobConf acJobConf : acJobConfs) {
-            JobConfDTO jobConfDTO = new JobConfDTO();
-            BeanUtils.copyProperties(acJobConf, jobConfDTO);
+            JobConfDTO jobConfDTO = createJobConfDTO(acJobConf);
             jobConfDTOs.add(jobConfDTO);
         }
         return jobConfDTOs;
+    }
+
+    @Override
+    public List<JobConfDTO> findByJobId(Long jobId) {
+        LOGGER.trace("start find JobConf,jobId:{}", jobId);
+        AcJobConf query = new AcJobConf();
+        query.setIsValid(Valid.VALID.getValid());
+        query.setAcJobId(jobId);
+        List<AcJobConf> acJobConfs
+            = this.jobConfRepository.findAll(Example.of(query), new Sort(Sort.Direction.DESC, "updateTime"));
+        if (CollectionUtils.isEmpty(acJobConfs)) {
+            LOGGER.trace("JobConf is empty,jobId:{}", jobId);
+            return Collections.emptyList();
+        }
+        List<JobConfDTO> jobConfDTOs = new ArrayList<>(acJobConfs.size());
+        for (AcJobConf acJobConf : acJobConfs) {
+            JobConfDTO jobConfDTO = createJobConfDTO(acJobConf);
+            jobConfDTOs.add(jobConfDTO);
+        }
+        return jobConfDTOs;
+    }
+
+    private JobConfDTO createJobConfDTO(AcJobConf acJobConf) {
+        JobConfDTO jobConfDTO = new JobConfDTO();
+        BeanUtils.copyProperties(acJobConf, jobConfDTO);
+        jobConfDTO.setContent(JsonUtils.fromJson(acJobConf.getContent(), Content.class));
+        return jobConfDTO;
     }
 
     @Transactional(readOnly = true)
     @Override
     public List<JobConfDTO> findAll() {
         LOGGER.trace("start find  all JobConf");
-        List<AcJobConf> acJobConfs = this.jobConfRepository.findByIsValid(Valid.VALID.getValid(),
-            new Sort(Sort.Direction.DESC, "update_time"));
+        List<AcJobConf> acJobConfs
+            = this.jobConfRepository.findByIsValid(Valid.VALID.getValid(), new Sort(Sort.Direction.DESC, "updateTime"));
         if (CollectionUtils.isEmpty(acJobConfs)) {
             LOGGER.trace("JobConf is empty");
             return Collections.emptyList();
         }
         List<JobConfDTO> jobConfDTOs = new ArrayList<>(acJobConfs.size());
         for (AcJobConf acJobConf : acJobConfs) {
-            JobConfDTO jobConfDTO = new JobConfDTO();
-            BeanUtils.copyProperties(acJobConf, jobConfDTO);
+            JobConfDTO jobConfDTO = createJobConfDTO(acJobConf);
             jobConfDTOs.add(jobConfDTO);
         }
         return jobConfDTOs;

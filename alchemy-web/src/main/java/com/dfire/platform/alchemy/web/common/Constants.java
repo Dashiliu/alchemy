@@ -6,6 +6,30 @@ package com.dfire.platform.alchemy.web.common;
  */
 public final class Constants {
 
+    public static final String BIND_PREFIX_TABLE = "table";
+
+    public static final String DESCRIPTOR_TYPE_KEY = "type";
+
+    public static final String TYPE_VALUE_JAR = "jar";
+
+    public static final String TYPE_VALUE_SOURCE = "source";
+
+    public static final String TYPE_VALUE_TABLE = "table";
+
+    public static final String TYPE_VALUE_UDF = "udf";
+
+    public static final String CONNECTOR_TYPE_VALUE_KAFKA = "kafka";
+
+    public static final String SINK_TYPE_VALUE_REDIS = "redis";
+
+    public static final String SINK_TYPE_VALUE_ES = "elasticsearch";
+
+    public static final String SINK_TYPE_VALUE_HBASE = "hbase";
+
+    public static final String SINK_TYPE_VALUE_KAFKA = "kafka";
+
+    public static final String SINK_TYPE_VALUE_OPENTSDB = "opentsdb";
+
     // Regex for acceptable logins
     public static final String LOGIN_REGEX = "^[_.@A-Za-z0-9-]*$";
 

@@ -5,6 +5,7 @@ import org.springframework.util.Assert;
 
 import com.dfire.platform.alchemy.connectors.elasticsearch.ElasticsearchTableSink;
 import com.dfire.platform.alchemy.web.common.ClusterType;
+import com.dfire.platform.alchemy.web.common.Constants;
 
 /**
  * @author congbai
@@ -13,6 +14,8 @@ import com.dfire.platform.alchemy.web.common.ClusterType;
 @Component
 public class EsSinkDescriptor extends SinkDescriptor {
 
+    private String name;
+
     private String address;
 
     private String clusterName;
@@ -20,6 +23,15 @@ public class EsSinkDescriptor extends SinkDescriptor {
     private String index;
 
     private int bufferSize;
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public String getAddress() {
         return address;
@@ -54,11 +66,6 @@ public class EsSinkDescriptor extends SinkDescriptor {
     }
 
     @Override
-    public String getContentType() {
-        return "esSink";
-    }
-
-    @Override
     public <T> T transform(ClusterType clusterType) throws Exception {
         if (ClusterType.FLINK.equals(clusterType)) {
             return transformFlink();
@@ -75,5 +82,10 @@ public class EsSinkDescriptor extends SinkDescriptor {
 
     private <T> T transformFlink() {
         return (T)new ElasticsearchTableSink(this.address, this.clusterName, this.index, this.bufferSize);
+    }
+
+    @Override
+    public String getType() {
+        return Constants.SINK_TYPE_VALUE_ES;
     }
 }

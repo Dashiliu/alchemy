@@ -6,7 +6,7 @@ package com.dfire.platform.alchemy.web.common;
  */
 public enum ConfType {
 
-    JAR(0), SOURCE(1), UDF(2), SINK(3), SQL(4)
+    JAR(0), CONFIG(1), SQL(2)
 
     ;
 

@@ -1,11 +1,9 @@
 import './vendor.ts';
-
 import { NgModule, Injector } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { Ng2Webstorage, LocalStorageService, SessionStorageService } from 'ngx-webstorage';
 import { JhiEventManager } from 'ng-jhipster';
-
 import { AuthInterceptor } from './blocks/interceptor/auth.interceptor';
 import { AuthExpiredInterceptor } from './blocks/interceptor/auth-expired.interceptor';
 import { ErrorHandlerInterceptor } from './blocks/interceptor/errorhandler.interceptor';
@@ -17,8 +15,8 @@ import { AlchemyHomeModule } from './home/home.module';
 import { AlchemyAccountModule } from './account/account.module';
 import { AlchemyEntityModule } from './entities/entity.module';
 import { CodemirrorModule } from 'ng2-codemirror';
-// jhipster-needle-angular-add-module-import JHipster will add new module here
 import { JhiMainComponent, NavbarComponent, FooterComponent, PageRibbonComponent, ErrorComponent } from './layouts';
+// jhipster-needle-angular-add-module-import JHipster will add new module here
 
 @NgModule({
     imports: [
@@ -31,6 +29,7 @@ import { JhiMainComponent, NavbarComponent, FooterComponent, PageRibbonComponent
         AlchemyAccountModule,
         AlchemyEntityModule,
         CodemirrorModule
+
         // jhipster-needle-angular-add-module JHipster will add new module here
     ],
     declarations: [JhiMainComponent, NavbarComponent, ErrorComponent, PageRibbonComponent, FooterComponent],

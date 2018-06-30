@@ -2,6 +2,8 @@ package com.dfire.platform.alchemy.web.rest.vm;
 
 import javax.validation.constraints.NotNull;
 
+import com.dfire.platform.alchemy.web.common.Content;
+
 /**
  * @author congbai
  * @date 2018/6/8
@@ -14,7 +16,7 @@ public class JobConfVM {
     private Long acJobId;
 
     @NotNull
-    private String content;
+    private Content content;
 
     @NotNull
     private int type;
@@ -38,11 +40,11 @@ public class JobConfVM {
         this.acJobId = acJobId;
     }
 
-    public String getContent() {
+    public Content getContent() {
         return content;
     }
 
-    public void setContent(String content) {
+    public void setContent(Content content) {
         this.content = content;
     }
 

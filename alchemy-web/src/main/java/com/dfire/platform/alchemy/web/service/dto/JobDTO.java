@@ -64,7 +64,6 @@ public class JobDTO {
         this.submitMode = submitMode;
     }
 
-
     public int getStatus() {
         return status;
     }

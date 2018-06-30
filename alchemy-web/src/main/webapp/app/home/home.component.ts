@@ -1,13 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
-
 import { ActivatedRoute, Router } from '@angular/router';
 import { JhiEventManager, JhiParseLinks, JhiAlertService } from 'ng-jhipster';
-
 import { ITEMS_PER_PAGE } from '../shared';
 import { LoginModalService, Principal } from '../core';
 import { JobService } from './job.service';
-import { Job } from './job.model';
+import { Job } from './model/job.model';
 import { NgbModalRef, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { JobDeleteDialogComponent } from './job-delete-dialog.component';
 

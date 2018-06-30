@@ -3,6 +3,7 @@ package com.dfire.platform.alchemy.web.descriptor;
 import org.springframework.stereotype.Component;
 
 import com.dfire.platform.alchemy.web.common.ClusterType;
+import com.dfire.platform.alchemy.web.common.Constants;
 
 /**
  * @author congbai
@@ -11,9 +12,15 @@ import com.dfire.platform.alchemy.web.common.ClusterType;
 @Component
 public class TsdbSinkDescriptor extends SinkDescriptor {
 
+    private String name;
+
     @Override
-    public String getContentType() {
-        return "tsdbSink";
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override
@@ -24,5 +31,10 @@ public class TsdbSinkDescriptor extends SinkDescriptor {
     @Override
     public void validate() throws Exception {
 
+    }
+
+    @Override
+    public String getType() {
+        return Constants.SINK_TYPE_VALUE_OPENTSDB;
     }
 }

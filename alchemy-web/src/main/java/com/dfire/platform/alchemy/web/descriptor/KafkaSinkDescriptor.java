@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import com.dfire.platform.alchemy.web.common.ClusterType;
+import com.dfire.platform.alchemy.web.common.Constants;
 import com.dfire.platform.alchemy.web.util.PropertiesUtils;
 
 /**
@@ -20,11 +21,22 @@ import com.dfire.platform.alchemy.web.util.PropertiesUtils;
 @Component
 public class KafkaSinkDescriptor extends SinkDescriptor {
 
+    private String name;
+
     private String topic;
 
     private String brokers;
 
     private Map<String, String> properties;
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public String getTopic() {
         return topic;
@@ -48,11 +60,6 @@ public class KafkaSinkDescriptor extends SinkDescriptor {
 
     public void setProperties(Map<String, String> properties) {
         this.properties = properties;
-    }
-
-    @Override
-    public String getContentType() {
-        return "kafkaSink";
     }
 
     @Override
@@ -80,5 +87,10 @@ public class KafkaSinkDescriptor extends SinkDescriptor {
             Preconditions.checkNotNull(this.brokers, "brokers can not be null"));
         Properties conf = PropertiesUtils.getProperties(prop);
         return (T)new Kafka010JsonTableSink(this.topic, conf);
+    }
+
+    @Override
+    public String getType() {
+        return Constants.SINK_TYPE_VALUE_KAFKA;
     }
 }

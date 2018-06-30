@@ -15,7 +15,9 @@ public interface JobConfService {
 
     void update(JobConfVM jobConfVM);
 
-    List<JobConfDTO> findByType(Long jobiD,int type);
+    List<JobConfDTO> findByType(Long jobiD, int type);
+
+    List<JobConfDTO> findByJobId(Long jobiD);
 
     List<JobConfDTO> findAll();
 

@@ -2,6 +2,8 @@ package com.dfire.platform.alchemy.web.service.dto;
 
 import java.util.Date;
 
+import com.dfire.platform.alchemy.web.common.Content;
+
 /**
  * @author congbai
  * @date 11/11/2017
@@ -12,7 +14,7 @@ public class JobConfDTO {
 
     private String acJobId;
 
-    private String content;
+    private Content content;
 
     private int type;
 
@@ -36,11 +38,11 @@ public class JobConfDTO {
         this.acJobId = acJobId;
     }
 
-    public String getContent() {
+    public Content getContent() {
         return content;
     }
 
-    public void setContent(String content) {
+    public void setContent(Content content) {
         this.content = content;
     }
 
