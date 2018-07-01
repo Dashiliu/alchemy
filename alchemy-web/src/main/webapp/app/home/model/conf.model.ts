@@ -10,8 +10,8 @@ export class Conf {
     ) {
         this.id = id ? id : null;
         this.acJobId = acJobId ? acJobId : null;
-        this.content = content ? content : new Content();
-        this.type = type ? type : 1;
+        this.content = content ? content : new Content(null, null);
+        this.type = type ? type : null;
         this.createTime = createTime ? createTime : null;
         this.updateTime = updateTime ? updateTime : null;
     }

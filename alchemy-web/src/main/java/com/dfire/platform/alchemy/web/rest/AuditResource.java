@@ -1,5 +1,7 @@
 package com.dfire.platform.alchemy.web.rest;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
@@ -7,6 +9,8 @@ import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 
+import com.dfire.platform.alchemy.web.rest.vm.JobVM;
+import com.dfire.platform.alchemy.web.service.dto.JobDTO;
 import org.springframework.boot.actuate.audit.AuditEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -91,18 +95,18 @@ public class AuditResource {
         return ResponseUtil.wrapOrNotFound(auditEventService.find(id));
     }
 
-    @GetMapping(value = "/pass", params = {"acJobId"})
-    @ResponseBody
-    public ResponseEntity<Void> pass(@RequestParam(value = "acJobId") @NotEmpty Long acJobId) {
+    @GetMapping(value = "/pass", params = {"jobId"})
+    public ResponseEntity<Void> pass(@RequestParam(value = "jobId") @NotEmpty Long acJobId) throws URISyntaxException {
         this.jobService.updateStatus(acJobId, Status.AUDIT_PASS.getStatus());
         this.submitService.submit(acJobId);
-        return ResponseEntity.ok().headers(HeaderUtil.createAlert("A job is passed  ", null)).build();
+        return ResponseEntity.created(new URI("/management/audits/pass")).headers(HeaderUtil.createAlert("A job is passed ", null))
+            .build();
     }
 
     @PostMapping(value = "/fail")
-    @ResponseBody
-    public ResponseEntity<Void> fail(@Valid @RequestBody JobFailVM auditVM) {
+    public ResponseEntity<Void> fail(@Valid @RequestBody JobFailVM auditVM) throws URISyntaxException {
         this.jobFailService.save(auditVM);
-        return ResponseEntity.ok().headers(HeaderUtil.createAlert("A job is failed  ", null)).build();
+        return ResponseEntity.created(new URI("/management/audits/fail")).headers(HeaderUtil.createAlert("A job is failed ", null))
+            .build();
     }
 }

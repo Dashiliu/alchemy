@@ -1,7 +1,5 @@
 package com.dfire.platform.alchemy.web.descriptor;
 
-import org.springframework.stereotype.Component;
-
 import com.dfire.platform.alchemy.web.common.ClusterType;
 import com.dfire.platform.alchemy.web.common.Constants;
 
@@ -9,7 +7,6 @@ import com.dfire.platform.alchemy.web.common.Constants;
  * @author congbai
  * @date 03/06/2018
  */
-@Component
 public class TsdbSinkDescriptor extends SinkDescriptor {
 
     private String name;

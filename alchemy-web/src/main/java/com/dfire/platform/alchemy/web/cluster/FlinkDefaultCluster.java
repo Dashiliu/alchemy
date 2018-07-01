@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -27,6 +28,7 @@ import org.apache.flink.optimizer.DataStatistics;
 import org.apache.flink.optimizer.Optimizer;
 import org.apache.flink.optimizer.costs.DefaultCostEstimator;
 import org.apache.flink.optimizer.plan.FlinkPlan;
+import org.apache.flink.runtime.client.JobStatusMessage;
 import org.apache.flink.runtime.jobmanager.HighAvailabilityMode;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -62,7 +64,7 @@ public class FlinkDefaultCluster implements Cluster {
 
     private static final String NAME = "flink_default";
 
-    private static final String MATCH_CODE = "^\\${[1-9]{1,2}}$";
+    private static final String MATCH_CODE = "^\\$\\{[0-9]{1,2}\\}$";
 
     private static final String REPLACE_CODE = "[^\\d]+";
 
@@ -116,7 +118,8 @@ public class FlinkDefaultCluster implements Cluster {
     }
 
     private Response listJob(ListJobFlinkRequest message) throws Exception {
-        return new ListJobFlinkResponse(true, clusterClient.listJobs().get());
+        Collection<JobStatusMessage> jobStatusMessages = clusterClient.listJobs().get();
+        return new ListJobFlinkResponse(true, jobStatusMessages);
     }
 
     private Response cancelJob(CancelFlinkRequest message) throws Exception {
@@ -155,34 +158,31 @@ public class FlinkDefaultCluster implements Cluster {
     }
 
     private Response sendSqlSubmitRequest(SqlSubmitFlinkRequest message) throws Exception {
-        LOGGER.trace("start submit sql request,jobName:{},sql:{}", message.getJobName(),
-            message.getTableDescriptor().getSql());
-        if (CollectionUtils.isEmpty(message.getTableDescriptor().getSources())) {
+        LOGGER.trace("start submit sql request,jobName:{},sql:{}", message.getJobName(), message.getTable().getSql());
+        if (CollectionUtils.isEmpty(message.getTable().getSources())) {
             return new SubmitFlinkResponse(ResultMessage.SOURCE_EMPTY.getMsg());
         }
-        if (CollectionUtils.isEmpty(message.getTableDescriptor().getSinkDescriptors())) {
+        if (CollectionUtils.isEmpty(message.getTable().getSinkDescriptors())) {
             return new SubmitFlinkResponse(ResultMessage.SINK_EMPTY.getMsg());
         }
-        if (StringUtils.isEmpty(message.getTableDescriptor().getSql())) {
+        if (StringUtils.isEmpty(message.getTable().getSql())) {
             return new SubmitFlinkResponse(ResultMessage.SQL_EMPTY.getMsg());
         }
         final StreamExecutionEnvironment execEnv = StreamExecutionEnvironment.createLocalEnvironment();
-        execEnv.setParallelism(message.getTableDescriptor().getParallelism());
+        execEnv.setParallelism(message.getParallelism());
         execEnv.setRestartStrategy(RestartStrategies.fixedDelayRestart(
-            PropertiesUtils.getProperty(message.getTableDescriptor().getRestartAttempts(), Constants.RESTART_ATTEMPTS),
-            PropertiesUtils.getProperty(message.getTableDescriptor().getDelayBetweenAttempts(),
-                Constants.DELAY_BETWEEN_ATTEMPTS)));
-        if (message.getTableDescriptor().getCheckpointingInterval() != null) {
-            execEnv.enableCheckpointing(message.getTableDescriptor().getCheckpointingInterval());
+            PropertiesUtils.getProperty(message.getRestartAttempts(), Constants.RESTART_ATTEMPTS),
+            PropertiesUtils.getProperty(message.getDelayBetweenAttempts(), Constants.DELAY_BETWEEN_ATTEMPTS)));
+        if (message.getCheckpointingInterval() != null) {
+            execEnv.enableCheckpointing(message.getCheckpointingInterval());
         }
         StreamTableEnvironment env = StreamTableEnvironment.getTableEnvironment(execEnv);
-        if (StringUtils.isNotEmpty(message.getTableDescriptor().getTimeCharacteristic())) {
-            execEnv.setStreamTimeCharacteristic(
-                TimeCharacteristic.valueOf(message.getTableDescriptor().getTimeCharacteristic()));
+        if (StringUtils.isNotEmpty(message.getTimeCharacteristic())) {
+            execEnv.setStreamTimeCharacteristic(TimeCharacteristic.valueOf(message.getTimeCharacteristic()));
         } else {
             execEnv.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime);
         }
-        message.getTableDescriptor().getSources().forEach(consumer -> {
+        message.getTable().getSources().forEach(consumer -> {
             try {
                 TableSource tableSource = consumer.transform(clusterType());
                 env.registerTableSource(consumer.getName(), tableSource);
@@ -190,8 +190,8 @@ public class FlinkDefaultCluster implements Cluster {
                 throw new RuntimeException(e);
             }
         });
-        if (CollectionUtils.isNotEmpty(message.getTableDescriptor().getUdfs())) {
-            message.getTableDescriptor().getUdfs().forEach(udfDescriptor -> {
+        if (CollectionUtils.isNotEmpty(message.getTable().getUdfs())) {
+            message.getTable().getUdfs().forEach(udfDescriptor -> {
                 Object udf = null;
                 try {
                     replaceCodeValue(message, udfDescriptor);
@@ -211,8 +211,8 @@ public class FlinkDefaultCluster implements Cluster {
 
             });
         }
-        Table table = env.sqlQuery(message.getTableDescriptor().getSql());
-        message.getTableDescriptor().getSinkDescriptors().forEach(sinkDescriptor -> {
+        Table table = env.sqlQuery(message.getTable().getSql());
+        message.getTable().getSinkDescriptors().forEach(sinkDescriptor -> {
             try {
                 replaceCodeValue(message, sinkDescriptor);
                 table.writeToSink(sinkDescriptor.transform(clusterType()));
@@ -226,7 +226,7 @@ public class FlinkDefaultCluster implements Cluster {
         }
         StreamGraph streamGraph = execEnv.getStreamGraph();
         streamGraph.setJobName(message.getJobName());
-        List<URL> jarFiles = createPath(message.getTableDescriptor().getJarPath());
+        List<URL> jarFiles = createPath(message.getJarPath());
         ClassLoader usercodeClassLoader
             = JobWithJars.buildUserCodeClassLoader(jarFiles, createGlobalPath(), getClass().getClassLoader());
         try {
@@ -259,7 +259,7 @@ public class FlinkDefaultCluster implements Cluster {
                     Pattern pattern = Pattern.compile(REPLACE_CODE);
                     Matcher matcher = pattern.matcher(value);
                     Integer index = Integer.valueOf(matcher.replaceAll("").trim());
-                    field.set(descriptor, message.getTableDescriptor().getCodes().get(index));
+                    field.set(descriptor, message.getTable().getCodes().get(index));
                 }
             }
         }

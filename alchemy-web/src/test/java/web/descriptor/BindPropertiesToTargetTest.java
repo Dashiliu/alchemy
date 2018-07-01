@@ -1,9 +1,13 @@
 package web.descriptor;
 
 import com.dfire.platform.alchemy.web.bind.BindPropertiesFactory;
+import com.dfire.platform.alchemy.web.cluster.request.SqlSubmitFlinkRequest;
+import com.dfire.platform.alchemy.web.common.Constants;
 import com.dfire.platform.alchemy.web.descriptor.ConnectorDescriptor;
-import com.dfire.platform.alchemy.web.descriptor.TableDescriptor;
+import com.dfire.platform.alchemy.web.descriptor.SinkDescriptor;
 import org.junit.Test;
+
+import java.util.List;
 
 
 /**
@@ -54,9 +58,10 @@ public class BindPropertiesToTargetTest {
             "          type: json\n" +
             "          schema: \"ROW(rideId LONG, lon FLOAT, lat FLOAT, rideTime TIMESTAMP)\"\n" +
             "\n";
-        TableDescriptor tableDescriptor=new TableDescriptor();
-        BindPropertiesFactory.bindPropertiesToTarget(tableDescriptor,"table",value);
-        ConnectorDescriptor connectorDescriptor=tableDescriptor.getSources().get(0).getConnectorDescriptor();
+        SqlSubmitFlinkRequest sqlSubmitFlinkRequest =new SqlSubmitFlinkRequest();
+        BindPropertiesFactory.bindProperties(sqlSubmitFlinkRequest, Constants.BIND_PREFIX,value);
+        ConnectorDescriptor connectorDescriptor=sqlSubmitFlinkRequest.getTable().getSources().get(0).getConnectorDescriptor();
+        List<SinkDescriptor> sinkDescriptorList=sqlSubmitFlinkRequest.getTable().getSinkDescriptors();
     }
 
 

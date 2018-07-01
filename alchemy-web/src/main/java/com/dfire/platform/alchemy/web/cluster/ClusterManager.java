@@ -32,7 +32,7 @@ public class ClusterManager {
 
     public ClusterManager(ClusterProperties clusterProperties, Cluster... clusters) {
         this.clusterProperties = clusterProperties;
-        this.nameClusters = init(clusterProperties, clusters);
+        this.nameClusters = init(this.clusterProperties, clusters);
     }
 
     private Map<String, Cluster> init(ClusterProperties clusterProperties, Cluster[] clusters) {

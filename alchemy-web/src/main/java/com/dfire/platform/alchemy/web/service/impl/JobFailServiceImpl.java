@@ -39,11 +39,11 @@ public class JobFailServiceImpl implements JobFailService {
 
     @Override
     public void save(JobFailVM jobFailVM) {
-        this.jobService.updateStatus(jobFailVM.getAcJobId(), Status.AUDIT_FAIL.getStatus());
+        this.jobService.updateStatus(jobFailVM.getJobId(), Status.AUDIT_FAIL.getStatus());
         AcJobFailMsg jobFailMsg = new AcJobFailMsg();
         jobFailMsg.setId(flame.nextId());
-        jobFailMsg.setAcJobId(jobFailMsg.getAcJobId());
-        jobFailMsg.setMsg(jobFailMsg.getMsg());
+        jobFailMsg.setAcJobId(jobFailVM.getJobId());
+        jobFailMsg.setMsg(jobFailVM.getMsg());
         this.jobFailMsgRepository.save(jobFailMsg);
     }
 

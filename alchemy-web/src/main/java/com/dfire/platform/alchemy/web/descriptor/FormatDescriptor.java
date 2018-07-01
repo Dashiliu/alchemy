@@ -1,5 +1,7 @@
 package com.dfire.platform.alchemy.web.descriptor;
 
+import com.dfire.platform.alchemy.web.common.Constants;
+
 /**
  * @author congbai
  * @date 2018/6/30
@@ -10,7 +12,7 @@ public class FormatDescriptor implements Descriptor {
 
     @Override
     public String getType() {
-        return null;
+        return Constants.TYPE_VALUE_FORMAT;
     }
 
     @Override

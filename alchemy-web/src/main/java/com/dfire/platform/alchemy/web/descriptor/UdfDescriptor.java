@@ -2,7 +2,6 @@ package com.dfire.platform.alchemy.web.descriptor;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import com.dfire.platform.alchemy.api.function.StreamAggregateFunction;
@@ -22,7 +21,6 @@ import com.dfire.platform.alchemy.web.common.ReadMode;
  * @author congbai
  * @date 01/06/2018
  */
-@Component
 public class UdfDescriptor implements CoreDescriptor {
 
     private int readMode = ReadMode.CODE.getMode();
@@ -73,7 +71,7 @@ public class UdfDescriptor implements CoreDescriptor {
     }
 
     private <T> T transformFlink() {
-        if (ReadMode.JAR.equals(this.readMode)) {
+        if (ReadMode.JAR.getMode() == this.readMode) {
             try {
                 Class clazz = Class.forName(this.value);
                 Object udf = clazz.newInstance();
@@ -97,7 +95,7 @@ public class UdfDescriptor implements CoreDescriptor {
             } catch (Exception ex) {
                 throw new IllegalArgumentException("Invalid UDF " + this.name, ex);
             }
-        } else if (ReadMode.CODE.equals(this.readMode)) {
+        } else if (ReadMode.CODE.getMode() == this.readMode) {
             try {
                 Class<StreamScalarFunction> clazz = GroovyCompiler.compile(this.value, this.name);
                 Object udf = clazz.newInstance();

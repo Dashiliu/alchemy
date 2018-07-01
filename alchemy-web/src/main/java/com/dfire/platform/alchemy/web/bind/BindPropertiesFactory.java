@@ -1,12 +1,14 @@
 package com.dfire.platform.alchemy.web.bind;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.config.YamlProcessor;
 import org.springframework.core.CollectionFactory;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -20,18 +22,15 @@ import org.yaml.snakeyaml.resolver.Resolver;
  */
 public class BindPropertiesFactory {
 
-    public static void bindPropertiesToTarget(Object target, String prefix, String value) throws Exception {
-        PropertiesConfigurationFactory<Object> factory = new PropertiesConfigurationFactory<Object>(target);
-        factory.setProperties(createProperty(value));
-        factory.setIgnoreInvalidFields(false);
-        factory.setIgnoreUnknownFields(true);
-        factory.setExceptionIfInvalid(true);
-        factory.setIgnoreNestedProperties(false);
-        factory.setTargetName(prefix);
-        factory.bindPropertiesToTarget();
+    public static void bindProperties(Object target, String prefix, String value) throws Exception {
+        bindProperties(target, prefix, createProperties(value));
     }
 
-    public static void bindPropertiesToTarget(Object target, String prefix, Properties properties) throws Exception {
+    public static void bindProperties(Object target, String prefix, InputStream inputStream) throws Exception {
+        bindProperties(target, prefix, createProperties(inputStream));
+    }
+
+    public static void bindProperties(Object target, String prefix, Properties properties) throws Exception {
         PropertiesConfigurationFactory<Object> factory = new PropertiesConfigurationFactory<Object>(target);
         factory.setProperties(properties);
         factory.setIgnoreInvalidFields(false);
@@ -42,9 +41,15 @@ public class BindPropertiesFactory {
         factory.bindPropertiesToTarget();
     }
 
-    private static Properties createProperty(String value) throws IOException {
+    private static Properties createProperties(String value) throws IOException {
         ByteArrayResource byteArrayResource = new ByteArrayResource(value.getBytes());
         Processor propertySources = new Processor(byteArrayResource);
+        return propertySources.createProperties();
+    }
+
+    private static Properties createProperties(InputStream inputStream) throws IOException {
+        InputStreamResource inputStreamResource = new InputStreamResource(inputStream);
+        Processor propertySources = new Processor(inputStreamResource);
         return propertySources.createProperties();
     }
 

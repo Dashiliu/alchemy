@@ -1,0 +1,19 @@
+<form name="deleteForm" (ngSubmit)="confirmSubmit()">
+    <div class="modal-header">
+        <h4 class="modal-title">Confirm submit operation</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+                (click)="clear()">&times;</button>
+    </div>
+    <div class="modal-body">
+        <jhi-alert-error></jhi-alert-error>
+        <p>Are you sure you want to submit this Job?</p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="clear()">
+            <fa-icon [icon]="'ban'"></fa-icon>&nbsp;<span>Cancel</span>
+        </button>
+        <button type="submit" class="btn btn-danger">
+            <fa-icon [icon]="'save'"></fa-icon>&nbsp;<span>Submit</span>
+        </button>
+    </div>
+</form>

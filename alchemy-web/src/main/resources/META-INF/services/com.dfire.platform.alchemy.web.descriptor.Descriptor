@@ -1,0 +1,11 @@
+com.dfire.platform.alchemy.web.descriptor.EsSinkDescriptor
+com.dfire.platform.alchemy.web.descriptor.FormatDescriptor
+com.dfire.platform.alchemy.web.descriptor.HbaseSinkDescriptor
+com.dfire.platform.alchemy.web.descriptor.JarInfoDescriptor
+com.dfire.platform.alchemy.web.descriptor.KafkaConnectorDescriptor
+com.dfire.platform.alchemy.web.descriptor.KafkaSinkDescriptor
+com.dfire.platform.alchemy.web.descriptor.RedisSinkDescriptor
+com.dfire.platform.alchemy.web.descriptor.SourceDescriptor
+com.dfire.platform.alchemy.web.descriptor.TableDescriptor
+com.dfire.platform.alchemy.web.descriptor.TsdbSinkDescriptor
+com.dfire.platform.alchemy.web.descriptor.UdfDescriptor

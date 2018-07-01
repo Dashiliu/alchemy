@@ -3,8 +3,6 @@ import { HomeComponent } from './';
 import { JhiResolvePagingParams } from 'ng-jhipster';
 import { JobCreateComponent } from './job-create.component';
 import { ConfComponent } from './conf/conf.component';
-import { ConfDeleteComponent } from './conf/conf-delete-dialog.component';
-import { ConfUpdateComponent } from './conf/conf-update.component';
 import { Injectable } from '@angular/core';
 import { JobService } from './job.service';
 import { Job } from './model/job.model';
@@ -66,14 +64,14 @@ export const HOME_ROUTE: Routes = [
         data: {
             pageTitle: 'JobConf'
         }
-    },
-    {
-        path: 'confs/:jobId/:id/delete',
-        component: ConfDeleteComponent,
-        data: {
-            pageTitle: 'JobConf'
-        }
     }
+    // {
+    //     path: 'confs/:jobId/:id/delete',
+    //     component: ConfDeleteComponent,
+    //     data: {
+    //         pageTitle: 'JobConf'
+    //     }
+    // }
     // {
     //     path: 'confs/:jobId/:type/new',
     //     component: ConfUpdateComponent,

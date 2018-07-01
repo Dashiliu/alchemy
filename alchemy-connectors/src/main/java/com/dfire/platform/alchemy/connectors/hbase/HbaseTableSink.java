@@ -15,8 +15,6 @@ import org.apache.flink.types.Row;
 import org.apache.flink.util.Preconditions;
 
 import com.dfire.platform.alchemy.api.sink.HbaseInvoker;
-import com.dfire.platform.alchemy.api.util.GroovyCompiler;
-import com.dfire.platform.alchemy.api.util.RandomUtils;
 
 /**
  * @author congbai
@@ -92,19 +90,7 @@ public class HbaseTableSink implements UpsertStreamTableSink<Row> {
 
         RowTypeInfo rowSchema = new RowTypeInfo(fieldTypes, fieldNames);
         copy.serializationSchema = new JsonRowSerializationSchema(rowSchema);
-        if (this.hbaseInvoker == null) {
-            copy.hbaseInvoker = createInvoker(this.code);
-        }
         return copy;
-    }
-
-    private HbaseInvoker createInvoker(String code) {
-        Class clazz = GroovyCompiler.compile(code, RandomUtils.uuid());
-        try {
-            return (HbaseInvoker)clazz.newInstance();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override
@@ -134,8 +120,13 @@ public class HbaseTableSink implements UpsertStreamTableSink<Row> {
     }
 
     private OutputFormatSinkFunction creatHbaseSink() {
-        return new OutputFormatSinkFunction(new HBaseOutputFormat(this.zookeeper, this.node, this.tableName,
-            this.family, this.bufferSize, this.fieldNames.length, this.serializationSchema, this.hbaseInvoker));
+        if (this.hbaseInvoker != null) {
+            return new OutputFormatSinkFunction(new HBaseOutputFormat(this.zookeeper, this.node, this.tableName,
+                this.family, this.bufferSize, this.fieldNames.length, this.serializationSchema, this.hbaseInvoker));
+        } else {
+            return new OutputFormatSinkFunction(new HBaseOutputFormat(this.zookeeper, this.node, this.tableName,
+                this.family, this.bufferSize, this.fieldNames.length, this.serializationSchema, this.code));
+        }
     }
 
 }

@@ -1,6 +1,5 @@
 package com.dfire.platform.alchemy.web.descriptor;
 
-import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import com.dfire.platform.alchemy.connectors.elasticsearch.ElasticsearchTableSink;
@@ -11,7 +10,6 @@ import com.dfire.platform.alchemy.web.common.Constants;
  * @author congbai
  * @date 03/06/2018
  */
-@Component
 public class EsSinkDescriptor extends SinkDescriptor {
 
     private String name;

@@ -37,10 +37,16 @@ public class AlchemyApp {
      *
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Throwable {
         SpringApplication app = new SpringApplication(AlchemyApp.class);
         DefaultProfileUtil.addDefaultProfile(app);
-        Environment env = app.run(args).getEnvironment();
+        Environment env=null;
+        try {
+             env = app.run(args).getEnvironment();
+        }catch (Throwable e){
+            throw new Throwable(e);
+        }
+
         String protocol = "http";
         if (env.getProperty("server.ssl.key-store") != null) {
             protocol = "https";

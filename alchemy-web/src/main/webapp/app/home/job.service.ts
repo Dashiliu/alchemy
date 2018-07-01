@@ -20,11 +20,31 @@ export class JobService {
         return this.http.get<Job[]>(this.resourceUrl, { params: options, observe: 'response' });
     }
 
+    updateStatus(id: any, status: any): Observable<HttpResponse<Job>> {
+        const options = createRequestOption({ jobId: id, status: status });
+        return this.http.get<Job>(`${this.resourceUrl}/status`, { params: options, observe: 'response' });
+    }
+
     find(id: string): Observable<HttpResponse<Job>> {
         return this.http.get<Job>(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 
     delete(id: string): Observable<HttpResponse<any>> {
         return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
+    }
+
+    pass(jobId: any): Observable<HttpResponse<any>> {
+        const options = createRequestOption({ jobId: jobId });
+        const requestURL = SERVER_API_URL + 'management/audits/pass';
+
+        return this.http.get<any>(requestURL, {
+            params: options,
+            observe: 'response'
+        });
+    }
+
+    fail(req: any): Observable<HttpResponse<any>> {
+        const requestURL = SERVER_API_URL + 'management/audits/fail';
+        return this.http.post<any>(requestURL, req, { observe: 'response' });
     }
 }

@@ -8,12 +8,32 @@ import javax.validation.constraints.Pattern;
  */
 public class JobVM {
 
+    private Long id;
+
     private Long acServiceId;
 
     @Pattern(regexp = "^[A-Za-z0-9-]*$")
     private String name;
 
-    private int submitMode;
+    private Integer submitMode;
+
+    private Integer status;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
 
     public Long getAcServiceId() {
         return acServiceId;
@@ -31,11 +51,11 @@ public class JobVM {
         this.name = name;
     }
 
-    public int getSubmitMode() {
+    public Integer getSubmitMode() {
         return submitMode;
     }
 
-    public void setSubmitMode(int submitMode) {
+    public void setSubmitMode(Integer submitMode) {
         this.submitMode = submitMode;
     }
 

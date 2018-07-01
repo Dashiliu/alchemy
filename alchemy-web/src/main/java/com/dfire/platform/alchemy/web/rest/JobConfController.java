@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.dfire.platform.alchemy.web.common.Content;
+import com.dfire.platform.alchemy.web.util.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -62,7 +64,16 @@ public class JobConfController {
         @RequestParam(value = "type") Integer type) {
         LOGGER.debug("REST request to get JobConf ,jobid: {}", jobId);
         final List<JobConfDTO> jobDTOList = jobConfService.findByType(jobId, type);
-        return new ResponseEntity<>(CollectionUtils.isEmpty(jobDTOList) ? jobDTOList.get(0) : null,
+        JobConfDTO jobConfDTO;
+        if(CollectionUtils.isEmpty(jobDTOList)){
+            jobConfDTO=new JobConfDTO();
+            jobConfDTO.setAcJobId(jobId);
+            jobConfDTO.setType(type);
+            jobConfDTO.setContent(new Content());
+        }else{
+            jobConfDTO=jobDTOList.get(0);
+        }
+        return new ResponseEntity<>(jobConfDTO,
             HeaderUtil.createAlert("get jobConf ", null), HttpStatus.OK);
     }
 

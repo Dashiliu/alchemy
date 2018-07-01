@@ -78,12 +78,34 @@
                 <td class="text-right">
                     <div class="btn-group flex-btn-group-container">
                         <button type="submit"
-                                [routerLink]="['./confs', job.id, 'info']"
+                                [routerLink]="['./confs', job.id,1, 'info']"
                                 queryParamsHandling="merge"
                                 class="btn btn-primary btn-sm">
                             <fa-icon [icon]="'pencil-alt'"></fa-icon>
-                            <span class="d-none d-md-inline">Edit</span>
+                            <span class="d-none d-md-inline">配置</span>
                         </button>
+                        <button type="submit"
+                                [routerLink]="['./confs', job.id,2, 'info']"
+                                queryParamsHandling="merge"
+                                class="btn btn-primary btn-sm">
+                            <fa-icon [icon]="'pencil-alt'"></fa-icon>
+                            <span class="d-none d-md-inline">sql</span>
+                        </button>
+                        <div  *ngIf="job.status==0">
+                            <button type="submit"
+                                    queryParamsHandling="merge" (click)="submit(job.id)"
+                                    class="btn btn-primary btn-sm">
+                                <span class="d-none d-md-inline">提审</span>
+                            </button>
+                        </div>
+                        <div  *ngIf="job.status==1">
+                            <button type="submit" *jhiHasAnyAuthority="'ROLE_ADMIN'"
+                                    queryParamsHandling="merge" (click)="audit(job.id)"
+                                    class="btn btn-primary btn-sm">
+                                <span class="d-none d-md-inline">审核</span>
+                            </button>
+                        </div>
+
                         <button type="button" (click)="deleteJob(job.id)"
                                 class="btn btn-danger btn-sm">
                             <fa-icon [icon]="'times'"></fa-icon>

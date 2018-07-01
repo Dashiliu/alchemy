@@ -34,7 +34,7 @@ import com.dfire.platform.alchemy.web.cluster.response.Response;
 import com.dfire.platform.alchemy.web.cluster.response.SubmitFlinkResponse;
 import com.dfire.platform.alchemy.web.common.*;
 import com.dfire.platform.alchemy.web.config.Flame;
-import com.dfire.platform.alchemy.web.descriptor.DescriptorManager;
+import com.dfire.platform.alchemy.web.descriptor.DescriptorFactory;
 import com.dfire.platform.alchemy.web.descriptor.JarInfoDescriptor;
 import com.dfire.platform.alchemy.web.descriptor.TableDescriptor;
 import com.dfire.platform.alchemy.web.domain.AcJob;
@@ -59,7 +59,6 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClusterJobServiceImpl.class);
     private final ClusterManager clusterManager;
-    private final DescriptorManager descriptorManager;
     private final AcJobRepository jobRepository;
     private final AcJobConfRepository jobConfRepository;
     private final AcJobHistoryRepository jobHistoryRepository;
@@ -78,11 +77,10 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
 
     private long period;
 
-    public ClusterJobServiceImpl(ClusterManager clusterManager, DescriptorManager descriptorManager,
+    public ClusterJobServiceImpl(ClusterManager clusterManager,
         AcJobRepository jobRepository, AcJobConfRepository jobConfRepository,
         AcJobHistoryRepository jobHistoryRepository, Flame flame, ICacheService cacheService) {
         this.clusterManager = clusterManager;
-        this.descriptorManager = descriptorManager;
         this.jobRepository = jobRepository;
         this.jobConfRepository = jobConfRepository;
         this.jobHistoryRepository = jobHistoryRepository;
@@ -301,35 +299,34 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
         private SqlSubmitFlinkRequest createSqlSubmitFlinkRequest(AcJob acJob, List<AcJobConf> jobConfs)
             throws Exception {
             SqlSubmitFlinkRequest sqlSubmitFlinkRequest = new SqlSubmitFlinkRequest();
-            sqlSubmitFlinkRequest.setCluster(acJob.getCluster());
-            sqlSubmitFlinkRequest.setJobName(acJob.getName());
             TableDescriptor tableDescriptor = new TableDescriptor();
-            sqlSubmitFlinkRequest.setTableDescriptor(tableDescriptor);
+            sqlSubmitFlinkRequest.setTable(tableDescriptor);
             for (AcJobConf acJobConf : jobConfs) {
                 switch (ConfType.fromType(acJobConf.getType())) {
                     case SQL:
-                        bindSql(acJobConf, tableDescriptor);
+                        bindSql(acJobConf, sqlSubmitFlinkRequest);
                         break;
                     case CONFIG:
-                        bindConfig(acJobConf, tableDescriptor);
+                        bindConfig(acJobConf, sqlSubmitFlinkRequest);
                         break;
                     default:
                         // nothing to do
                 }
             }
+            sqlSubmitFlinkRequest.setCluster(acJob.getCluster());
+            sqlSubmitFlinkRequest.setJobName(acJob.getName());
             return sqlSubmitFlinkRequest;
         }
 
-        private void bindConfig(AcJobConf acJobConf, TableDescriptor tableDescriptor) throws Exception {
+        private void bindConfig(AcJobConf acJobConf, SqlSubmitFlinkRequest submitFlinkRequest) throws Exception {
             Content content = JsonUtils.fromJson(acJobConf.getContent(), Content.class);
-            BindPropertiesFactory.bindPropertiesToTarget(tableDescriptor, Constants.BIND_PREFIX_TABLE,
-                content.getConfig());
-            tableDescriptor.setCodes(content.getCode());
+            BindPropertiesFactory.bindProperties(submitFlinkRequest, Constants.BIND_PREFIX, content.getConfig());
+            submitFlinkRequest.getTable().setCodes(content.getCode());
         }
 
-        private void bindSql(AcJobConf acJobConf, TableDescriptor tableDescriptor) {
+        private void bindSql(AcJobConf acJobConf, SqlSubmitFlinkRequest submitFlinkRequest) {
             Content content = JsonUtils.fromJson(acJobConf.getContent(), Content.class);
-            tableDescriptor.setSql(content.getConfig());
+            submitFlinkRequest.getTable().setSql(content.getConfig());
         }
 
         private <T> T buildJar(AcJobConf acJobConf, Class<? extends T> clazz) {

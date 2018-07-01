@@ -13,6 +13,8 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 
 import com.dfire.platform.alchemy.api.sink.HbaseInvoker;
+import com.dfire.platform.alchemy.api.util.GroovyCompiler;
+import com.dfire.platform.alchemy.api.util.RandomUtils;
 
 public class HBaseOutputFormat implements OutputFormat<Tuple2<Boolean, Row>> {
 
@@ -31,7 +33,21 @@ public class HBaseOutputFormat implements OutputFormat<Tuple2<Boolean, Row>> {
     private HTable table = null;
     private SerializationSchema<org.apache.flink.types.Row> serializationSchema;
 
+    private String code;
+
     private HbaseInvoker hbaseInvoker;
+
+    public HBaseOutputFormat(String zookeeper, String node, String tableName, String family, long bufferSize,
+        int rowLength, SerializationSchema<Row> serializationSchema, String code) {
+        this.zookeeper = zookeeper;
+        this.node = node;
+        this.tableName = tableName;
+        this.family = family;
+        this.bufferSize = bufferSize;
+        this.rowLength = rowLength;
+        this.serializationSchema = serializationSchema;
+        this.code = code;
+    }
 
     public HBaseOutputFormat(String zookeeper, String node, String tableName, String family, long bufferSize,
         int rowLength, SerializationSchema<Row> serializationSchema, HbaseInvoker hbaseInvoker) {
@@ -58,6 +74,18 @@ public class HBaseOutputFormat implements OutputFormat<Tuple2<Boolean, Row>> {
         if (bufferSize > 0) {
             table.setAutoFlushTo(false);
             table.setWriteBufferSize(bufferSize);
+        }
+        if (this.hbaseInvoker == null) {
+            this.hbaseInvoker = createInvoker(this.code);
+        }
+    }
+
+    private HbaseInvoker createInvoker(String code) {
+        Class clazz = GroovyCompiler.compile(code, RandomUtils.uuid());
+        try {
+            return (HbaseInvoker)clazz.newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

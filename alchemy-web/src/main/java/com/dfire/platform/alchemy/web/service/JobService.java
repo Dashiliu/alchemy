@@ -6,6 +6,8 @@ import org.springframework.data.domain.Pageable;
 import com.dfire.platform.alchemy.web.rest.vm.JobVM;
 import com.dfire.platform.alchemy.web.service.dto.JobDTO;
 
+import javax.validation.Valid;
+
 /**
  * 对job的增删改查
  *
@@ -23,4 +25,5 @@ public interface JobService {
     void delete(Long id);
 
     JobDTO findById(Long id);
+
 }

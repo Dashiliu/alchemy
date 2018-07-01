@@ -9,17 +9,17 @@ import javax.validation.constraints.NotNull;
 public class JobFailVM {
 
     @NotNull
-    private Long acJobId;
+    private Long jobId;
 
     @NotNull
     private String msg;
 
-    public Long getAcJobId() {
-        return acJobId;
+    public Long getJobId() {
+        return jobId;
     }
 
-    public void setAcJobId(Long acJobId) {
-        this.acJobId = acJobId;
+    public void setJobId(Long jobId) {
+        this.jobId = jobId;
     }
 
     public String getMsg() {

@@ -27,7 +27,13 @@ export class ConfComponent {
         private router: Router
     ) {
         this.route.data.subscribe(({ conf }) => {
-            this.conf = conf.body ? conf.body : conf;
+            this.conf = conf.body ? conf.body : new Conf();
+            if (!this.conf.content.code || this.conf.content.code.length == 0) {
+                this.conf.content.code = [''];
+            }
+            if (!this.conf.content.config) {
+                this.conf.content.config = '';
+            }
         });
     }
 
@@ -56,7 +62,9 @@ export class ConfComponent {
         this.router.navigate(['']);
     }
 
-    private onSaveSuccess(result) {}
+    private onSaveSuccess(result) {
+        this.router.navigate(['']);
+    }
 
     private onSaveError(error) {
         this.alertService.error(error.error, error.message, null);

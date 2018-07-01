@@ -11,7 +11,7 @@
                     <label class="form-control-label">任务名称</label>
                     <input type="text" class="form-control" name="name" #loginInput="ngModel"
                         [(ngModel)]="job.name" required minlength="1" maxlength="50" pattern="^[A-Za-z0-9-]*$">
-
+                </div>
 
                 <div class="form-group">
                     <label>提交方式</label>
@@ -19,7 +19,6 @@
                         <option *ngFor="let mode of modes" [value]="mode.value">{{mode.label}}</option>
                     </select>
                 </div>
-            </div>
             <div>
                 <button type="button" class="btn btn-secondary" (click)="previousState()">
                     <fa-icon [icon]="'ban'"></fa-icon>&nbsp;<span

@@ -25,7 +25,7 @@ export class ConfService {
 
     query(req?: any): Observable<HttpResponse<Conf>> {
         const options = createRequestOption(req);
-        return this.http.get<Conf[]>(this.resourceUrl, { params: options, observe: 'response' });
+        return this.http.get<Conf>(this.resourceUrl, { params: options, observe: 'response' });
     }
 
     delete(id: string): Observable<HttpResponse<any>> {

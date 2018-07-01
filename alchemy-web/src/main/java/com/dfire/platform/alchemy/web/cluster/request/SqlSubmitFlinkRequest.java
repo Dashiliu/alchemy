@@ -8,13 +8,68 @@ import com.dfire.platform.alchemy.web.descriptor.TableDescriptor;
  */
 public class SqlSubmitFlinkRequest extends AbstractSubmitRequest {
 
-    private TableDescriptor tableDescriptor;
+    private String jarPath;
+    private Integer parallelism;
+    private Long checkpointingInterval;
+    private String timeCharacteristic;
+    private Integer restartAttempts;
+    private Long delayBetweenAttempts;
 
-    public TableDescriptor getTableDescriptor() {
-        return tableDescriptor;
+    private TableDescriptor table;
+
+    public String getJarPath() {
+        return jarPath;
     }
 
-    public void setTableDescriptor(TableDescriptor tableDescriptor) {
-        this.tableDescriptor = tableDescriptor;
+    public void setJarPath(String jarPath) {
+        this.jarPath = jarPath;
+    }
+
+    public Integer getParallelism() {
+        return parallelism;
+    }
+
+    public void setParallelism(Integer parallelism) {
+        this.parallelism = parallelism;
+    }
+
+    public Long getCheckpointingInterval() {
+        return checkpointingInterval;
+    }
+
+    public void setCheckpointingInterval(Long checkpointingInterval) {
+        this.checkpointingInterval = checkpointingInterval;
+    }
+
+    public String getTimeCharacteristic() {
+        return timeCharacteristic;
+    }
+
+    public void setTimeCharacteristic(String timeCharacteristic) {
+        this.timeCharacteristic = timeCharacteristic;
+    }
+
+    public Integer getRestartAttempts() {
+        return restartAttempts;
+    }
+
+    public void setRestartAttempts(Integer restartAttempts) {
+        this.restartAttempts = restartAttempts;
+    }
+
+    public Long getDelayBetweenAttempts() {
+        return delayBetweenAttempts;
+    }
+
+    public void setDelayBetweenAttempts(Long delayBetweenAttempts) {
+        this.delayBetweenAttempts = delayBetweenAttempts;
+    }
+
+    public TableDescriptor getTable() {
+        return table;
+    }
+
+    public void setTable(TableDescriptor table) {
+        this.table = table;
     }
 }

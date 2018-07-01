@@ -2,7 +2,6 @@ package com.dfire.platform.alchemy.web.descriptor;
 
 import java.util.Map;
 
-import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import com.dfire.platform.alchemy.web.common.Constants;
@@ -13,7 +12,6 @@ import com.dfire.platform.alchemy.web.common.Constants;
  * @author congbai
  * @date 03/06/2018
  */
-@Component
 public class KafkaConnectorDescriptor implements ConnectorDescriptor {
 
     private String topic;

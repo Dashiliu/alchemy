@@ -6,7 +6,7 @@ package com.dfire.platform.alchemy.web.common;
  */
 public final class Constants {
 
-    public static final String BIND_PREFIX_TABLE = "table";
+    public static final String BIND_PREFIX = "job";
 
     public static final String DESCRIPTOR_TYPE_KEY = "type";
 
@@ -17,6 +17,8 @@ public final class Constants {
     public static final String TYPE_VALUE_TABLE = "table";
 
     public static final String TYPE_VALUE_UDF = "udf";
+
+    public static final String TYPE_VALUE_FORMAT = "format";
 
     public static final String CONNECTOR_TYPE_VALUE_KAFKA = "kafka";
 

@@ -4,9 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.streaming.connectors.kafka.Kafka010JsonTableSource;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.sources.tsextractors.ExistingField;
@@ -18,8 +16,8 @@ import org.springframework.util.Assert;
 
 import com.dfire.platform.alchemy.web.bind.BindPropertiesFactory;
 import com.dfire.platform.alchemy.web.common.*;
-import com.dfire.platform.alchemy.web.util.DescriptorUtils;
 import com.dfire.platform.alchemy.web.util.PropertiesUtils;
+import com.dfire.platform.alchemy.web.util.TypeUtils;
 
 /**
  * @author congbai
@@ -91,13 +89,13 @@ public class SourceDescriptor implements CoreDescriptor {
                     return this.connectorDescriptor;
                 }
                 ConnectorDescriptor connectorDescriptor
-                    = DescriptorUtils.find(String.valueOf(type), ConnectorDescriptor.class);
+                    = DescriptorFactory.me.find(String.valueOf(type), ConnectorDescriptor.class);
                 if (connectorDescriptor == null) {
                     return this.connectorDescriptor;
                 }
                 try {
                     this.connectorDescriptor = connectorDescriptor.getClass().newInstance();
-                    BindPropertiesFactory.bindPropertiesToTarget(connectorDescriptor, "",
+                    BindPropertiesFactory.bindProperties(this.connectorDescriptor, "",
                         PropertiesUtils.createProperties(this.connector));
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -133,27 +131,21 @@ public class SourceDescriptor implements CoreDescriptor {
     }
 
     private <T> T transformFlink() throws Exception {
-        if (this.connectorDescriptor instanceof KafkaConnectorDescriptor) {
+        if (this.getConnectorDescriptor() instanceof KafkaConnectorDescriptor) {
             return buildKafkaSource();
         }
         return null;
     }
 
     private <T> T buildKafkaSource() throws ClassNotFoundException {
-        KafkaConnectorDescriptor descriptor = (KafkaConnectorDescriptor)this.connectorDescriptor;
+        KafkaConnectorDescriptor descriptor = (KafkaConnectorDescriptor)this.getConnectorDescriptor();
         Kafka010JsonTableSource.Builder builder = Kafka010JsonTableSource.builder();
         builder.forTopic(descriptor.getTopic());
         createSchema(this.schema, builder);
-        Map<String, Object> prop = new HashedMap();
-        for (Object value : descriptor.getProperties().values()) {
-            if (value instanceof Map) {
-                prop.putAll((Map<? extends String, ?>)value);
-            }
-        }
         if (StartupMode.EARLIEST.getMode().equals(descriptor.getStartupMode())) {
             builder.fromEarliest();
         }
-        builder.withKafkaProperties(PropertiesUtils.createProperties(prop));
+        builder.withKafkaProperties(PropertiesUtils.fromYamlMap(descriptor.getProperties()));
         return (T)builder.build();
     }
 
@@ -167,11 +159,15 @@ public class SourceDescriptor implements CoreDescriptor {
         TypeInformation[] columnTypes = new TypeInformation[schema.size()];
         for (int i = 0; i < schema.size(); i++) {
             columnNames[i] = schema.get(i).getName();
-            columnTypes[i] = TypeExtractor.createTypeInfo(Class.forName(schema.get(i).getType()));
+            TypeInformation typeInformation = TypeUtils.readTypeInfo(schema.get(i).getType());
+            if (typeInformation == null) {
+                throw new UnsupportedOperationException("Unsupported type:" + schema.get(i).getType());
+            }
+            columnTypes[i] = typeInformation;
             if (schema.get(i).isProctime()) {
-                builder.withProctimeAttribute(schema.get(0).getName());
+                builder.withProctimeAttribute(schema.get(i).getName());
             } else {
-                TimeAttribute timeAttribute = schema.get(0).getRowtime();
+                TimeAttribute timeAttribute = schema.get(i).getRowtime();
                 if (timeAttribute == null) {
                     continue;
                 }
@@ -181,7 +177,7 @@ public class SourceDescriptor implements CoreDescriptor {
                 WatermarkStrategy watermarkStrategy
                     = Watermarks.Type.PERIODIC_BOUNDED.getType().equals(timeAttribute.getWatermarks().getType())
                         ? new BoundedOutOfOrderTimestamps(timeAttribute.getWatermarks().getDelay()) : null;
-                builder.withRowtimeAttribute(schema.get(0).getName(), timestampExtractor, watermarkStrategy);
+                builder.withRowtimeAttribute(schema.get(i).getName(), timestampExtractor, watermarkStrategy);
             }
         }
         TableSchema tableSchema = new TableSchema(columnNames, columnTypes);

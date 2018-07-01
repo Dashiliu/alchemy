@@ -14,14 +14,7 @@
     </h2>
     <div class="ui-g ui-fluid" *ngIf="conf">
         <div class="ui-g-12 ui-md-2"></div>
-        <div class="ui-g-12 ui-md-8">
-
-        </div>
-        <div class="ui-g-12 ui-md-2"></div>
-    </div>
-    <div class="ui-g ui-fluid" *ngIf="conf">
-        <div class="ui-g-12 ui-md-2"></div>
-        <div class="ui-g-12 ui-md-8">
+        <div class="ui-g-12 ui-md-10">
             <h3>请使用yaml格式在下面的文本中定义配置：</h3>
             <codemirror [(ngModel)]="conf.content.config" [config]="yamlConfig"></codemirror>
             <h2></h2>
@@ -39,7 +32,7 @@
             <div class="ui-g ui-fluid" *ngIf="conf.content.code.length >=2">
                 <codemirror class="ui-g-12 ui-md-10"   [(ngModel)]="conf.content.code[1]" [config]="groovyConfig"></codemirror>
                 <button type="button" (click)="delete(1)"
-                        class="btn btn-danger btn-sm ui-g-12 ui-md-1" style="height: 40px">
+                        class="btn btn-danger btn-sm ui-g-12 ui-md-2" style="height: 40px">
                     <fa-icon [icon]="'times'"></fa-icon>
                     <span class="d-none d-md-inline">Delete</span>
                 </button>
@@ -120,13 +113,12 @@
                     <button type="button" (click)="save()"
                             class="btn btn-primary">
                         <fa-icon [icon]="'save'"></fa-icon>
-                        &nbsp;<span>下一步</span>
+                        &nbsp;<span>确定</span>
                     </button>
                 </div>
                 <div class="ui-g-12 ui-md-2"></div>
             </div>
         </div>
-        <div class="ui-g-12 ui-md-2"></div>
     </div>
 </div>
 
@@ -134,8 +126,8 @@
 <!-- sql -->
 <div *ngIf="conf.type ==2">
     <div class="ui-g ui-fluid" *ngIf="conf">
-        <div class="ui-g-12 ui-md-4"></div>
-        <div class="ui-g-12 ui-md-4">
+        <div class="ui-g-12 ui-md-2"></div>
+        <div class="ui-g-12 ui-md-8">
             <h3>请输入sql语句：</h3>
             <codemirror  [(ngModel)]="conf.content.config" [config]="sqlConfig"></codemirror>
             <h2></h2>
@@ -152,12 +144,12 @@
                     <button type="button" (click)="save()"
                             class="btn btn-primary">
                         <fa-icon [icon]="'save'"></fa-icon>
-                        &nbsp;<span>下一步</span>
+                        &nbsp;<span>确定</span>
                     </button>
                 </div>
                 <div class="ui-g-12 ui-md-2"></div>
             </div>
         </div>
-        <div class="ui-g-12 ui-md-4"></div>
+        <div class="ui-g-12 ui-md-2"></div>
     </div>
 </div>

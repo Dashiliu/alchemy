@@ -1,6 +1,5 @@
 package com.dfire.platform.alchemy.web.descriptor;
 
-import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import com.dfire.platform.alchemy.api.sink.HbaseInvoker;
@@ -13,7 +12,6 @@ import com.dfire.platform.alchemy.web.common.ReadMode;
  * @author congbai
  * @date 03/06/2018
  */
-@Component
 public class HbaseSinkDescriptor extends SinkDescriptor {
 
     private String name;
@@ -99,7 +97,7 @@ public class HbaseSinkDescriptor extends SinkDescriptor {
 
     @Override
     public <T> T transform(ClusterType clusterType) throws Exception {
-        if (ReadMode.CODE.equals(this.readMode)) {
+        if (ReadMode.CODE.getMode() == this.readMode) {
             return (T)new HbaseTableSink(this.zookeeper, this.node, this.tableName, this.family, this.bufferSize,
                 this.value);
         } else {

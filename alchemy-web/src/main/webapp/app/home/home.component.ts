@@ -8,6 +8,8 @@ import { JobService } from './job.service';
 import { Job } from './model/job.model';
 import { NgbModalRef, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { JobDeleteDialogComponent } from './job-delete-dialog.component';
+import { JobAuditDialogComponent } from './job-audit.component';
+import { JobSubmitDialogComponent } from './job-submit.component';
 
 @Component({
     selector: 'jhi-home',
@@ -73,8 +75,39 @@ export class HomeComponent implements OnInit {
     login() {
         this.modalRef = this.loginModalService.open();
     }
+
     ngOnDestroy() {
         this.routeData.unsubscribe();
+    }
+
+    audit(jobId) {
+        const modalRef = this.modalService.open(JobAuditDialogComponent, { size: 'lg', backdrop: 'static' });
+        modalRef.componentInstance.id = jobId;
+        modalRef.result.then(
+            result => {
+                // Left blank intentionally, nothing to do here
+                this.loadAll();
+            },
+            reason => {
+                // Left blank intentionally, nothing to do here
+            }
+        );
+        this.loadAll();
+    }
+
+    submit(jobId) {
+        const modalRef = this.modalService.open(JobSubmitDialogComponent, { size: 'lg', backdrop: 'static' });
+        modalRef.componentInstance.id = jobId;
+        modalRef.result.then(
+            result => {
+                // Left blank intentionally, nothing to do here
+                this.loadAll();
+            },
+            reason => {
+                // Left blank intentionally, nothing to do here
+            }
+        );
+        this.loadAll();
     }
 
     loadAll() {
@@ -125,12 +158,12 @@ export class HomeComponent implements OnInit {
         modalRef.result.then(
             result => {
                 // Left blank intentionally, nothing to do here
+                this.loadAll();
             },
             reason => {
                 // Left blank intentionally, nothing to do here
             }
         );
-        this.loadAll();
     }
 
     private onSuccess(data, headers) {

@@ -1,11 +1,11 @@
 package com.dfire.platform.alchemy.api.function.scalar;
 
-import com.dfire.platform.alchemy.api.function.StreamScalarFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.table.functions.FunctionContext;
 import org.apache.flink.table.functions.ScalarFunction;
 import org.apache.flink.util.Preconditions;
 
+import com.dfire.platform.alchemy.api.function.StreamScalarFunction;
 import com.dfire.platform.alchemy.api.util.GroovyCompiler;
 
 /**

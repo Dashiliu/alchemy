@@ -23,10 +23,16 @@ public class SpringUtils implements ApplicationContextInitializer<ConfigurableAp
     }
 
     public static <T> T getBean(String name) {
+        if (applicationContext == null) {
+            return null;
+        }
         return (T)applicationContext.getBean(name);
     }
 
     public static <T> T getBean(Class<T> clazz) {
+        if (applicationContext == null) {
+            return null;
+        }
         return applicationContext.getBean(clazz);
     }
 
@@ -39,6 +45,9 @@ public class SpringUtils implements ApplicationContextInitializer<ConfigurableAp
      * @return
      */
     public static <T> T getBean(String name, Class<T> t) {
+        if (applicationContext == null) {
+            return null;
+        }
         if (applicationContext.containsBean(name)) {
             return applicationContext.getBean(name, t);
         }
@@ -53,6 +62,9 @@ public class SpringUtils implements ApplicationContextInitializer<ConfigurableAp
      * @return
      */
     public static <T> List<T> getBeanList(Class<T> clazz) {
+        if (applicationContext == null) {
+            return null;
+        }
         Map<String, T> beanMap = applicationContext.getBeansOfType(clazz);
         if (beanMap == null || beanMap.isEmpty()) {
             return null;

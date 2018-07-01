@@ -14,7 +14,7 @@ import org.springframework.util.CollectionUtils;
 import com.dfire.platform.alchemy.web.bind.BindPropertiesFactory;
 import com.dfire.platform.alchemy.web.common.*;
 import com.dfire.platform.alchemy.web.config.Flame;
-import com.dfire.platform.alchemy.web.descriptor.DescriptorManager;
+import com.dfire.platform.alchemy.web.descriptor.DescriptorFactory;
 import com.dfire.platform.alchemy.web.descriptor.TableDescriptor;
 import com.dfire.platform.alchemy.web.domain.AcJob;
 import com.dfire.platform.alchemy.web.domain.AcJobConf;
@@ -45,15 +45,12 @@ public class JobConfServiceImpl implements JobConfService {
 
     private final JobService jobService;
 
-    private final DescriptorManager descriptorManager;
-
     public JobConfServiceImpl(Flame flame, AcJobConfRepository jobConfRepository, AcJobRepository jobRepository,
-        JobService jobService, DescriptorManager descriptorManager) {
+        JobService jobService) {
         this.flame = flame;
         this.jobConfRepository = jobConfRepository;
         this.jobRepository = jobRepository;
         this.jobService = jobService;
-        this.descriptorManager = descriptorManager;
     }
 
     @Override
@@ -85,8 +82,7 @@ public class JobConfServiceImpl implements JobConfService {
         if (ConfType.CONFIG.getType() == jobConfVM.getType()) {
             try {
                 TableDescriptor tableDescriptor = new TableDescriptor();
-                BindPropertiesFactory.bindPropertiesToTarget(tableDescriptor, Constants.BIND_PREFIX_TABLE,
-                    content.getConfig());
+                BindPropertiesFactory.bindProperties(tableDescriptor, Constants.BIND_PREFIX, content.getConfig());
                 tableDescriptor.validate();
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -98,7 +94,7 @@ public class JobConfServiceImpl implements JobConfService {
     public void update(JobConfVM jobConfVM) {
         checkArguments(jobConfVM);
         Optional<AcJobConf> acJobConfOptional = this.jobConfRepository.findById(jobConfVM.getId());
-        Preconditions.checkArgument(!acJobConfOptional.isPresent(), "jobConf is null");
+        Preconditions.checkArgument(acJobConfOptional.isPresent(), "jobConf is null");
         Optional<AcJob> acJob = this.jobRepository.findById(jobConfVM.getAcJobId());
         Preconditions.checkNotNull(acJob, "job is null");
         AcJobConf acJobConf = createJobConf(jobConfVM);

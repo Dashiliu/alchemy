@@ -48,7 +48,14 @@ public class JobController {
         jobService.save(jobVM);
         return ResponseEntity.created(new URI("/api/jobs/")).headers(HeaderUtil.createAlert("A job is created ", null))
             .build();
+    }
 
+    @GetMapping(value = "/jobs/status",params = {"jobId", "status"})
+    public ResponseEntity<JobDTO> updateStatus(@RequestParam(value = "jobId") Long jobId,@RequestParam(value = "status") int status)  throws URISyntaxException {
+        LOGGER.debug("REST request to udpate job status,id : {},status: {}", jobId,status);
+        jobService.updateStatus(jobId,status);
+        return ResponseEntity.created(new URI("/api/jobs/")).headers(HeaderUtil.createAlert("A job status is update ", null))
+            .build();
     }
 
     @GetMapping("/jobs")

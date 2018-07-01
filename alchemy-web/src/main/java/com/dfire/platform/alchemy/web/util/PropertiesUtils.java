@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.collections.map.HashedMap;
+
 import com.dfire.platform.alchemy.web.common.Pair;
 
 public class PropertiesUtils {
@@ -24,6 +26,21 @@ public class PropertiesUtils {
             p.put(e.getKey(), e.getValue());
         }
         return p;
+    }
+
+    public static Properties fromYamlMap(Map<String, Object> properties) {
+        Map<String, Object> prop = new HashedMap();
+        for (Object object : properties.values()) {
+            if (object instanceof Map) {
+                Map<String, Object> value = (Map<String, Object>)object;
+                Object key = value.get("key");
+                if (key == null) {
+                    continue;
+                }
+                prop.put(String.valueOf(value.get("key")), value.get("value"));
+            }
+        }
+        return createProperties(prop);
     }
 
     public static Properties getProperties(List<Pair<String, String>> prop) {

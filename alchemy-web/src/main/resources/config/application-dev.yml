@@ -92,7 +92,7 @@ spring:
     thymeleaf:
         cache: false
 logging:
-  config: classpath:logback-spring.xml
+  config: classpath:alchemy-logback.xml
   path: /opt/logs/spring-boot
   level:
     root: info

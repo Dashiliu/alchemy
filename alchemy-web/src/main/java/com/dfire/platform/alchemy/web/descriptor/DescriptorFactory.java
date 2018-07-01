@@ -1,28 +1,30 @@
 package com.dfire.platform.alchemy.web.descriptor;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import org.springframework.stereotype.Component;
+import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
-
-import com.google.common.base.Preconditions;
 
 /**
  * @author congbai
  * @date 2018/6/19
  */
-@Component
-public class DescriptorManager {
+public class DescriptorFactory {
+
+    public static final DescriptorFactory me = new DescriptorFactory();
 
     private final Map<String, List<Descriptor>> typeDescriptors;
 
-    public DescriptorManager(Descriptor... descriptors) {
-        Preconditions.checkNotNull(descriptors, "descriptors can't be null");
-        this.typeDescriptors = new HashMap<>(descriptors.length);
-        for (Descriptor descriptor : descriptors) {
+    private DescriptorFactory() {
+        this.typeDescriptors = new HashedMap();
+        ServiceLoader<Descriptor> serviceLoader = ServiceLoader.load(Descriptor.class);
+        Iterator<Descriptor> iterator = serviceLoader.iterator();
+        while (iterator.hasNext()) {
+            Descriptor descriptor = iterator.next();
+            if (StringUtils.isEmpty(descriptor.getType())) {
+                continue;
+            }
             List<Descriptor> descriptorList = this.typeDescriptors.get(descriptor.getType());
             if (descriptorList == null) {
                 descriptorList = new ArrayList<>();
@@ -40,7 +42,7 @@ public class DescriptorManager {
             return null;
         }
         for (Descriptor descriptor : descriptorList) {
-            if (descriptor.getClass().isAssignableFrom(clazz)) {
+            if (clazz.isAssignableFrom(descriptor.getClass())) {
                 return (T)descriptor;
             }
         }

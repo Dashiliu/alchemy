@@ -12,7 +12,7 @@ public class JobConfDTO {
 
     private Long id;
 
-    private String acJobId;
+    private Long acJobId;
 
     private Content content;
 
@@ -30,11 +30,11 @@ public class JobConfDTO {
         this.id = id;
     }
 
-    public String getAcJobId() {
+    public Long getAcJobId() {
         return acJobId;
     }
 
-    public void setAcJobId(String acJobId) {
+    public void setAcJobId(Long acJobId) {
         this.acJobId = acJobId;
     }
 

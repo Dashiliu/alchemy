@@ -1,12 +1,13 @@
 package com.dfire.platform.alchemy.api.function.table;
 
-import com.dfire.platform.alchemy.api.function.StreamTableFunction;
-import com.dfire.platform.alchemy.api.util.GroovyCompiler;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.table.functions.FunctionContext;
 import org.apache.flink.table.functions.TableFunction;
 import org.apache.flink.util.Preconditions;
+
+import com.dfire.platform.alchemy.api.function.StreamTableFunction;
+import com.dfire.platform.alchemy.api.util.GroovyCompiler;
 
 /**
  * @author congbai

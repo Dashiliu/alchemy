@@ -1,13 +1,8 @@
 package com.dfire.platform.alchemy.web.descriptor;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.flink.streaming.connectors.kafka.Kafka010JsonTableSink;
-import org.apache.flink.util.Preconditions;
-import org.apache.kafka.clients.CommonClientConfigs;
-import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import com.dfire.platform.alchemy.web.common.ClusterType;
@@ -18,16 +13,13 @@ import com.dfire.platform.alchemy.web.util.PropertiesUtils;
  * @author congbai
  * @date 06/06/2018
  */
-@Component
 public class KafkaSinkDescriptor extends SinkDescriptor {
 
     private String name;
 
     private String topic;
 
-    private String brokers;
-
-    private Map<String, String> properties;
+    private Map<String, Object> properties;
 
     @Override
     public String getName() {
@@ -46,19 +38,11 @@ public class KafkaSinkDescriptor extends SinkDescriptor {
         this.topic = topic;
     }
 
-    public String getBrokers() {
-        return brokers;
-    }
-
-    public void setBrokers(String brokers) {
-        this.brokers = brokers;
-    }
-
-    public Map<String, String> getProperties() {
+    public Map<String, Object> getProperties() {
         return properties;
     }
 
-    public void setProperties(Map<String, String> properties) {
+    public void setProperties(Map<String, Object> properties) {
         this.properties = properties;
     }
 
@@ -73,20 +57,11 @@ public class KafkaSinkDescriptor extends SinkDescriptor {
     @Override
     public void validate() throws Exception {
         Assert.notNull(topic, "topic不能为空");
-        Assert.notNull(brokers, "brokers不能为空");
+        Assert.notNull(properties, "properties不能为空");
     }
 
     private <T> T transformFlink() throws Exception {
-        Map<String, String> prop;
-        if (this.properties != null) {
-            prop = new HashMap<>(this.properties);
-        } else {
-            prop = new HashMap<>();
-        }
-        prop.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG,
-            Preconditions.checkNotNull(this.brokers, "brokers can not be null"));
-        Properties conf = PropertiesUtils.getProperties(prop);
-        return (T)new Kafka010JsonTableSink(this.topic, conf);
+        return (T)new Kafka010JsonTableSink(this.topic, PropertiesUtils.fromYamlMap(this.getProperties()));
     }
 
     @Override
