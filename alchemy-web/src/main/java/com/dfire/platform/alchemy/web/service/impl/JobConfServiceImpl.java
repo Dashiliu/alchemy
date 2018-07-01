@@ -14,7 +14,6 @@ import org.springframework.util.CollectionUtils;
 import com.dfire.platform.alchemy.web.bind.BindPropertiesFactory;
 import com.dfire.platform.alchemy.web.common.*;
 import com.dfire.platform.alchemy.web.config.Flame;
-import com.dfire.platform.alchemy.web.descriptor.DescriptorFactory;
 import com.dfire.platform.alchemy.web.descriptor.TableDescriptor;
 import com.dfire.platform.alchemy.web.domain.AcJob;
 import com.dfire.platform.alchemy.web.domain.AcJobConf;

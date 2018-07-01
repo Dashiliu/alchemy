@@ -9,9 +9,10 @@ import { ConfDeleteComponent } from './conf/conf-delete-dialog.component';
 import { CodemirrorModule } from 'ng2-codemirror';
 import { JobAuditDialogComponent } from './job-audit.component';
 import { JobSubmitDialogComponent } from './job-submit.component';
+import { FileUploadModule } from 'primeng/fileupload';
 
 @NgModule({
-    imports: [AlchemySharedModule, CodemirrorModule, RouterModule.forChild(HOME_ROUTE)],
+    imports: [AlchemySharedModule, FileUploadModule, CodemirrorModule, RouterModule.forChild(HOME_ROUTE)],
     declarations: [
         HomeComponent,
         JobCreateComponent,

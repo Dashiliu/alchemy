@@ -1,26 +1,32 @@
 package com.dfire.platform.alchemy.web.rest;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
 
-import com.dfire.platform.alchemy.web.common.Content;
-import com.dfire.platform.alchemy.web.util.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.codahale.metrics.annotation.Timed;
+import com.dfire.platform.alchemy.web.common.Constants;
+import com.dfire.platform.alchemy.web.common.Content;
+import com.dfire.platform.alchemy.web.common.JarInfo;
 import com.dfire.platform.alchemy.web.domain.User;
 import com.dfire.platform.alchemy.web.rest.util.HeaderUtil;
 import com.dfire.platform.alchemy.web.rest.vm.JobConfVM;
 import com.dfire.platform.alchemy.web.service.JobConfService;
 import com.dfire.platform.alchemy.web.service.dto.JobConfDTO;
+import com.dfire.platform.alchemy.web.util.FileUtils;
 
 /**
  * @author congbai
@@ -80,8 +86,25 @@ public class JobConfController {
     @DeleteMapping("/confs/{id}")
     @Timed
     public ResponseEntity<Void> deleteJobConf(@PathVariable Long id) {
-        LOGGER.debug("REST request to delete job : {}", id);
+        LOGGER.debug("REST request to delete jobConf : {}", id);
         jobConfService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createAlert("A jobConf is deleted ", null)).build();
+    }
+
+
+    @PostMapping("/confs/upload")
+    public ResponseEntity<JarInfo> upload(@RequestParam("file") MultipartFile file) throws IOException {
+        LOGGER.debug("REST request to upload jar : {}", file.getOriginalFilename());
+        if(!file.getOriginalFilename().endsWith("jar")){
+            throw new RuntimeException("file must be a jar");
+        }
+        String fileName = System.currentTimeMillis()+file.getOriginalFilename();
+        File uoloadLoadFile=FileUtils.uploadFile(file.getBytes(), Constants.FILE_PATH, fileName);
+        JarInfo jarInfo=new JarInfo();
+        jarInfo.setFileName(file.getOriginalFilename());
+        jarInfo.setJarPath(uoloadLoadFile.getPath());
+        jarInfo.setUploadTime(new Date());
+        return new ResponseEntity<>(jarInfo,
+            HeaderUtil.createAlert("upload a jar ", null), HttpStatus.OK);
     }
 }

@@ -6,12 +6,17 @@ import 'codemirror/mode/yaml/yaml';
 import 'codemirror/mode/groovy/groovy';
 import 'codemirror/mode/sql/sql';
 import { JhiAlertService } from 'ng-jhipster';
+import { Jar } from '../model/jar.model';
 
 @Component({
     selector: 'jhi-conf',
     templateUrl: 'conf.component.html'
 })
 export class ConfComponent {
+    selected: boolean = false;
+
+    jarInfo: Jar;
+
     conf: Conf;
 
     yamlConfig: any = { lineNumbers: true, mode: 'text/x-yaml', theme: 'material' };
@@ -33,11 +38,27 @@ export class ConfComponent {
             }
             if (!this.conf.content.config) {
                 this.conf.content.config = '';
+            } else {
+                if (this.conf.type == 0) {
+                    this.jarInfo = JSON.parse(this.conf.content.config);
+                }
             }
         });
     }
 
     ngOnInit() {}
+
+    upload(event) {
+        if (event.xhr.status == 200) {
+            this.jarInfo = new Jar();
+            this.jarInfo = JSON.parse(event.xhr.response);
+        }
+    }
+
+    submit() {
+        this.conf.content.config = JSON.stringify(this.jarInfo);
+        this.save();
+    }
 
     add() {
         if (!this.conf.content.code) {

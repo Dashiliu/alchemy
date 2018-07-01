@@ -6,6 +6,8 @@ package com.dfire.platform.alchemy.web.common;
  */
 public final class Constants {
 
+    public static final String FILE_PATH="/opt/data/flink/jar/";
+
     public static final String BIND_PREFIX = "job";
 
     public static final String DESCRIPTOR_TYPE_KEY = "type";

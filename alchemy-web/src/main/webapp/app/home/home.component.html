@@ -77,20 +77,37 @@
                 <td>{{job.updateTime | date:'dd/MM/yy HH:mm:ss'}}</td>
                 <td class="text-right">
                     <div class="btn-group flex-btn-group-container">
-                        <button type="submit"
-                                [routerLink]="['./confs', job.id,1, 'info']"
-                                queryParamsHandling="merge"
-                                class="btn btn-primary btn-sm">
-                            <fa-icon [icon]="'pencil-alt'"></fa-icon>
-                            <span class="d-none d-md-inline">配置</span>
-                        </button>
-                        <button type="submit"
-                                [routerLink]="['./confs', job.id,2, 'info']"
-                                queryParamsHandling="merge"
-                                class="btn btn-primary btn-sm">
-                            <fa-icon [icon]="'pencil-alt'"></fa-icon>
-                            <span class="d-none d-md-inline">sql</span>
-                        </button>
+
+                        <div *ngIf="job.submitMode==1">
+                            <button type="submit"
+                                    [routerLink]="['./confs', job.id,0, 'info']"
+                                    queryParamsHandling="merge"
+                                    class="btn btn-primary btn-sm">
+                                <fa-icon [icon]="'pencil-alt'"></fa-icon>
+                                <span class="d-none d-md-inline">配置</span>
+                            </button>
+                        </div>
+
+                        <div *ngIf="job.submitMode==2">
+                            <button type="submit"
+                                    [routerLink]="['./confs', job.id,1, 'info']"
+                                    queryParamsHandling="merge"
+                                    class="btn btn-primary btn-sm">
+                                <fa-icon [icon]="'pencil-alt'"></fa-icon>
+                                <span class="d-none d-md-inline">配置</span>
+                            </button>
+                        </div>
+
+                        <div *ngIf="job.submitMode==2">
+                            <button type="submit"
+                                    [routerLink]="['./confs', job.id,2, 'info']"
+                                    queryParamsHandling="merge"
+                                    class="btn btn-primary btn-sm">
+                                <fa-icon [icon]="'pencil-alt'"></fa-icon>
+                                <span class="d-none d-md-inline">sql</span>
+                            </button>
+                        </div>
+
                         <div  *ngIf="job.status==0">
                             <button type="submit"
                                     queryParamsHandling="merge" (click)="submit(job.id)"

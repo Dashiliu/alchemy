@@ -21,6 +21,10 @@ spring:
             enabled: true
         livereload:
             enabled: false # we use Webpack dev server + BrowserSync for livereload
+    servlet:
+      multipart:
+        max-file-size: 200Mb
+        max-request-size: 200Mb
     jackson:
         serialization.indent_output: true
     application:

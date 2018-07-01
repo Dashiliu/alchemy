@@ -34,7 +34,6 @@ import com.dfire.platform.alchemy.web.cluster.response.Response;
 import com.dfire.platform.alchemy.web.cluster.response.SubmitFlinkResponse;
 import com.dfire.platform.alchemy.web.common.*;
 import com.dfire.platform.alchemy.web.config.Flame;
-import com.dfire.platform.alchemy.web.descriptor.DescriptorFactory;
 import com.dfire.platform.alchemy.web.descriptor.JarInfoDescriptor;
 import com.dfire.platform.alchemy.web.descriptor.TableDescriptor;
 import com.dfire.platform.alchemy.web.domain.AcJob;
@@ -244,14 +243,14 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
             JarSubmitFlinkRequest jarSubmitFlinkRequest = new JarSubmitFlinkRequest();
             jarSubmitFlinkRequest.setCluster(acJob.getCluster());
             jarSubmitFlinkRequest.setJobName(acJob.getName());
-            AcJobConf acJobConf = jobConfs.get(0);
-            if (ConfType.JAR.getType() != acJobConf.getType()) {
-                LOGGER.warn("job hasn't jar conf,acJobId:{},acJobConfId:{}", acJob.getId(), acJobConf.getId());
-                return null;
+            for(AcJobConf acJobConf:jobConfs){
+                if (ConfType.JAR.getType() != acJobConf.getType()) {
+                    continue;
+                }
+                JarInfoDescriptor descriptor = buildJar(acJobConf, JarInfoDescriptor.class);
+                downLoadJarIfNeed(descriptor);
+                jarSubmitFlinkRequest.setJarInfoDescriptor(descriptor);
             }
-            JarInfoDescriptor descriptor = buildJar(acJobConf, JarInfoDescriptor.class);
-            downLoadJarIfNeed(descriptor);
-            jarSubmitFlinkRequest.setJarInfoDescriptor(descriptor);
             return jarSubmitFlinkRequest;
         }
 
@@ -427,7 +426,8 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
         private void updateJobStatus(Long acJobId, int status) {
             Optional<AcJob> acJob = jobRepository.findById(acJobId);
             if (Status.RUNNING.getStatus() == acJob.get().getStatus()
-                || Status.COMMIT.getStatus() != acJob.get().getStatus()) {
+                || Status.COMMIT.getStatus() == acJob.get().getStatus()
+                ) {
                 acJob.get().setStatus(status);
                 jobRepository.save(acJob.get());
             } else {
