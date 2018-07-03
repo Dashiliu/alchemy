@@ -100,13 +100,14 @@
     ]
   },
   "scripts": {
+    "prebuild": "rm -rf src/main/resources/static",
     "precommit": "lint-staged",
     "prettier:format": "npm prettier --write 'src/**/*.{ts,css,scss}'",
     "lint": "tslint --project tsconfig.json -e 'node_modules/**'",
     "lint:fix": "npm run lint -- --fix",
     "ngc": "ngc -p tsconfig-aot.json",
-    "cleanup": "rimraf target/{aot,www}",
-    "clean-www": "rimraf target//www/app/{src,target/}",
+    "cleanup": "rimraf src/main/resources/static/{aot,www}",
+    "clean-www": "rimraf src/main/resources/static/app/{src,target/}",
     "start": "npm run webpack:dev",
     "serve": "npm run start",
     "build": "npm run webpack:prod",

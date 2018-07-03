@@ -40,13 +40,7 @@ public class AlchemyApp {
     public static void main(String[] args) throws Throwable {
         SpringApplication app = new SpringApplication(AlchemyApp.class);
         DefaultProfileUtil.addDefaultProfile(app);
-        Environment env=null;
-        try {
-             env = app.run(args).getEnvironment();
-        }catch (Throwable e){
-            throw new Throwable(e);
-        }
-
+        Environment env = app.run(args).getEnvironment();
         String protocol = "http";
         if (env.getProperty("server.ssl.key-store") != null) {
             protocol = "https";

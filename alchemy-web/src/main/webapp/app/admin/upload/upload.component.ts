@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { JhiAlertService } from 'ng-jhipster';
 import { Jar } from '../../home/model/jar.model';
 
 @Component({
@@ -10,7 +9,7 @@ import { Jar } from '../../home/model/jar.model';
 export class UploadComponent {
     jarInfo: Jar;
 
-    constructor(private route: ActivatedRoute) {
+    constructor(private route: ActivatedRoute, private router: Router) {
         this.route.data.subscribe(({ jar }) => {
             this.jarInfo = jar.body ? jar.body : jar;
         });

@@ -83,11 +83,9 @@ export class ConfComponent {
         this.router.navigate(['']);
     }
 
-    private onSaveSuccess() {
+    private onSaveSuccess(response) {
         this.router.navigate(['']);
     }
 
-    private onSaveError(error) {
-        this.alertService.error(error.error, error.message, null);
-    }
+    private onSaveError() {}
 }

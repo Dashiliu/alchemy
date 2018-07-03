@@ -10,7 +10,7 @@
         "noImplicitAny": false,
         "skipLibCheck": true,
         "suppressImplicitAnyIndexErrors": true,
-        "outDir": "target/www/app",
+        "outDir": "src/main/resources/static/app",
         "lib": ["es7", "dom"],
         "typeRoots": [
             "node_modules/@types"
