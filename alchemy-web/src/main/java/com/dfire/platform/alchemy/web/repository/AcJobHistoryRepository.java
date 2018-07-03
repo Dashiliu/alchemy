@@ -22,4 +22,6 @@ public interface AcJobHistoryRepository extends JpaRepository<AcJobHistory, Long
 
     List<AcJobHistory> findByClusterJobId(String clusterJobId, Pageable pageable);
 
+    List<AcJobHistory> findByAcJobId(Long acJobId, Pageable pageable);
+
 }

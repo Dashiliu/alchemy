@@ -50,6 +50,7 @@ public class FlinkClusterTest {
         SqlSubmitFlinkRequest sqlSubmitRequest = createSqlRequest( "select scalarF(id) as id,CURRENT_DATE as createTime from kafka_table_test",
             "flinkClusterTest-ScalarSQL");
         Response resp = this.cluster.send(sqlSubmitRequest);
+        System.in.read();
         assert resp.isSuccess();
     }
 

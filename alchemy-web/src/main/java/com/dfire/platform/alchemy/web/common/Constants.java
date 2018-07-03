@@ -6,7 +6,22 @@ package com.dfire.platform.alchemy.web.common;
  */
 public final class Constants {
 
+    //数据传输时间
+    public static final Integer SO_TIMEOUT=15000;
+
+    //创建连接时间
+    public static final int CONNECTION_TIMEOUT = 5000;
+
+    //设置从连接池获取连接的超时时间
+    public static final int CONNECTION_REQUEST_TIMEOUT = 3000;
+
+    //连接存活时间
+    public static final int KEEP_ALIVE= 15000;
+
+
     public static final String FILE_PATH="/opt/data/flink/jar/";
+
+    public static final String GLOBAL_FILE_NAME="global.jar";
 
     public static final String BIND_PREFIX = "job";
 

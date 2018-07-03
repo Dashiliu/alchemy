@@ -1,7 +1,10 @@
 job:
+    name: test
+    cluster:
     parallelism: 1
+    timeCharacteristic: EventTime
     checkpointingInterval: 10000 #ms
-    jarPath: /Users/dongbinglin/Code/platform/alchemy/alchemy-connectors/target/alchemy-connectors-1.0-SNAPSHOT.jar
+    #jarPath: /Users/dongbinglin/Code/platform/alchemy/alchemy-connectors/target/alchemy-connectors-1.0-SNAPSHOT.jar
     table:
 #        sql: select * from  TaxiRides
         sources:
@@ -15,7 +18,10 @@ job:
                 type: FLOAT
               - name: lat
                 type: FLOAT
-              - name: rowTime
+              - name: procTime
+                type: TIMESTAMP
+                proctime: true
+              - name: rideTime
                 type: TIMESTAMP
                 rowtime:
                   timestamps:
@@ -69,4 +75,3 @@ job:
               properties:
                  - key: bootstrap.servers
                    value: kafka1001.2dfire-daily.com:9092,kafka1002.2dfire-daily.com:9092
-

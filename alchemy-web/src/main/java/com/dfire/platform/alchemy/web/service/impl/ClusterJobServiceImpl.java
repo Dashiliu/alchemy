@@ -11,6 +11,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.dfire.platform.alchemy.web.cluster.request.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.runtime.client.JobStatusMessage;
 import org.slf4j.Logger;
@@ -25,10 +26,6 @@ import org.springframework.util.CollectionUtils;
 
 import com.dfire.platform.alchemy.web.bind.BindPropertiesFactory;
 import com.dfire.platform.alchemy.web.cluster.ClusterManager;
-import com.dfire.platform.alchemy.web.cluster.request.JarSubmitFlinkRequest;
-import com.dfire.platform.alchemy.web.cluster.request.ListJobFlinkRequest;
-import com.dfire.platform.alchemy.web.cluster.request.SqlSubmitFlinkRequest;
-import com.dfire.platform.alchemy.web.cluster.request.SubmitRequest;
 import com.dfire.platform.alchemy.web.cluster.response.ListJobFlinkResponse;
 import com.dfire.platform.alchemy.web.cluster.response.Response;
 import com.dfire.platform.alchemy.web.cluster.response.SubmitFlinkResponse;
@@ -183,12 +180,8 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
                     LOGGER.warn("clusterType is null,id:{},cluster:{}", id, acJob.get().getCluster());
                     return;
                 }
-                List<AcJobConf> jobConfs = findJobConf(id);
-                if (CollectionUtils.isEmpty(jobConfs)) {
-                    LOGGER.warn("jobConfs is empty,id:{}", id);
-                    return;
-                }
-                SubmitRequest submitRequest = createSubmitRequest(acJob.get(), jobConfs, clusterType);
+                cancelJob(acJob.get(),clusterType);
+                SubmitRequest submitRequest = createSubmitRequest(acJob.get(), clusterType);
                 if (submitRequest == null) {
                     LOGGER.warn("submitRequest is null,id:{}", id);
                     updateJobStatus(acJob.get(), Status.FAILED.getStatus());
@@ -209,13 +202,26 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
             }
         }
 
+        private void cancelJob(AcJob acJob, ClusterType clusterType) {
+            List<AcJobHistory> acJobHistorys
+                = jobHistoryRepository.findByAcJobId(acJob.getId(),
+                new PageRequest(0, 1, new Sort(Sort.Direction.DESC, "updateTime")));
+            if(CollectionUtils.isEmpty(acJobHistorys)){
+                return;
+            }
+            AcJobHistory acJobHistory=acJobHistorys.get(0);
+            if (ClusterType.FLINK.equals(clusterType)) {
+                clusterManager.send(new CancelFlinkRequest(acJobHistory.getClusterJobId(),acJob.getCluster()));
+            }
+            jobHistoryRepository.deleteJobHistory(acJob.getId());
+        }
+
         private void updateJobStatus(AcJob acJob, int status) {
             acJob.setStatus(status);
             jobRepository.saveAndFlush(acJob);
         }
 
         private void insertJobHistory(AcJob acJob, SubmitFlinkResponse submitResponse) {
-            jobHistoryRepository.deleteJobHistory(acJob.getId());
             AcJobHistory acJobHistory = new AcJobHistory();
             acJobHistory.setId(flame.nextId());
             acJobHistory.setAcJobId(acJob.getId());
@@ -224,8 +230,13 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
             jobHistoryRepository.save(acJobHistory);
         }
 
-        private SubmitRequest createSubmitRequest(AcJob acJob, List<AcJobConf> jobConfs, ClusterType clusterType)
+        private SubmitRequest createSubmitRequest(AcJob acJob, ClusterType clusterType)
             throws Exception {
+            List<AcJobConf> jobConfs = findJobConf(acJob.getId());
+            if (CollectionUtils.isEmpty(jobConfs)) {
+                LOGGER.warn("jobConfs is empty,id:{}", acJob.getId());
+                return null;
+            }
             SubmitRequest submitRequest = null;
             if (SubmitMode.SQL.getMode() == acJob.getSubmitMode()) {
                 if (ClusterType.FLINK.equals(clusterType)) {

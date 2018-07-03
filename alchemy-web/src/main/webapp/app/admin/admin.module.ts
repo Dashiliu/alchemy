@@ -18,10 +18,13 @@ import {
     JhiConfigurationComponent,
     JhiDocsComponent
 } from './';
+import { UploadComponent } from './upload/upload.component';
+import { FileUploadModule } from 'primeng/components/fileupload/fileupload';
 
 @NgModule({
     imports: [
         AlchemySharedModule,
+        FileUploadModule,
         RouterModule.forChild(adminState)
         /* jhipster-needle-add-admin-module - JHipster will add admin modules here */
     ],
@@ -36,6 +39,7 @@ import {
         JhiHealthCheckComponent,
         JhiHealthModalComponent,
         JhiDocsComponent,
+        UploadComponent,
         JhiMetricsMonitoringComponent,
         JhiMetricsMonitoringModalComponent
     ],

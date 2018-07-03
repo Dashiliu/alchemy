@@ -83,7 +83,7 @@ export class ConfComponent {
         this.router.navigate(['']);
     }
 
-    private onSaveSuccess(result) {
+    private onSaveSuccess() {
         this.router.navigate(['']);
     }
 

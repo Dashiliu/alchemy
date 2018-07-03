@@ -29,6 +29,7 @@ import org.apache.flink.optimizer.Optimizer;
 import org.apache.flink.optimizer.costs.DefaultCostEstimator;
 import org.apache.flink.optimizer.plan.FlinkPlan;
 import org.apache.flink.runtime.client.JobStatusMessage;
+import org.apache.flink.runtime.instance.ActorGateway;
 import org.apache.flink.runtime.jobmanager.HighAvailabilityMode;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -123,7 +124,7 @@ public class FlinkDefaultCluster implements Cluster {
     }
 
     private Response cancelJob(CancelFlinkRequest message) throws Exception {
-        clusterClient.cancel(JobID.fromByteArray(message.getJobID().getBytes()));
+        clusterClient.cancel(JobID.fromHexString(message.getJobID()));
         return new Response(true);
     }
 
@@ -227,6 +228,7 @@ public class FlinkDefaultCluster implements Cluster {
         StreamGraph streamGraph = execEnv.getStreamGraph();
         streamGraph.setJobName(message.getJobName());
         List<URL> jarFiles = createPath(message.getJarPath());
+        jarFiles.add(new File(Constants.FILE_PATH+Constants.GLOBAL_FILE_NAME).getAbsoluteFile().toURI().toURL());
         ClassLoader usercodeClassLoader
             = JobWithJars.buildUserCodeClassLoader(jarFiles, createGlobalPath(), getClass().getClassLoader());
         try {
@@ -267,10 +269,10 @@ public class FlinkDefaultCluster implements Cluster {
 
     private List<URL> createPath(String filePath) {
         List<URL> jarFiles = new ArrayList<>(1);
-        if (StringUtils.isEmpty(filePath)) {
-            return jarFiles;
-        }
         try {
+            if (StringUtils.isEmpty(filePath)) {
+                return jarFiles;
+            }
             URL jarFileUrl = new File(filePath).getAbsoluteFile().toURI().toURL();
             jarFiles.add(jarFileUrl);
             JobWithJars.checkJarFile(jarFileUrl);
@@ -303,4 +305,5 @@ public class FlinkDefaultCluster implements Cluster {
     public void destroy() throws Exception {
         clusterClient.shutdown();
     }
+
 }

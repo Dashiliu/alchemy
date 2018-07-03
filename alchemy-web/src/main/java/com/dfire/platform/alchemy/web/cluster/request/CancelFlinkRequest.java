@@ -12,6 +12,11 @@ public class CancelFlinkRequest implements FlinkRequest {
 
     private boolean test;
 
+    public CancelFlinkRequest(String jobID, String cluster) {
+        this.jobID = jobID;
+        this.cluster = cluster;
+    }
+
     public String getJobID() {
         return jobID;
     }

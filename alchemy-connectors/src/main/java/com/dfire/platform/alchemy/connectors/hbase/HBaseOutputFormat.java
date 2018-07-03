@@ -1,6 +1,7 @@
 package com.dfire.platform.alchemy.connectors.hbase;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 import org.apache.flink.api.common.io.OutputFormat;
 import org.apache.flink.api.common.serialization.SerializationSchema;
@@ -16,9 +17,10 @@ import com.dfire.platform.alchemy.api.sink.HbaseInvoker;
 import com.dfire.platform.alchemy.api.util.GroovyCompiler;
 import com.dfire.platform.alchemy.api.util.RandomUtils;
 
+/**
+ * @author dongbinglin
+ */
 public class HBaseOutputFormat implements OutputFormat<Tuple2<Boolean, Row>> {
-
-    private static final long serialVersionUID = 1L;
 
     private static final String HBASE_QUORUM = "hbase.zookeeper.quorum";
 

@@ -9,6 +9,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.dfire.platform.alchemy.web.service.FileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -39,6 +40,7 @@ public class JobConfController {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobConfController.class);
 
     private final JobConfService jobConfService;
+
 
     public JobConfController(JobConfService jobConfService) {
         this.jobConfService = jobConfService;
@@ -91,20 +93,4 @@ public class JobConfController {
         return ResponseEntity.ok().headers(HeaderUtil.createAlert("A jobConf is deleted ", null)).build();
     }
 
-
-    @PostMapping("/confs/upload")
-    public ResponseEntity<JarInfo> upload(@RequestParam("file") MultipartFile file) throws IOException {
-        LOGGER.debug("REST request to upload jar : {}", file.getOriginalFilename());
-        if(!file.getOriginalFilename().endsWith("jar")){
-            throw new RuntimeException("file must be a jar");
-        }
-        String fileName = System.currentTimeMillis()+file.getOriginalFilename();
-        File uoloadLoadFile=FileUtils.uploadFile(file.getBytes(), Constants.FILE_PATH, fileName);
-        JarInfo jarInfo=new JarInfo();
-        jarInfo.setFileName(file.getOriginalFilename());
-        jarInfo.setJarPath(uoloadLoadFile.getPath());
-        jarInfo.setUploadTime(new Date());
-        return new ResponseEntity<>(jarInfo,
-            HeaderUtil.createAlert("upload a jar ", null), HttpStatus.OK);
-    }
 }

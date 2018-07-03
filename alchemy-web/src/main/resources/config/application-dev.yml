@@ -104,6 +104,9 @@ logging:
     com.dfire.platform.alchemy: DEBUG
 
 alchemy:
+  file:
+    upload-url: http://upload.2dfire-daily.com/upbigfile
+    download-url: https://assets.2dfire.com/
   clusters:
     - name: flink_default
       mode: zookeeper
