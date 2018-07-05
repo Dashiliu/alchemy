@@ -534,7 +534,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.dfire.platform.beaconfire.Application</mainClass>
+                            <mainClass>com.dfire.platform.alchemy.web.AlchemyApp</mainClass>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
                         </manifest>
