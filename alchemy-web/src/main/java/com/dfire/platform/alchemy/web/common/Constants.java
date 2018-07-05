@@ -19,7 +19,7 @@ public final class Constants {
     public static final int KEEP_ALIVE= 15000;
 
 
-    public static final String FILE_PATH="/opt/data/flink/jar/";
+    public static final String FILE_PATH=System.getProperty("user.home")+"/upload/alchemy";
 
     public static final String GLOBAL_FILE_NAME="global.jar";
 
