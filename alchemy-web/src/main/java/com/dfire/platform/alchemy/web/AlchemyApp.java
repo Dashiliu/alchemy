@@ -45,12 +45,8 @@ public class AlchemyApp {
         if (env.getProperty("server.ssl.key-store") != null) {
             protocol = "https";
         }
-        String hostAddress = "localhost";
-        try {
-            hostAddress = InetAddress.getLocalHost().getHostAddress();
-        } catch (Exception e) {
-            log.warn("The host name could not be determined, using `localhost` as fallback");
-        }
+        String hostAddress = InetAddress.getLocalHost().getHostAddress();
+
         log.info(
             "\n----------------------------------------------------------\n\t"
                 + "Application '{}' is running! Access URLs:\n\t" + "Local: \t\t{}://localhost:{}\n\t"

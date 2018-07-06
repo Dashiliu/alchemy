@@ -43,12 +43,7 @@ public class DatabaseConfiguration {
         liquibase.setContexts(liquibaseProperties.getContexts());
         liquibase.setDefaultSchema(liquibaseProperties.getDefaultSchema());
         liquibase.setDropFirst(liquibaseProperties.isDropFirst());
-        if (env.acceptsProfiles(JHipsterConstants.SPRING_PROFILE_NO_LIQUIBASE)) {
-            liquibase.setShouldRun(false);
-        } else {
-            liquibase.setShouldRun(liquibaseProperties.isEnabled());
-            log.debug("Configuring Liquibase");
-        }
+        liquibase.setShouldRun(false);
         return liquibase;
     }
 }
