@@ -103,7 +103,7 @@ alchemy:
       mode: zookeeper
       clusterId: default
       zookeeperQuorum: zk101.2dfire-inc.com:2181,zk102.2dfire-inc.com:2181,zk103.2dfire-inc.com:2181
-      storagePath: hdfs://10.15.0.1:8020/user/flink
+      storagePath: hdfs://10.15.0.1:8020/user/alchemy/flink/ha
       address: job-manager
       port: 6123
   job:
