@@ -18,6 +18,12 @@ spring:
             enabled: false
         livereload:
             enabled: false
+    servlet:
+      multipart:
+        max-file-size: 200Mb
+        max-request-size: 200Mb
+    jackson:
+        serialization.indent_output: true
     application:
         name: alchemy
     redis:
