@@ -88,7 +88,7 @@ spring:
         cache: false
 logging:
   config: classpath:alchemy-logback.xml
-#  path: /opt/logs/spring-boot
+  path: /opt/spring-boot/logs
   level:
     root: info
     io.github.jhipster: INFO
