@@ -40,20 +40,24 @@ public class AlchemyApp {
     public static void main(String[] args) throws Throwable {
         SpringApplication app = new SpringApplication(AlchemyApp.class);
         DefaultProfileUtil.addDefaultProfile(app);
-        Environment env = app.run(args).getEnvironment();
-        String protocol = "http";
-        if (env.getProperty("server.ssl.key-store") != null) {
-            protocol = "https";
-        }
-        String hostAddress = InetAddress.getLocalHost().getHostAddress();
-
-        log.info(
-            "\n----------------------------------------------------------\n\t"
-                + "Application '{}' is running! Access URLs:\n\t" + "Local: \t\t{}://localhost:{}\n\t"
-                + "External: \t{}://{}:{}\n\t"
-                + "Profile(s): \t{}\n----------------------------------------------------------",
-            env.getProperty("spring.application.name"), protocol, env.getProperty("server.port"), protocol, hostAddress,
-            env.getProperty("server.port"), env.getActiveProfiles());
+        Environment env=null;
+//        try {
+             env = app.run(args).getEnvironment();
+            String protocol = "http";
+            if (env.getProperty("server.ssl.key-store") != null) {
+                protocol = "https";
+            }
+            String hostAddress = InetAddress.getLocalHost().getHostAddress();
+            log.info(
+                "\n----------------------------------------------------------\n\t"
+                    + "Application '{}' is running! Access URLs:\n\t" + "Local: \t\t{}://localhost:{}\n\t"
+                    + "External: \t{}://{}:{}\n\t"
+                    + "Profile(s): \t{}\n----------------------------------------------------------",
+                env.getProperty("spring.application.name"), protocol, env.getProperty("server.port"), protocol, hostAddress,
+                env.getProperty("server.port"), env.getActiveProfiles());
+//        }catch (Throwable e){
+//            log.error("init error",e);
+//        }
 
     }
 
