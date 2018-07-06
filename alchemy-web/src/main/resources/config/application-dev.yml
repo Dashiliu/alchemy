@@ -112,7 +112,7 @@ alchemy:
       mode: zookeeper
       clusterId: daily
       zookeeperQuorum: 10.1.22.21:2181,10.1.22.22:2181,10.1.22.23:2181
-      storagePath: hdfs://10.1.22.25:8020/flink/ha
+      storagePath: hdfs://10.1.21.57:8020/flink/ha
       address: 10.1.21.95
       port: 6123
   job:
