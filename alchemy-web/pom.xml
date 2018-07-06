@@ -113,7 +113,7 @@
         <sonar.sources>${project.basedir}/src/main/</sonar.sources>
         <sonar.surefire.reportsPath>${project.testresult.directory}/surefire-reports</sonar.surefire.reportsPath>
         <sonar.tests>${project.basedir}/src/test/</sonar.tests>
-        <start-class>com.dfire.platform.alchemy.web.Application</start-class>
+        <start-class>com.dfire.platform.alchemy.web.AlchemyApp</start-class>
     </properties>
 
     <dependencies>
