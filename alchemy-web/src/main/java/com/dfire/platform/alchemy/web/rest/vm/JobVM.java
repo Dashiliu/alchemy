@@ -19,6 +19,8 @@ public class JobVM {
 
     private Integer status;
 
+    private String cluster;
+
     public Long getId() {
         return id;
     }
@@ -57,6 +59,14 @@ public class JobVM {
 
     public void setSubmitMode(Integer submitMode) {
         this.submitMode = submitMode;
+    }
+
+    public String getCluster() {
+        return cluster;
+    }
+
+    public void setCluster(String cluster) {
+        this.cluster = cluster;
     }
 
     @Override

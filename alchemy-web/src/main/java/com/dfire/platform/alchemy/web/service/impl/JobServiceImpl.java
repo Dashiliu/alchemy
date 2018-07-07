@@ -3,6 +3,8 @@ package com.dfire.platform.alchemy.web.service.impl;
 import java.util.Date;
 import java.util.Optional;
 
+import com.dfire.magiceye.util.StringUtils;
+import com.dfire.platform.alchemy.web.common.Constants;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -94,7 +96,11 @@ public class JobServiceImpl implements JobService {
         acJob.setAcServiceId(jobVM.getAcServiceId() == null ? DEFAUL_SERVICE_ID : jobVM.getAcServiceId());
         acJob.setCreateTime(new Date());
         acJob.setName(jobVM.getName());
-        acJob.setCluster("");
+        if(StringUtils.isEmpty(jobVM.getCluster())){
+            acJob.setCluster(Constants.DEFAULT_FLINK_CLUSTER);
+        }else{
+            acJob.setCluster(jobVM.getCluster());
+        }
         acJob.setStatus(Status.UN_FIX.getStatus());
         acJob.setSubmitMode(jobVM.getSubmitMode());
         acJob.setIsValid(Valid.VALID.getValid());

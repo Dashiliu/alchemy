@@ -6,6 +6,8 @@ package com.dfire.platform.alchemy.web.common;
  */
 public final class Constants {
 
+    public static final String DEFAULT_FLINK_CLUSTER="flink_default";
+
     //数据传输时间
     public static final Integer SO_TIMEOUT=15000;
 

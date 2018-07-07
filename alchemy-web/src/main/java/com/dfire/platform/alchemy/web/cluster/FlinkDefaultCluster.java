@@ -63,8 +63,6 @@ public class FlinkDefaultCluster implements Cluster {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlinkDefaultCluster.class);
 
-    private static final String NAME = "flink_default";
-
     private static final String MATCH_CODE = "^\\$\\{[0-9]{1,2}\\}$";
 
     private static final String REPLACE_CODE = "[^\\d]+";
@@ -75,7 +73,7 @@ public class FlinkDefaultCluster implements Cluster {
 
     @Override
     public String name() {
-        return NAME;
+        return Constants.DEFAULT_FLINK_CLUSTER;
     }
 
     @Override
