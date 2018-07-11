@@ -32,6 +32,8 @@ public class HbaseTableSink implements UpsertStreamTableSink<Row> {
 
     private final long bufferSize;
 
+    private final boolean skipWal;
+
     private final String code;
 
     private HbaseInvoker hbaseInvoker;
@@ -42,23 +44,25 @@ public class HbaseTableSink implements UpsertStreamTableSink<Row> {
 
     private TypeInformation[] fieldTypes;
 
-    public HbaseTableSink(String zookeeper, String node, String tableName, String family, long bufferSize,
+    public HbaseTableSink(String zookeeper, String node, String tableName, String family, long bufferSize,boolean skipWal,
         String code) {
         this.zookeeper = zookeeper;
         this.node = node;
         this.tableName = tableName;
         this.family = family;
         this.bufferSize = bufferSize;
+        this.skipWal=skipWal;
         this.code = Preconditions.checkNotNull(code, "code can not be null ");
     }
 
-    public HbaseTableSink(String zookeeper, String node, String tableName, String family, long bufferSize,
+    public HbaseTableSink(String zookeeper, String node, String tableName, String family, long bufferSize,boolean skipWal,
         HbaseInvoker hbaseInvoker) {
         this.zookeeper = zookeeper;
         this.node = node;
         this.tableName = tableName;
         this.family = family;
         this.bufferSize = bufferSize;
+        this.skipWal=skipWal;
         this.code = null;
         this.hbaseInvoker = Preconditions.checkNotNull(hbaseInvoker, "hbaseInvoker can not be null ");
     }
@@ -77,10 +81,10 @@ public class HbaseTableSink implements UpsertStreamTableSink<Row> {
     public TableSink<Tuple2<Boolean, Row>> configure(String[] fieldNames, TypeInformation<?>[] fieldTypes) {
         HbaseTableSink copy;
         if (hbaseInvoker == null) {
-            copy = new HbaseTableSink(this.zookeeper, this.node, this.tableName, this.family, this.bufferSize,
+            copy = new HbaseTableSink(this.zookeeper, this.node, this.tableName, this.family, this.bufferSize,this.skipWal,
                 this.code);
         } else {
-            copy = new HbaseTableSink(this.zookeeper, this.node, this.tableName, this.family, this.bufferSize,
+            copy = new HbaseTableSink(this.zookeeper, this.node, this.tableName, this.family, this.bufferSize,this.skipWal,
                 this.hbaseInvoker);
         }
         copy.fieldNames = Preconditions.checkNotNull(fieldNames, "fieldNames");
@@ -122,10 +126,10 @@ public class HbaseTableSink implements UpsertStreamTableSink<Row> {
     private OutputFormatSinkFunction creatHbaseSink() {
         if (this.hbaseInvoker != null) {
             return new OutputFormatSinkFunction(new HBaseOutputFormat(this.zookeeper, this.node, this.tableName,
-                this.family, this.bufferSize, this.fieldNames.length, this.serializationSchema, this.hbaseInvoker));
+                this.family, this.bufferSize,this.skipWal, this.serializationSchema, this.hbaseInvoker));
         } else {
             return new OutputFormatSinkFunction(new HBaseOutputFormat(this.zookeeper, this.node, this.tableName,
-                this.family, this.bufferSize, this.fieldNames.length, this.serializationSchema, this.code));
+                this.family, this.bufferSize,this.skipWal,this.serializationSchema, this.code));
         }
     }
 

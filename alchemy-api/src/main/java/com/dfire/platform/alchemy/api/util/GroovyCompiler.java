@@ -19,6 +19,9 @@ import java.io.IOException;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyObject;
 
+/**
+ * @author congbai
+ */
 public class GroovyCompiler {
 
     public static void main(String[] args) throws IllegalAccessException, InstantiationException {
@@ -41,6 +44,15 @@ public class GroovyCompiler {
         GroovyClassLoader loader = getGroovyClassLoader();
         Class groovyClass = loader.parseClass(sCode, sName);
         return groovyClass;
+    }
+
+    public static  <T> T create(String sCode, String sName){
+        Class clazz = compile(sCode, sName);
+        try {
+            return (T)clazz.newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

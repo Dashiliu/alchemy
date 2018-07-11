@@ -1,5 +1,6 @@
 package com.dfire.platform.alchemy.web.descriptor;
 
+import com.dfire.platform.alchemy.web.common.ReadMode;
 import org.springframework.util.Assert;
 
 import com.dfire.platform.alchemy.web.common.ClusterType;
@@ -13,6 +14,8 @@ public class RedisSinkDescriptor extends SinkDescriptor {
 
     private String name;
 
+    private int readMode = ReadMode.CODE.getMode();
+
     private String sentinels;
 
     private String master;
@@ -23,7 +26,9 @@ public class RedisSinkDescriptor extends SinkDescriptor {
 
     private Integer queueSize;
 
-    private Integer thread;
+    private Integer threadNum;
+
+    private String value;
 
     @Override
     public String getName() {
@@ -74,12 +79,28 @@ public class RedisSinkDescriptor extends SinkDescriptor {
         this.queueSize = queueSize;
     }
 
-    public Integer getThread() {
-        return thread;
+    public Integer getThreadNum() {
+        return threadNum;
     }
 
-    public void setThread(Integer thread) {
-        this.thread = thread;
+    public void setThreadNum(Integer threadNum) {
+        this.threadNum = threadNum;
+    }
+
+    public int getReadMode() {
+        return readMode;
+    }
+
+    public void setReadMode(int readMode) {
+        this.readMode = readMode;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 
     @Override
@@ -99,7 +120,7 @@ public class RedisSinkDescriptor extends SinkDescriptor {
         if (queueSize != null && queueSize.intValue() > Constants.REDIS_MAX_QUEUE_SIZE) {
             throw new IllegalArgumentException("redis队列最大数是：" + Constants.REDIS_MAX_QUEUE_SIZE);
         }
-        if (thread != null && thread.intValue() > Constants.REDIS_MAX_THREAD_SIZE) {
+        if (threadNum != null && threadNum.intValue() > Constants.REDIS_MAX_THREAD_SIZE) {
             throw new IllegalArgumentException("redis最大消费线程是：" + Constants.REDIS_MAX_THREAD_SIZE);
         }
     }

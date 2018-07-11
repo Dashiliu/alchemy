@@ -46,10 +46,6 @@ public class FlinkAllScalarFunction extends ScalarFunction {
         return this.streamScalarFunction.invoke(args);
     }
 
-    // @Override
-    // public TypeInformation<?> getResultType(Class<?>[] signature) {
-    // return this.resultType;
-    // }
 
     public void setResultType(TypeInformation resultType) {
         this.resultType = resultType;

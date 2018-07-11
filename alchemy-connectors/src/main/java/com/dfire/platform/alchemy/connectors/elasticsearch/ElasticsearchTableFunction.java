@@ -31,6 +31,9 @@ public class ElasticsearchTableFunction implements ElasticsearchSinkFunction<Tup
     @Override
     public void process(Tuple2<Boolean, Row> booleanRowTuple2, RuntimeContext runtimeContext,
         RequestIndexer requestIndexer) {
+        if(booleanRowTuple2==null||booleanRowTuple2.f1==null){
+            return;
+        }
         if (booleanRowTuple2.f0) {
             requestIndexer.add(createIndexRequest(booleanRowTuple2.f1));
         }

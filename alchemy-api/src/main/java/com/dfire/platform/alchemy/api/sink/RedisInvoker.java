@@ -11,6 +11,6 @@ import com.twodfire.redis.ICacheService;
  */
 public interface RedisInvoker extends Serializable {
 
-    void invoke(ICacheService cacheService, Map<String, Object> values);
+    void invoke(ICacheService cacheService,Object[] values);
 
 }

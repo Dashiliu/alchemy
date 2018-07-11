@@ -28,6 +28,8 @@ public class HbaseSinkDescriptor extends SinkDescriptor {
 
     private long bufferSize;
 
+    private boolean skipWal;
+
     private String value;
 
     @Override
@@ -79,6 +81,14 @@ public class HbaseSinkDescriptor extends SinkDescriptor {
         this.bufferSize = bufferSize;
     }
 
+    public boolean isSkipWal() {
+        return skipWal;
+    }
+
+    public void setSkipWal(boolean skipWal) {
+        this.skipWal = skipWal;
+    }
+
     public int getReadMode() {
         return readMode;
     }
@@ -98,11 +108,11 @@ public class HbaseSinkDescriptor extends SinkDescriptor {
     @Override
     public <T> T transform(ClusterType clusterType) throws Exception {
         if (ReadMode.CODE.getMode() == this.readMode) {
-            return (T)new HbaseTableSink(this.zookeeper, this.node, this.tableName, this.family, this.bufferSize,
+            return (T)new HbaseTableSink(this.zookeeper, this.node, this.tableName, this.family, this.bufferSize,this.skipWal,
                 this.value);
         } else {
             HbaseInvoker hbaseInvoker = (HbaseInvoker)Class.forName(this.value).newInstance();
-            return (T)new HbaseTableSink(this.zookeeper, this.node, this.tableName, this.family, this.bufferSize,
+            return (T)new HbaseTableSink(this.zookeeper, this.node, this.tableName, this.family, this.bufferSize,this.skipWal,
                 hbaseInvoker);
         }
     }

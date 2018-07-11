@@ -15,9 +15,15 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <hitsdb.version>0.0.5</hitsdb.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>hitsdb-client</artifactId>
+            <version>${hitsdb.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.dfire.platform</groupId>
             <artifactId>alchemy-api</artifactId>

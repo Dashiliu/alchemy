@@ -1,7 +1,6 @@
 package com.dfire.platform.alchemy.connectors.hbase;
 
 import java.io.IOException;
-import java.io.Serializable;
 
 import org.apache.flink.api.common.io.OutputFormat;
 import org.apache.flink.api.common.serialization.SerializationSchema;
@@ -9,6 +8,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.types.Row;
 import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.client.Durability;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
@@ -16,6 +16,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 import com.dfire.platform.alchemy.api.sink.HbaseInvoker;
 import com.dfire.platform.alchemy.api.util.GroovyCompiler;
 import com.dfire.platform.alchemy.api.util.RandomUtils;
+import com.dfire.platform.alchemy.api.util.RowUtils;
 
 /**
  * @author dongbinglin
@@ -30,7 +31,7 @@ public class HBaseOutputFormat implements OutputFormat<Tuple2<Boolean, Row>> {
     private final String tableName;
     private final String family;
     private final long bufferSize;
-    private final int rowLength;
+    private final boolean skipWal;
     private org.apache.hadoop.conf.Configuration conf = null;
     private HTable table = null;
     private SerializationSchema<org.apache.flink.types.Row> serializationSchema;
@@ -40,25 +41,25 @@ public class HBaseOutputFormat implements OutputFormat<Tuple2<Boolean, Row>> {
     private HbaseInvoker hbaseInvoker;
 
     public HBaseOutputFormat(String zookeeper, String node, String tableName, String family, long bufferSize,
-        int rowLength, SerializationSchema<Row> serializationSchema, String code) {
+        boolean skipWal, SerializationSchema<Row> serializationSchema, String code) {
         this.zookeeper = zookeeper;
         this.node = node;
         this.tableName = tableName;
         this.family = family;
         this.bufferSize = bufferSize;
-        this.rowLength = rowLength;
+        this.skipWal=skipWal;
         this.serializationSchema = serializationSchema;
         this.code = code;
     }
 
     public HBaseOutputFormat(String zookeeper, String node, String tableName, String family, long bufferSize,
-        int rowLength, SerializationSchema<Row> serializationSchema, HbaseInvoker hbaseInvoker) {
+        boolean skipWal, SerializationSchema<Row> serializationSchema, HbaseInvoker hbaseInvoker) {
         this.zookeeper = zookeeper;
         this.node = node;
         this.tableName = tableName;
         this.family = family;
         this.bufferSize = bufferSize;
-        this.rowLength = rowLength;
+        this.skipWal = skipWal;
         this.serializationSchema = serializationSchema;
         this.hbaseInvoker = hbaseInvoker;
     }
@@ -78,35 +79,25 @@ public class HBaseOutputFormat implements OutputFormat<Tuple2<Boolean, Row>> {
             table.setWriteBufferSize(bufferSize);
         }
         if (this.hbaseInvoker == null) {
-            this.hbaseInvoker = createInvoker(this.code);
-        }
-    }
-
-    private HbaseInvoker createInvoker(String code) {
-        Class clazz = GroovyCompiler.compile(code, RandomUtils.uuid());
-        try {
-            return (HbaseInvoker)clazz.newInstance();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            this.hbaseInvoker =  GroovyCompiler.create(this.code, RandomUtils.uuid());
         }
     }
 
     @Override
     public void writeRecord(Tuple2<Boolean, Row> value) throws IOException {
-        Object[] rows = createRows(value);
+        if(value==null||value.f1==null){
+            return;
+        }
+        Object[] rows = RowUtils.createRows((value.f1));
         Put put = new Put(Bytes.toBytes(hbaseInvoker.getRowKey(rows)));
         put.add(Bytes.toBytes(family), Bytes.toBytes(hbaseInvoker.getQualifier(rows)),
             serializationSchema.serialize(value.f1));
+        if(this.skipWal){
+            put.setDurability(Durability.SKIP_WAL);
+        }
         table.put(put);
     }
 
-    private Object[] createRows(Tuple2<Boolean, Row> value) {
-        Object[] rows = new Object[rowLength];
-        for (int i = 0; i < rowLength; i++) {
-            rows[i] = value.f1.getField(i);
-        }
-        return rows;
-    }
 
     @Override
     public void close() throws IOException {
