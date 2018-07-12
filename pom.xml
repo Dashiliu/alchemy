@@ -30,7 +30,7 @@
         <scala.version>2.11.11</scala.version>
         <maven.compiler.source>1.7</maven.compiler.source>
         <groovy.version>2.4.11</groovy.version>
-        <redis.version>1.4.0</redis.version>
+        <redis.version>1.4.1</redis.version>
         <lombok.version>1.16.18</lombok.version>
         <fastjson.versoiin>1.2.46</fastjson.versoiin>
         <p3c.pmd.version>1.3.0</p3c.pmd.version>

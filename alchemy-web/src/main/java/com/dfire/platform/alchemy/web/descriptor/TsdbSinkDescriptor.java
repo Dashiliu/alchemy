@@ -1,7 +1,13 @@
 package com.dfire.platform.alchemy.web.descriptor;
 
+import org.springframework.beans.BeanUtils;
+
+import com.dfire.platform.alchemy.api.sink.OpentsdbInvoker;
+import com.dfire.platform.alchemy.connectors.tsdb.OpentsdbProperties;
+import com.dfire.platform.alchemy.connectors.tsdb.OpentsdbTableSink;
 import com.dfire.platform.alchemy.web.common.ClusterType;
 import com.dfire.platform.alchemy.web.common.Constants;
+import com.dfire.platform.alchemy.web.common.ReadMode;
 
 /**
  * @author congbai
@@ -10,6 +16,24 @@ import com.dfire.platform.alchemy.web.common.Constants;
 public class TsdbSinkDescriptor extends SinkDescriptor {
 
     private String name;
+
+    private int readMode = ReadMode.CODE.getMode();
+
+    private String opentsdbUrl;
+
+    private Integer ioThreadCount;
+
+    private Integer batchPutBufferSize;
+
+    private Integer batchPutConsumerThreadCount;
+
+    private Integer batchPutSize;
+
+    private Integer batchPutTimeLimit;
+
+    private Integer putRequestLimit;
+
+    private String value;
 
     @Override
     public String getName() {
@@ -22,12 +46,91 @@ public class TsdbSinkDescriptor extends SinkDescriptor {
 
     @Override
     public <T> T transform(ClusterType clusterType) throws Exception {
-        return null;
+        OpentsdbProperties opentsdbProperties = new OpentsdbProperties();
+        BeanUtils.copyProperties(this, opentsdbProperties);
+        if (ReadMode.CODE.getMode() == this.readMode) {
+            return (T)new OpentsdbTableSink(opentsdbProperties, this.value);
+        } else {
+            OpentsdbInvoker redisInvoker = (OpentsdbInvoker)Class.forName(this.value).newInstance();
+            return (T)new OpentsdbTableSink(opentsdbProperties, redisInvoker);
+        }
     }
 
     @Override
     public void validate() throws Exception {
 
+    }
+
+    public int getReadMode() {
+        return readMode;
+    }
+
+    public void setReadMode(int readMode) {
+        this.readMode = readMode;
+    }
+
+    public String getOpentsdbUrl() {
+        return opentsdbUrl;
+    }
+
+    public void setOpentsdbUrl(String opentsdbUrl) {
+        this.opentsdbUrl = opentsdbUrl;
+    }
+
+    public Integer getIoThreadCount() {
+        return ioThreadCount;
+    }
+
+    public void setIoThreadCount(Integer ioThreadCount) {
+        this.ioThreadCount = ioThreadCount;
+    }
+
+    public Integer getBatchPutBufferSize() {
+        return batchPutBufferSize;
+    }
+
+    public void setBatchPutBufferSize(Integer batchPutBufferSize) {
+        this.batchPutBufferSize = batchPutBufferSize;
+    }
+
+    public Integer getBatchPutConsumerThreadCount() {
+        return batchPutConsumerThreadCount;
+    }
+
+    public void setBatchPutConsumerThreadCount(Integer batchPutConsumerThreadCount) {
+        this.batchPutConsumerThreadCount = batchPutConsumerThreadCount;
+    }
+
+    public Integer getBatchPutSize() {
+        return batchPutSize;
+    }
+
+    public void setBatchPutSize(Integer batchPutSize) {
+        this.batchPutSize = batchPutSize;
+    }
+
+    public Integer getBatchPutTimeLimit() {
+        return batchPutTimeLimit;
+    }
+
+    public void setBatchPutTimeLimit(Integer batchPutTimeLimit) {
+        this.batchPutTimeLimit = batchPutTimeLimit;
+    }
+
+    public Integer getPutRequestLimit() {
+        return putRequestLimit;
+    }
+
+    public void setPutRequestLimit(Integer putRequestLimit) {
+        this.putRequestLimit = putRequestLimit;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 
     @Override

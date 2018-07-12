@@ -28,61 +28,22 @@ public class OpentsdbSinkFunction extends RichSinkFunction<Row> {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpentsdbSinkFunction.class);
 
-    private final String opentsdbUrl;
-
-    private final Integer ioThreadCount;
-
-    private final Integer batchPutBufferSize;
-
-    private final Integer batchPutConsumerThreadCount;
-
-    private final Integer batchPutSize;
-
-    private final Integer batchPutTimeLimit;
-
-    private final Integer putRequestLimit;
+    private final OpentsdbProperties opentsdbProperties;
 
     private final String code;
 
     private OpentsdbInvoker invoker;
 
-
     private transient HiTSDB tsdb;
 
-    public OpentsdbSinkFunction(String opentsdbUrl,
-                                Integer ioThreadCount,
-                                Integer batchPutBufferSize,
-                                Integer batchPutConsumerThreadCount,
-                                Integer batchPutSize,
-                                Integer batchPutTimeLimit,
-                                Integer putRequestLimit,
-                                String code) {
-        this.opentsdbUrl = opentsdbUrl;
-        this.ioThreadCount = ioThreadCount;
-        this.batchPutBufferSize = batchPutBufferSize;
-        this.batchPutConsumerThreadCount = batchPutConsumerThreadCount;
-        this.batchPutSize = batchPutSize;
-        this.batchPutTimeLimit = batchPutTimeLimit;
-        this.putRequestLimit = putRequestLimit;
+    public OpentsdbSinkFunction(OpentsdbProperties opentsdbProperties, String code) {
+        this.opentsdbProperties=opentsdbProperties;
         this.code=code;
         this.invoker=null;
     }
 
-    public OpentsdbSinkFunction(String opentsdbUrl,
-                                Integer ioThreadCount,
-                                Integer batchPutBufferSize,
-                                Integer batchPutConsumerThreadCount,
-                                Integer batchPutSize,
-                                Integer batchPutTimeLimit,
-                                Integer putRequestLimit,
-                                OpentsdbInvoker invoker) {
-        this.opentsdbUrl = opentsdbUrl;
-        this.ioThreadCount = ioThreadCount;
-        this.batchPutBufferSize = batchPutBufferSize;
-        this.batchPutConsumerThreadCount = batchPutConsumerThreadCount;
-        this.batchPutSize = batchPutSize;
-        this.batchPutTimeLimit = batchPutTimeLimit;
-        this.putRequestLimit = putRequestLimit;
+    public OpentsdbSinkFunction(OpentsdbProperties opentsdbProperties, OpentsdbInvoker invoker) {
+        this.opentsdbProperties=opentsdbProperties;
         this.code=null;
         this.invoker=invoker;
     }
@@ -92,7 +53,7 @@ public class OpentsdbSinkFunction extends RichSinkFunction<Row> {
     public void open(Configuration parameters) throws Exception {
         HiTSDBConfig.Builder builder = HiTSDBConfig
                 // 配置地址，第一个参数可以是域名，IP。
-                .address(opentsdbUrl, 8242)
+                .address(opentsdbProperties.getOpentsdbUrl(), 8242)
                 // 异步写相关，异步批量 Put 回调接口。
                 .listenBatchPut(new BatchPutCallback() {
                     @Override
@@ -109,23 +70,23 @@ public class OpentsdbSinkFunction extends RichSinkFunction<Row> {
                 })
                 // 流量限制。设置每秒最大提交Point的个数。
                 .maxTPS(50000);
-        if(this.ioThreadCount!=null){
-            builder.ioThreadCount(this.ioThreadCount);
+        if(this.opentsdbProperties.getIoThreadCount()!=null){
+            builder.ioThreadCount(this.opentsdbProperties.getIoThreadCount());
         }
-        if(this.batchPutBufferSize!=null){
-            builder.batchPutBufferSize(this.batchPutBufferSize);
+        if(this.opentsdbProperties.getBatchPutBufferSize()!=null){
+            builder.batchPutBufferSize(this.opentsdbProperties.getBatchPutBufferSize());
         }
-        if(this.batchPutConsumerThreadCount!=null){
-            builder.batchPutConsumerThreadCount(this.batchPutConsumerThreadCount);
+        if(this.opentsdbProperties.getBatchPutConsumerThreadCount()!=null){
+            builder.batchPutConsumerThreadCount(this.opentsdbProperties.getBatchPutConsumerThreadCount());
         }
-        if(this.batchPutSize!=null){
-            builder.batchPutSize(this.batchPutSize);
+        if(this.opentsdbProperties.getBatchPutSize()!=null){
+            builder.batchPutSize(this.opentsdbProperties.getBatchPutSize());
         }
-        if(this.batchPutTimeLimit!=null){
-            builder.batchPutTimeLimit(this.batchPutTimeLimit);
+        if(this.opentsdbProperties.getBatchPutTimeLimit()!=null){
+            builder.batchPutTimeLimit(this.opentsdbProperties.getBatchPutTimeLimit());
         }
-        if(this.putRequestLimit!=null){
-            builder.putRequestLimit(this.putRequestLimit);
+        if(this.opentsdbProperties.getPutRequestLimit()!=null){
+            builder.putRequestLimit(this.opentsdbProperties.getPutRequestLimit());
         }
         this.tsdb = HiTSDBClientFactory.connect(builder.config());
         if (this.invoker == null) {

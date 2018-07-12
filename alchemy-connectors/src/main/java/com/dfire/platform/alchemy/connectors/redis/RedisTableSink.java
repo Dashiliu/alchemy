@@ -20,17 +20,7 @@ import com.dfire.platform.alchemy.api.sink.RedisInvoker;
  */
 public class RedisTableSink implements UpsertStreamTableSink<Row> {
 
-    private final String sentinels;
-
-    private final String master;
-
-    private final int database;
-
-    private final Integer maxTotal;
-
-    private final Integer queueSize;
-
-    private final Integer threadNum;
+    private final RedisProperties redisProperties;
 
     private final String code;
 
@@ -40,27 +30,18 @@ public class RedisTableSink implements UpsertStreamTableSink<Row> {
 
     private TypeInformation[] fieldTypes;
 
-    public RedisTableSink(String sentinels, String master, int database, Integer maxTotal, Integer queueSize, Integer threadNum, String code) {
-        this.sentinels = sentinels;
-        this.master = master;
-        this.database = database;
-        this.maxTotal = maxTotal;
-        this.queueSize = queueSize;
-        this.threadNum = threadNum;
+    public RedisTableSink(RedisProperties redisProperties, String code) {
+        this.redisProperties = redisProperties;
         this.code = code;
         this.redisInvoker=null;
     }
 
-    public RedisTableSink(String sentinels, String master, int database, Integer maxTotal, Integer queueSize, Integer threadNum, RedisInvoker redisInvoker) {
-        this.sentinels = sentinels;
-        this.master = master;
-        this.database = database;
-        this.maxTotal = maxTotal;
-        this.queueSize = queueSize;
-        this.threadNum = threadNum;
-        this.code=null;
-        this.redisInvoker = redisInvoker;
+    public RedisTableSink(RedisProperties redisProperties, RedisInvoker redisInvoker) {
+        this.redisProperties =  Preconditions.checkNotNull(redisProperties, "redisProperties");
+        this.code = null;
+        this.redisInvoker=redisInvoker;
     }
+
 
     @Override
     public String[] getFieldNames() {
@@ -76,11 +57,9 @@ public class RedisTableSink implements UpsertStreamTableSink<Row> {
     public TableSink<Tuple2<Boolean, Row>> configure(String[] fieldNames, TypeInformation<?>[] fieldTypes) {
         RedisTableSink copy;
         if (redisInvoker == null) {
-            copy = new RedisTableSink(this.sentinels,this.master,this.database,this.maxTotal,this.queueSize,this.threadNum,
-                    this.code);
+            copy = new RedisTableSink(redisProperties, this.code);
         } else {
-            copy = new RedisTableSink(this.sentinels,this.master,this.database,this.maxTotal,this.queueSize,this.threadNum,
-                    this.redisInvoker);
+            copy = new RedisTableSink(redisProperties, this.redisInvoker);
         }
         copy.fieldNames = Preconditions.checkNotNull(fieldNames, "fieldNames");
         copy.fieldTypes = Preconditions.checkNotNull(fieldTypes, "fieldTypes");
@@ -107,11 +86,9 @@ public class RedisTableSink implements UpsertStreamTableSink<Row> {
 
     private RichSinkFunction creatRedisRich() {
         if (this.redisInvoker != null) {
-            return new RedisSinkFunction(this.sentinels,this.master,this.database,this.maxTotal,this.queueSize,this.threadNum,
-                    this.redisInvoker);
+            return new RedisSinkFunction(this.redisProperties, this.redisInvoker);
         } else {
-            return new RedisSinkFunction(this.sentinels,this.master,this.database,this.maxTotal,this.queueSize,this.threadNum,
-                    this.code);
+            return new RedisSinkFunction(this.redisProperties, this.code);
         }
     }
 

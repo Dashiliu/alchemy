@@ -1,8 +1,10 @@
 package com.dfire.platform.alchemy.web.descriptor;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.util.Assert;
 
 import com.dfire.platform.alchemy.api.sink.HbaseInvoker;
+import com.dfire.platform.alchemy.connectors.hbase.HbaseProperties;
 import com.dfire.platform.alchemy.connectors.hbase.HbaseTableSink;
 import com.dfire.platform.alchemy.web.common.ClusterType;
 import com.dfire.platform.alchemy.web.common.Constants;
@@ -107,13 +109,13 @@ public class HbaseSinkDescriptor extends SinkDescriptor {
 
     @Override
     public <T> T transform(ClusterType clusterType) throws Exception {
+        HbaseProperties hbaseProperties = new HbaseProperties();
+        BeanUtils.copyProperties(this, hbaseProperties);
         if (ReadMode.CODE.getMode() == this.readMode) {
-            return (T)new HbaseTableSink(this.zookeeper, this.node, this.tableName, this.family, this.bufferSize,this.skipWal,
-                this.value);
+            return (T)new HbaseTableSink(hbaseProperties, this.value);
         } else {
             HbaseInvoker hbaseInvoker = (HbaseInvoker)Class.forName(this.value).newInstance();
-            return (T)new HbaseTableSink(this.zookeeper, this.node, this.tableName, this.family, this.bufferSize,this.skipWal,
-                hbaseInvoker);
+            return (T)new HbaseTableSink(hbaseProperties, hbaseInvoker);
         }
     }
 

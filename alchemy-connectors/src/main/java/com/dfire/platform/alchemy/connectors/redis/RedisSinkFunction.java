@@ -15,7 +15,7 @@ import com.dfire.platform.alchemy.api.sink.RedisInvoker;
 import com.dfire.platform.alchemy.api.util.GroovyCompiler;
 import com.dfire.platform.alchemy.api.util.RandomUtils;
 import com.dfire.platform.alchemy.api.util.RowUtils;
-import com.twodfire.redis.RedisSentinelService;
+import com.twodfire.redis.ICacheService;
 
 /**
  * @author congbai
@@ -25,53 +25,40 @@ public class RedisSinkFunction extends RichSinkFunction<Tuple2<Boolean, Row>> {
 
     protected static final Logger LOG = LoggerFactory.getLogger(RedisSinkFunction.class);
 
-    private final String sentinels;
-
-    private final String master;
-
-    private final int database;
-
-    private final Integer maxTotal;
-
-    private final Integer threadNum;
+    private final RedisProperties redisProperties;
 
     private final String code;
 
     private RedisInvoker redisInvoker;
 
-    private transient final BlockingQueue<Row> queue;
+    private transient BlockingQueue<Row> queue;
 
-    protected  transient RedisSentinelService cacheService;
+    private transient ICacheService cacheService;
 
     private transient ExecutorService threadPool;
 
     private AtomicBoolean shutDown = new AtomicBoolean(false);
 
-    public RedisSinkFunction(String sentinels, String master, int database, Integer maxTotal, Integer queueSize, Integer threadNum, String code) {
-        this.sentinels = sentinels;
-        this.master = master;
-        this.database = database;
-        this.maxTotal = maxTotal;
-        this.threadNum = threadNum;
+    public RedisSinkFunction(RedisProperties redisProperties, String code) {
         this.code = code;
         this.redisInvoker=null;
-        if(queueSize!=null&&queueSize>0){
-            this.queue = new ArrayBlockingQueue<>(queueSize);
-        }else{
-            this.queue=null;
-        }
+        this.redisProperties=redisProperties;
+        initQueue(redisProperties);
     }
 
-    public RedisSinkFunction(String sentinels, String master, int database, Integer maxTotal, Integer queueSize, Integer threadNum, RedisInvoker redisInvoker) {
-        this.sentinels = sentinels;
-        this.master = master;
-        this.database = database;
-        this.maxTotal = maxTotal;
-        this.threadNum = threadNum;
+    public RedisSinkFunction(RedisProperties redisProperties, RedisInvoker redisInvoker) {
         this.code = null;
         this.redisInvoker = redisInvoker;
-        if(queueSize!=null&&queueSize>0){
-            this.queue = new ArrayBlockingQueue<>(queueSize);
+        this.redisProperties=redisProperties;
+        initQueue(redisProperties);
+    }
+
+    private void initQueue(RedisProperties redisProperties) {
+        if(redisProperties.getQueueSize()!=null
+                &&redisProperties.getQueueSize()>0
+                &&redisProperties.getThreadNum()!=null
+                &&redisProperties.getThreadNum()>0){
+            this.queue = new ArrayBlockingQueue<>(redisProperties.getQueueSize());
         }else{
             this.queue=null;
         }
@@ -79,14 +66,11 @@ public class RedisSinkFunction extends RichSinkFunction<Tuple2<Boolean, Row>> {
 
     @Override
     public void open(Configuration parameters) throws Exception {
-        this.cacheService = new RedisSentinelService();
-        cacheService.setDatabase(database);
-        cacheService.setMasterName(master);
-        cacheService.setSentinels(sentinels);
-        cacheService.setMaxIdle(maxTotal);
-        cacheService.setMinIdle(maxTotal);
-        cacheService.setMaxTotal(maxTotal);
-        cacheService.init();
+        if(this.redisProperties.getCodis()!=null){
+            this.cacheService=initCodis();
+        }else if(this.redisProperties.getSentinel()!=null){
+            this.cacheService=initSentinel();
+        }
         if(this.queue!=null){
             initThreadPool();
         }
@@ -96,8 +80,20 @@ public class RedisSinkFunction extends RichSinkFunction<Tuple2<Boolean, Row>> {
         super.open(parameters);
     }
 
+    private ICacheService initSentinel() {
+        SentinelService cacheService = new SentinelService();
+        cacheService.init(this.redisProperties);
+        return cacheService;
+    }
+
+    private ICacheService initCodis() {
+        CodisService codisService=new CodisService();
+        codisService.init(this.redisProperties);
+        return codisService;
+    }
+
     private void initThreadPool() {
-        this.threadPool = Executors.newFixedThreadPool(threadNum, new ThreadFactory() {
+        this.threadPool = Executors.newFixedThreadPool(this.redisProperties.getThreadNum(), new ThreadFactory() {
 
             private final AtomicInteger poolNumber = new AtomicInteger(1);
 
@@ -109,7 +105,7 @@ public class RedisSinkFunction extends RichSinkFunction<Tuple2<Boolean, Row>> {
                 return thread;
             }
         });
-        for (int i = 0; i < threadNum; i++) {
+        for (int i = 0; i < this.redisProperties.getThreadNum(); i++) {
             threadPool.submit(new RedisConsumer());
         }
     }

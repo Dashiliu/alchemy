@@ -17,19 +17,7 @@ import com.dfire.platform.alchemy.api.sink.OpentsdbInvoker;
  */
 public class OpentsdbTableSink implements AppendStreamTableSink<Row> {
 
-    private final String opentsdbUrl;
-
-    private final Integer ioThreadCount;
-
-    private final Integer batchPutBufferSize;
-
-    private final Integer batchPutConsumerThreadCount;
-
-    private final Integer batchPutSize;
-
-    private final Integer batchPutTimeLimit;
-
-    private final Integer putRequestLimit;
+    private final OpentsdbProperties opentsdbProperties;
 
     private final String code;
 
@@ -39,25 +27,13 @@ public class OpentsdbTableSink implements AppendStreamTableSink<Row> {
 
     private TypeInformation[] fieldTypes;
 
-    public OpentsdbTableSink(String opentsdbUrl, Integer ioThreadCount, Integer batchPutBufferSize, Integer batchPutConsumerThreadCount, Integer batchPutSize, Integer batchPutTimeLimit, Integer putRequestLimit, String code) {
-        this.opentsdbUrl = opentsdbUrl;
-        this.ioThreadCount = ioThreadCount;
-        this.batchPutBufferSize = batchPutBufferSize;
-        this.batchPutConsumerThreadCount = batchPutConsumerThreadCount;
-        this.batchPutSize = batchPutSize;
-        this.batchPutTimeLimit = batchPutTimeLimit;
-        this.putRequestLimit = putRequestLimit;
+    public OpentsdbTableSink( OpentsdbProperties opentsdbProperties, String code) {
+        this.opentsdbProperties =  Preconditions.checkNotNull(opentsdbProperties, "opentsdbProperties");;
         this.code = code;
     }
 
-    public OpentsdbTableSink(String opentsdbUrl, Integer ioThreadCount, Integer batchPutBufferSize, Integer batchPutConsumerThreadCount, Integer batchPutSize, Integer batchPutTimeLimit, Integer putRequestLimit, OpentsdbInvoker invoker) {
-        this.opentsdbUrl = opentsdbUrl;
-        this.ioThreadCount = ioThreadCount;
-        this.batchPutBufferSize = batchPutBufferSize;
-        this.batchPutConsumerThreadCount = batchPutConsumerThreadCount;
-        this.batchPutSize = batchPutSize;
-        this.batchPutTimeLimit = batchPutTimeLimit;
-        this.putRequestLimit = putRequestLimit;
+    public OpentsdbTableSink(OpentsdbProperties opentsdbProperties, OpentsdbInvoker invoker) {
+        this.opentsdbProperties =  Preconditions.checkNotNull(opentsdbProperties, "opentsdbProperties");;
         this.code = null;
         this.invoker=invoker;
     }
@@ -81,13 +57,9 @@ public class OpentsdbTableSink implements AppendStreamTableSink<Row> {
     public TableSink<Row> configure(String[] fieldNames, TypeInformation<?>[] fieldTypes) {
         OpentsdbTableSink copy;
         if (invoker == null) {
-            copy = new OpentsdbTableSink(this.opentsdbUrl,this.ioThreadCount,this.batchPutBufferSize,this.batchPutConsumerThreadCount,
-                    this.batchPutSize,this.batchPutTimeLimit,this.putRequestLimit,
-                    this.code);
+            copy = new OpentsdbTableSink(this.opentsdbProperties, this.code);
         } else {
-            copy = new OpentsdbTableSink(this.opentsdbUrl,this.ioThreadCount,this.batchPutBufferSize,this.batchPutConsumerThreadCount,
-                    this.batchPutSize,this.batchPutTimeLimit,this.putRequestLimit,
-                    this.invoker);
+            copy = new OpentsdbTableSink(this.opentsdbProperties, this.invoker);
         }
         copy.fieldNames = Preconditions.checkNotNull(fieldNames, "fieldNames");
         copy.fieldTypes = Preconditions.checkNotNull(fieldTypes, "fieldTypes");
@@ -104,13 +76,9 @@ public class OpentsdbTableSink implements AppendStreamTableSink<Row> {
 
     private RichSinkFunction createTsdbRich() {
         if (invoker == null) {
-             return new OpentsdbSinkFunction(this.opentsdbUrl,this.ioThreadCount,this.batchPutBufferSize,this.batchPutConsumerThreadCount,
-                    this.batchPutSize,this.batchPutTimeLimit,this.putRequestLimit,
-                    this.code);
+             return new OpentsdbSinkFunction(this.opentsdbProperties, this.code);
         } else {
-            return new OpentsdbSinkFunction(this.opentsdbUrl,this.ioThreadCount,this.batchPutBufferSize,this.batchPutConsumerThreadCount,
-                    this.batchPutSize,this.batchPutTimeLimit,this.putRequestLimit,
-                    this.invoker);
+            return new OpentsdbSinkFunction(this.opentsdbProperties, this.invoker);
         }
 
     }

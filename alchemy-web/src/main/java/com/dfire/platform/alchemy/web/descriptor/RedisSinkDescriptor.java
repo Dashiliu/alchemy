@@ -1,10 +1,18 @@
 package com.dfire.platform.alchemy.web.descriptor;
 
-import com.dfire.platform.alchemy.web.common.ReadMode;
+import org.springframework.beans.BeanUtils;
 import org.springframework.util.Assert;
 
+import com.dfire.platform.alchemy.api.sink.RedisInvoker;
+import com.dfire.platform.alchemy.connectors.redis.Codis;
+import com.dfire.platform.alchemy.connectors.redis.RedisProperties;
+import com.dfire.platform.alchemy.connectors.redis.RedisTableSink;
+import com.dfire.platform.alchemy.connectors.redis.Sentinel;
 import com.dfire.platform.alchemy.web.common.ClusterType;
 import com.dfire.platform.alchemy.web.common.Constants;
+import com.dfire.platform.alchemy.web.common.ReadMode;
+
+import redis.clients.jedis.JedisPoolConfig;
 
 /**
  * @author congbai
@@ -16,13 +24,13 @@ public class RedisSinkDescriptor extends SinkDescriptor {
 
     private int readMode = ReadMode.CODE.getMode();
 
-    private String sentinels;
+    private Sentinel sentinel;
 
-    private String master;
+    private Codis codis;
+
+    private JedisPoolConfig config;
 
     private int database;
-
-    private Integer maxTotal;
 
     private Integer queueSize;
 
@@ -39,20 +47,20 @@ public class RedisSinkDescriptor extends SinkDescriptor {
         this.name = name;
     }
 
-    public String getSentinels() {
-        return sentinels;
+    public Sentinel getSentinel() {
+        return sentinel;
     }
 
-    public void setSentinels(String sentinels) {
-        this.sentinels = sentinels;
+    public void setSentinel(Sentinel sentinel) {
+        this.sentinel = sentinel;
     }
 
-    public String getMaster() {
-        return master;
+    public Codis getCodis() {
+        return codis;
     }
 
-    public void setMaster(String master) {
-        this.master = master;
+    public void setCodis(Codis codis) {
+        this.codis = codis;
     }
 
     public int getDatabase() {
@@ -63,12 +71,12 @@ public class RedisSinkDescriptor extends SinkDescriptor {
         this.database = database;
     }
 
-    public Integer getMaxTotal() {
-        return maxTotal;
+    public JedisPoolConfig getConfig() {
+        return config;
     }
 
-    public void setMaxTotal(Integer maxTotal) {
-        this.maxTotal = maxTotal;
+    public void setConfig(JedisPoolConfig config) {
+        this.config = config;
     }
 
     public Integer getQueueSize() {
@@ -105,18 +113,19 @@ public class RedisSinkDescriptor extends SinkDescriptor {
 
     @Override
     public <T> T transform(ClusterType clusterType) throws Exception {
-        //// TODO: 2018/6/30
-        return null;
+        RedisProperties redisProperties = new RedisProperties();
+        BeanUtils.copyProperties(this, redisProperties);
+        if (ReadMode.CODE.getMode() == this.readMode) {
+            return (T)new RedisTableSink(redisProperties, this.value);
+        } else {
+            RedisInvoker redisInvoker = (RedisInvoker)Class.forName(this.value).newInstance();
+            return (T)new RedisTableSink(redisProperties, redisInvoker);
+        }
     }
 
     @Override
     public void validate() throws Exception {
-        Assert.notNull(sentinels, "redis的sentinels地址不能为空");
-        Assert.notNull(master, "redis的master名称不能为空");
         Assert.notNull(database, "redis的database不能为空");
-        if (maxTotal != null && maxTotal.intValue() > Constants.REDIS_MAX_TOTAL) {
-            throw new IllegalArgumentException("redis最大连接数是：" + Constants.REDIS_MAX_TOTAL);
-        }
         if (queueSize != null && queueSize.intValue() > Constants.REDIS_MAX_QUEUE_SIZE) {
             throw new IllegalArgumentException("redis队列最大数是：" + Constants.REDIS_MAX_QUEUE_SIZE);
         }
@@ -129,4 +138,5 @@ public class RedisSinkDescriptor extends SinkDescriptor {
     public String getType() {
         return Constants.SINK_TYPE_VALUE_REDIS;
     }
+
 }
