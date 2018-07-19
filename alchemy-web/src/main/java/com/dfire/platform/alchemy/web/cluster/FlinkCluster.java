@@ -6,9 +6,9 @@ import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,6 +21,7 @@ import org.apache.flink.client.program.ClusterClient;
 import org.apache.flink.client.program.JobWithJars;
 import org.apache.flink.client.program.PackagedProgram;
 import org.apache.flink.client.program.StandaloneClusterClient;
+import org.apache.flink.configuration.AkkaOptions;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.configuration.HighAvailabilityOptions;
 import org.apache.flink.configuration.JobManagerOptions;
@@ -28,8 +29,7 @@ import org.apache.flink.optimizer.DataStatistics;
 import org.apache.flink.optimizer.Optimizer;
 import org.apache.flink.optimizer.costs.DefaultCostEstimator;
 import org.apache.flink.optimizer.plan.FlinkPlan;
-import org.apache.flink.runtime.client.JobStatusMessage;
-import org.apache.flink.runtime.instance.ActorGateway;
+import org.apache.flink.runtime.jobgraph.JobStatus;
 import org.apache.flink.runtime.jobmanager.HighAvailabilityMode;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -39,18 +39,18 @@ import org.apache.flink.table.api.java.StreamTableEnvironment;
 import org.apache.flink.table.sources.TableSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import com.dfire.platform.alchemy.api.function.aggregate.FlinkAllAggregateFunction;
 import com.dfire.platform.alchemy.api.function.scalar.FlinkAllScalarFunction;
 import com.dfire.platform.alchemy.api.function.table.FlinkAllTableFunction;
 import com.dfire.platform.alchemy.web.cluster.request.*;
-import com.dfire.platform.alchemy.web.cluster.response.ListJobFlinkResponse;
+import com.dfire.platform.alchemy.web.cluster.response.JobStatusResponse;
 import com.dfire.platform.alchemy.web.cluster.response.Response;
 import com.dfire.platform.alchemy.web.cluster.response.SubmitFlinkResponse;
 import com.dfire.platform.alchemy.web.common.ClusterType;
 import com.dfire.platform.alchemy.web.common.Constants;
 import com.dfire.platform.alchemy.web.common.ResultMessage;
+import com.dfire.platform.alchemy.web.common.Status;
 import com.dfire.platform.alchemy.web.descriptor.Descriptor;
 import com.dfire.platform.alchemy.web.util.PropertiesUtils;
 
@@ -58,10 +58,9 @@ import com.dfire.platform.alchemy.web.util.PropertiesUtils;
  * @author congbai
  * @date 01/06/2018
  */
-@Component
-public class FlinkDefaultCluster implements Cluster {
+public class FlinkCluster implements Cluster {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FlinkDefaultCluster.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlinkCluster.class);
 
     private static final String MATCH_CODE = "^\\$\\{[0-9]{1,2}\\}$";
 
@@ -70,11 +69,6 @@ public class FlinkDefaultCluster implements Cluster {
     private ClusterClient clusterClient;
 
     private String globalClassPath;
-
-    @Override
-    public String name() {
-        return Constants.DEFAULT_FLINK_CLUSTER;
-    }
 
     @Override
     public ClusterType clusterType() {
@@ -91,6 +85,7 @@ public class FlinkDefaultCluster implements Cluster {
         configuration.setString(HighAvailabilityOptions.HA_ZOOKEEPER_QUORUM, clusterInfo.getZookeeperQuorum());
         configuration.setString(HighAvailabilityOptions.HA_STORAGE_PATH, clusterInfo.getStoragePath());
         configuration.setString(JobManagerOptions.ADDRESS, clusterInfo.getAddress());
+        configuration.setString(AkkaOptions.LOOKUP_TIMEOUT,"30 s");
         configuration.setInteger(JobManagerOptions.PORT, clusterInfo.getPort());
         try {
             this.clusterClient = new StandaloneClusterClient(configuration);
@@ -109,16 +104,37 @@ public class FlinkDefaultCluster implements Cluster {
             return sendJarSubmitRequest((JarSubmitFlinkRequest)message);
         } else if (message instanceof CancelFlinkRequest) {
             return cancelJob((CancelFlinkRequest)message);
-        } else if (message instanceof ListJobFlinkRequest) {
-            return listJob((ListJobFlinkRequest)message);
+        } else if (message instanceof JobStatusRequest) {
+            return getJobStatus((JobStatusRequest)message);
         } else {
             throw new UnsupportedOperationException("unknow message type:" + message.getClass().getName());
         }
     }
 
-    private Response listJob(ListJobFlinkRequest message) throws Exception {
-        Collection<JobStatusMessage> jobStatusMessages = clusterClient.listJobs().get();
-        return new ListJobFlinkResponse(true, jobStatusMessages);
+    private Response getJobStatus(JobStatusRequest message) throws Exception {
+        CompletableFuture<JobStatus> jobStatusCompletableFuture
+            = clusterClient.getJobStatus(JobID.fromHexString(message.getJobID()));
+        // jobStatusCompletableFuture.
+        switch (jobStatusCompletableFuture.get()) {
+            case CREATED:
+            case RESTARTING:
+                break;
+            case RUNNING:
+                return new JobStatusResponse(true, Status.RUNNING.getStatus());
+            case FAILING:
+            case FAILED:
+                return new JobStatusResponse(true, Status.FAILED.getStatus());
+            case CANCELLING:
+            case CANCELED:
+                return new JobStatusResponse(true, Status.CANCELED.getStatus());
+            case FINISHED:
+                return new JobStatusResponse(true, Status.FINISHED.getStatus());
+            case SUSPENDED:
+            case RECONCILING:
+            default:
+                // nothing to do
+        }
+        return new JobStatusResponse(null);
     }
 
     private Response cancelJob(CancelFlinkRequest message) throws Exception {
@@ -226,7 +242,7 @@ public class FlinkDefaultCluster implements Cluster {
         StreamGraph streamGraph = execEnv.getStreamGraph();
         streamGraph.setJobName(message.getJobName());
         List<URL> jarFiles = createPath(message.getJarPath());
-        jarFiles.add(new File(Constants.FILE_PATH+Constants.GLOBAL_FILE_NAME).getAbsoluteFile().toURI().toURL());
+        jarFiles.add(new File(Constants.FILE_PATH + Constants.GLOBAL_FILE_NAME).getAbsoluteFile().toURI().toURL());
         ClassLoader usercodeClassLoader
             = JobWithJars.buildUserCodeClassLoader(jarFiles, createGlobalPath(), getClass().getClassLoader());
         try {

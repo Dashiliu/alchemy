@@ -27,7 +27,7 @@ public class Watermarks {
 
     public static enum Type {
 
-        PERIODIC_BOUNDED("periodic-bounded");
+        PERIODIC_BOUNDED("periodic-bounded"), PERIODIC_ASCENDING("periodic-ascending"), FROM_SOURCE("from-source");
 
         private String type;
 

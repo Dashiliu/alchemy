@@ -10,12 +10,12 @@ import java.io.IOException;
  */
 public class FileUtils {
 
-    public static File uploadFile(byte[] file, String filePath, String fileName){
+    public static File uploadFile(byte[] file, String filePath, String fileName) {
         File target = new File(filePath);
-        if(!target.exists()){
+        if (!target.exists()) {
             target.mkdirs();
         }
-        File result=new File(filePath+fileName);
+        File result = new File(filePath + fileName);
         FileOutputStream out = null;
         try {
             out = new FileOutputStream(result);
@@ -24,8 +24,8 @@ public class FileUtils {
             return result;
         } catch (Exception e) {
             e.printStackTrace();
-        }finally {
-            if(out!=null){
+        } finally {
+            if (out != null) {
                 try {
                     out.close();
                 } catch (IOException e) {
@@ -33,7 +33,6 @@ public class FileUtils {
                 }
             }
         }
-
 
         return result;
     }

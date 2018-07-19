@@ -1,6 +1,7 @@
 package com.dfire.platform.alchemy.web.descriptor;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.util.Assert;
 
 import com.dfire.platform.alchemy.api.sink.OpentsdbInvoker;
 import com.dfire.platform.alchemy.connectors.tsdb.OpentsdbProperties;
@@ -46,6 +47,14 @@ public class TsdbSinkDescriptor extends SinkDescriptor {
 
     @Override
     public <T> T transform(ClusterType clusterType) throws Exception {
+        if (ClusterType.FLINK.equals(clusterType)) {
+            return transformFlink();
+        }
+        throw new UnsupportedOperationException("unknow clusterType:" + clusterType);
+
+    }
+
+    private <T> T transformFlink() throws Exception {
         OpentsdbProperties opentsdbProperties = new OpentsdbProperties();
         BeanUtils.copyProperties(this, opentsdbProperties);
         if (ReadMode.CODE.getMode() == this.readMode) {
@@ -58,7 +67,8 @@ public class TsdbSinkDescriptor extends SinkDescriptor {
 
     @Override
     public void validate() throws Exception {
-
+        Assert.notNull(opentsdbUrl, "opentsdbUrl不能为空");
+        Assert.notNull(value, "写入opentsdb的逻辑不能为空");
     }
 
     public int getReadMode() {

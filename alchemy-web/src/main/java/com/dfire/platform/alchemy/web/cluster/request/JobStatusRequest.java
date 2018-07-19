@@ -4,14 +4,25 @@ package com.dfire.platform.alchemy.web.cluster.request;
  * @author congbai
  * @date 2018/6/19
  */
-public class ListJobFlinkRequest implements FlinkRequest, ListRequest {
+public class JobStatusRequest implements StatusRequest {
 
     private String cluster;
 
+    private String jobID;
+
     private boolean test;
 
-    public ListJobFlinkRequest(String cluster) {
+    public JobStatusRequest(String cluster, String jobID) {
         this.cluster = cluster;
+        this.jobID = jobID;
+    }
+
+    public String getJobID() {
+        return jobID;
+    }
+
+    public void setJobID(String jobID) {
+        this.jobID = jobID;
     }
 
     @Override

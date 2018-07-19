@@ -112,7 +112,7 @@ public class WebConfigurer extends WebMvcConfigurerAdapter
     public void customize(WebServerFactory server) {
         setMimeMappings(server);
         // When running in an IDE or with ./mvnw spring-boot:run, set location of the static web assets.
-//        setLocationForStaticAssets(server);
+        // setLocationForStaticAssets(server);
 
         /*
          * Enable HTTP/2 for Undertow - https://twitter.com/ankinson/status/829256167700492288

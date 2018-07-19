@@ -4,13 +4,13 @@ package com.dfire.platform.alchemy.web.cluster.response;
  * @author congbai
  * @date 2018/6/20
  */
-public class ListJobResponse extends Response {
+public class StatusJobResponse extends Response {
 
-    public ListJobResponse(boolean success) {
+    public StatusJobResponse(boolean success) {
         super(success);
     }
 
-    public ListJobResponse(String message) {
+    public StatusJobResponse(String message) {
         super(message);
     }
 }

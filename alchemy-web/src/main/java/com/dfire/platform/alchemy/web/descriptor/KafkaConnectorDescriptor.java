@@ -1,10 +1,28 @@
 package com.dfire.platform.alchemy.web.descriptor;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.streaming.connectors.kafka.Kafka010JsonTableSource;
+import org.apache.flink.streaming.connectors.kafka.internals.KafkaTopicPartition;
+import org.apache.flink.table.api.TableSchema;
+import org.apache.flink.table.descriptors.KafkaValidator;
+import org.apache.flink.table.sources.tsextractors.ExistingField;
+import org.apache.flink.table.sources.tsextractors.StreamRecordTimestamp;
+import org.apache.flink.table.sources.tsextractors.TimestampExtractor;
+import org.apache.flink.table.sources.wmstrategies.AscendingTimestamps;
+import org.apache.flink.table.sources.wmstrategies.BoundedOutOfOrderTimestamps;
+import org.apache.flink.table.sources.wmstrategies.PreserveWatermarks;
+import org.apache.flink.table.sources.wmstrategies.WatermarkStrategy;
+import org.apache.flink.table.typeutils.TypeStringUtils;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.springframework.util.Assert;
 
-import com.dfire.platform.alchemy.web.common.Constants;
+import com.dfire.platform.alchemy.web.common.*;
+import com.dfire.platform.alchemy.web.util.PropertiesUtils;
 
 /**
  * todo 事件事件、处理时间 --> 水位
@@ -17,6 +35,8 @@ public class KafkaConnectorDescriptor implements ConnectorDescriptor {
     private String topic;
 
     private String startupMode;
+
+    private Map<String, String> specificOffsets;
 
     private Map<String, Object> properties;
 
@@ -46,11 +66,96 @@ public class KafkaConnectorDescriptor implements ConnectorDescriptor {
 
     @Override
     public void validate() throws Exception {
-        Assert.notNull(topic, "topic不能为空");
+        Assert.notNull(topic, "kafka的topic不能为空");
+        Assert.notNull(properties, "kafka的properties不能为空");
+        Assert.notNull(properties.get(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG),
+            "kafak的" + ProducerConfig.BOOTSTRAP_SERVERS_CONFIG + "不能为空");
+
     }
 
     @Override
     public String getType() {
         return Constants.CONNECTOR_TYPE_VALUE_KAFKA;
+    }
+
+    @Override
+    public <T> T buildSource(ClusterType clusterType, List<Field> schema, FormatDescriptor format) throws Exception {
+        if (ClusterType.FLINK.equals(clusterType)) {
+            return buildKafkaFlinkSource(schema, format);
+        }
+        throw new UnsupportedOperationException("unknow clusterType:" + clusterType);
+    }
+
+    private <T> T buildKafkaFlinkSource(List<Field> schema, FormatDescriptor format) throws ClassNotFoundException {
+        Kafka010JsonTableSource.Builder builder = new Kafka010JsonTableSource.Builder();
+        builder.forTopic(this.topic);
+        createSchema(schema, builder);
+        switch (this.startupMode) {
+            case KafkaValidator.CONNECTOR_STARTUP_MODE_VALUE_EARLIEST:
+                builder.fromEarliest();
+                break;
+
+            case KafkaValidator.CONNECTOR_STARTUP_MODE_VALUE_LATEST:
+                builder.fromLatest();
+                break;
+
+            case KafkaValidator.CONNECTOR_STARTUP_MODE_VALUE_GROUP_OFFSETS:
+                builder.fromGroupOffsets();
+                break;
+
+            case KafkaValidator.CONNECTOR_STARTUP_MODE_VALUE_SPECIFIC_OFFSETS:
+                final Map<KafkaTopicPartition, Long> offsetMap = new HashMap<>();
+                for (Map.Entry<String, String> entry : this.specificOffsets.entrySet()) {
+                    final KafkaTopicPartition topicPartition
+                        = new KafkaTopicPartition(topic, Integer.parseInt(entry.getKey()));
+                    offsetMap.put(topicPartition, Long.parseLong(entry.getValue()));
+                }
+                builder.fromSpecificOffsets(offsetMap);
+                break;
+            default:
+
+        }
+        builder.withKafkaProperties(PropertiesUtils.fromYamlMap(this.properties));
+
+        return (T)builder.build();
+    }
+
+    private void createSchema(List<Field> schema, Kafka010JsonTableSource.Builder builder)
+        throws ClassNotFoundException {
+        if (CollectionUtils.isEmpty(schema)) {
+            return;
+        }
+
+        String[] columnNames = new String[schema.size()];
+        TypeInformation[] columnTypes = new TypeInformation[schema.size()];
+        for (int i = 0; i < schema.size(); i++) {
+            columnNames[i] = schema.get(i).getName();
+            TypeInformation typeInformation = TypeStringUtils.readTypeInfo(schema.get(i).getType());
+            if (typeInformation == null) {
+                throw new UnsupportedOperationException("Unsupported type:" + schema.get(i).getType());
+            }
+            columnTypes[i] = typeInformation;
+            if (schema.get(i).isProctime()) {
+                builder.withProctimeAttribute(schema.get(i).getName());
+            } else {
+                TimeAttribute timeAttribute = schema.get(i).getRowtime();
+                if (timeAttribute == null) {
+                    continue;
+                }
+                TimestampExtractor timestampExtractor
+                    = Timestamps.Type.FIELD.getType().equals(timeAttribute.getTimestamps().getType())
+                        ? new ExistingField(timeAttribute.getTimestamps().getFrom()) : new StreamRecordTimestamp();
+                WatermarkStrategy watermarkStrategy = null;
+                if (Watermarks.Type.PERIODIC_ASCENDING.getType().equals(timeAttribute.getWatermarks().getType())) {
+                    watermarkStrategy = new AscendingTimestamps();
+                } else if (Watermarks.Type.PERIODIC_BOUNDED.getType().equals(timeAttribute.getWatermarks().getType())) {
+                    watermarkStrategy = new BoundedOutOfOrderTimestamps(timeAttribute.getWatermarks().getDelay());
+                } else if (Watermarks.Type.FROM_SOURCE.getType().equals(timeAttribute.getWatermarks().getType())) {
+                    watermarkStrategy = PreserveWatermarks.INSTANCE();
+                }
+                builder.withRowtimeAttribute(schema.get(i).getName(), timestampExtractor, watermarkStrategy);
+            }
+        }
+        builder.withSchema(new TableSchema(columnNames, columnTypes));
     }
 }

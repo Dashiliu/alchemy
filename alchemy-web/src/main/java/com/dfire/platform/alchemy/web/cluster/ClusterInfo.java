@@ -10,6 +10,8 @@ public class ClusterInfo {
 
     private String name;
 
+    private String type;
+
     private String mode = HighAvailabilityMode.NONE.toString().toLowerCase();
 
     private String clusterId;
@@ -30,6 +32,14 @@ public class ClusterInfo {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getMode() {

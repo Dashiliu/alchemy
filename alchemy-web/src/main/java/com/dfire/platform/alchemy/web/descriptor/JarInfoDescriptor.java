@@ -1,5 +1,9 @@
 package com.dfire.platform.alchemy.web.descriptor;
 
+import java.io.File;
+
+import org.springframework.util.Assert;
+
 import com.dfire.platform.alchemy.web.common.Constants;
 
 /**
@@ -68,6 +72,9 @@ public class JarInfoDescriptor implements Descriptor {
 
     @Override
     public void validate() throws Exception {
-        //// TODO: 2018/6/8
+        Assert.notNull(jarPath, "jar包不能为空");
+        Assert.isTrue(new File(jarPath).exists(), "请重新上传jar包");
+        Assert.notNull(parallelism, "并发数不能为空");
+        Assert.notNull(entryClass, "main函数不能为空");
     }
 }

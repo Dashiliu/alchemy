@@ -6,27 +6,23 @@ import java.net.URL;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.dfire.platform.alchemy.web.cluster.request.*;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.flink.runtime.client.JobStatusMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import com.dfire.platform.alchemy.web.bind.BindPropertiesFactory;
 import com.dfire.platform.alchemy.web.cluster.ClusterManager;
-import com.dfire.platform.alchemy.web.cluster.response.ListJobFlinkResponse;
+import com.dfire.platform.alchemy.web.cluster.request.*;
+import com.dfire.platform.alchemy.web.cluster.response.JobStatusResponse;
 import com.dfire.platform.alchemy.web.cluster.response.Response;
 import com.dfire.platform.alchemy.web.cluster.response.SubmitFlinkResponse;
 import com.dfire.platform.alchemy.web.common.*;
@@ -73,9 +69,9 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
 
     private long period;
 
-    public ClusterJobServiceImpl(ClusterManager clusterManager,
-        AcJobRepository jobRepository, AcJobConfRepository jobConfRepository,
-        AcJobHistoryRepository jobHistoryRepository, Flame flame, ICacheService cacheService) {
+    public ClusterJobServiceImpl(ClusterManager clusterManager, AcJobRepository jobRepository,
+        AcJobConfRepository jobConfRepository, AcJobHistoryRepository jobHistoryRepository, Flame flame,
+        ICacheService cacheService) {
         this.clusterManager = clusterManager;
         this.jobRepository = jobRepository;
         this.jobConfRepository = jobConfRepository;
@@ -180,7 +176,7 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
                     LOGGER.warn("clusterType is null,id:{},cluster:{}", id, acJob.get().getCluster());
                     return;
                 }
-                cancelJob(acJob.get(),clusterType);
+                cancelJob(acJob.get(), clusterType);
                 SubmitRequest submitRequest = createSubmitRequest(acJob.get(), clusterType);
                 if (submitRequest == null) {
                     LOGGER.warn("submitRequest is null,id:{}", id);
@@ -203,15 +199,14 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
         }
 
         private void cancelJob(AcJob acJob, ClusterType clusterType) {
-            List<AcJobHistory> acJobHistorys
-                = jobHistoryRepository.findByAcJobId(acJob.getId(),
+            List<AcJobHistory> acJobHistorys = jobHistoryRepository.findByAcJobId(acJob.getId(),
                 new PageRequest(0, 1, new Sort(Sort.Direction.DESC, "updateTime")));
-            if(CollectionUtils.isEmpty(acJobHistorys)){
+            if (CollectionUtils.isEmpty(acJobHistorys)) {
                 return;
             }
-            AcJobHistory acJobHistory=acJobHistorys.get(0);
+            AcJobHistory acJobHistory = acJobHistorys.get(0);
             if (ClusterType.FLINK.equals(clusterType)) {
-                clusterManager.send(new CancelFlinkRequest(acJobHistory.getClusterJobId(),acJob.getCluster()));
+                clusterManager.send(new CancelFlinkRequest(acJobHistory.getClusterJobId(), acJob.getCluster()));
             }
             jobHistoryRepository.deleteJobHistory(acJob.getId());
         }
@@ -230,8 +225,7 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
             jobHistoryRepository.save(acJobHistory);
         }
 
-        private SubmitRequest createSubmitRequest(AcJob acJob, ClusterType clusterType)
-            throws Exception {
+        private SubmitRequest createSubmitRequest(AcJob acJob, ClusterType clusterType) throws Exception {
             List<AcJobConf> jobConfs = findJobConf(acJob.getId());
             if (CollectionUtils.isEmpty(jobConfs)) {
                 LOGGER.warn("jobConfs is empty,id:{}", acJob.getId());
@@ -254,7 +248,7 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
             JarSubmitFlinkRequest jarSubmitFlinkRequest = new JarSubmitFlinkRequest();
             jarSubmitFlinkRequest.setCluster(acJob.getCluster());
             jarSubmitFlinkRequest.setJobName(acJob.getName());
-            for(AcJobConf acJobConf:jobConfs){
+            for (AcJobConf acJobConf : jobConfs) {
                 if (ConfType.JAR.getType() != acJobConf.getType()) {
                     continue;
                 }
@@ -387,58 +381,36 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
             if (!hasLock()) {
                 return;
             }
-            Set<String> clusters = clusterManager.clusters();
-            for (String cluster : clusters) {
-                ClusterType clusterType = clusterManager.getClusterType(cluster);
-                if (ClusterType.FLINK.equals(clusterType)) {
-                    Response response = clusterManager.send(new ListJobFlinkRequest(cluster));
-                    if (!response.isSuccess()) {
-                        continue;
-                    }
-                    ListJobFlinkResponse flinkResponse = (ListJobFlinkResponse)response;
-                    for (JobStatusMessage jobStatusMessage : flinkResponse.getJobStatusMessages()) {
-                        List<AcJobHistory> acJobHistorys
-                            = jobHistoryRepository.findByClusterJobId(jobStatusMessage.getJobId().toString(),
-                                new PageRequest(0, 1, new Sort(Sort.Direction.DESC, "updateTime")));
-                        if (CollectionUtils.isEmpty(acJobHistorys)) {
-                            LOGGER.warn("flink Job doesn't have relation Job,jobID:{}", jobStatusMessage.getJobId());
-                            continue;
-                        }
-                        AcJobHistory acJobHistory = acJobHistorys.get(0);
-                        switch (jobStatusMessage.getJobState()) {
-                            case CREATED:
-                            case RESTARTING:
-                                break;
-                            case RUNNING:
-                                updateJobStatus(acJobHistory.getAcJobId(), Status.RUNNING.getStatus());
-                                break;
-                            case FAILING:
-                            case FAILED:
-                                updateJobStatus(acJobHistory.getAcJobId(), Status.FAILED.getStatus());
-                                break;
-                            case CANCELLING:
-                            case CANCELED:
-                                updateJobStatus(acJobHistory.getAcJobId(), Status.CANCELED.getStatus());
-                                break;
-                            case FINISHED:
-                                updateJobStatus(acJobHistory.getAcJobId(), Status.FINISHED.getStatus());
-                                break;
-                            case SUSPENDED:
-                            case RECONCILING:
-                            default:
-                                // nothing to do
-                        }
-                    }
+            Pageable pageable = PageRequest.of(0, Constants.PAGE_SIZE);
+            updateJobStatusByPage(pageable);
+        }
+
+        private void updateJobStatusByPage(Pageable pageable) {
+            Page<AcJobHistory> acJobHistories = jobHistoryRepository.findByIsValid(Valid.VALID.getValid(), pageable);
+            acJobHistories.getContent().forEach(acJobHistory -> {
+                Optional<AcJob> acJobOptional = jobRepository.findById(acJobHistory.getAcJobId());
+                if (!acJobOptional.isPresent()) {
+                    return;
                 }
+                Response response = clusterManager
+                    .send(new JobStatusRequest(acJobOptional.get().getCluster(), acJobHistory.getClusterJobId()));
+                if (!response.isSuccess()) {
+                    return;
+                }
+                JobStatusResponse flinkResponse = (JobStatusResponse)response;
+                if (acJobOptional.get().getStatus().intValue() != flinkResponse.getStatus().intValue()) {
+                    updateJobStatus(acJobOptional.get().getId(), flinkResponse.getStatus());
+                }
+            });
+            if (acJobHistories.hasNext()) {
+                updateJobStatusByPage(acJobHistories.nextPageable());
             }
             jobRepository.flush();
         }
 
         private void updateJobStatus(Long acJobId, int status) {
             Optional<AcJob> acJob = jobRepository.findById(acJobId);
-            if (Status.RUNNING.getStatus() == acJob.get().getStatus()
-                || Status.COMMIT.getStatus() == acJob.get().getStatus()
-                ) {
+            if (Status.AUDIT_FAIL.getStatus() < acJob.get().getStatus()) {
                 acJob.get().setStatus(status);
                 jobRepository.save(acJob.get());
             } else {

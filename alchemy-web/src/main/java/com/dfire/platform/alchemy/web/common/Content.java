@@ -9,9 +9,9 @@ import java.util.List;
  */
 public class Content {
 
-    private String config="";
+    private String config = "";
 
-    private List<String> code=new ArrayList<>();
+    private List<String> code = new ArrayList<>();
 
     public String getConfig() {
         return config;

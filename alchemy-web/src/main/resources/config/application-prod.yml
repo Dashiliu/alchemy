@@ -106,6 +106,7 @@ alchemy:
 #    download-url: https://assets.2dfire.com/
   clusters:
     - name: flink_default
+      type: flink
       mode: zookeeper
       clusterId: default
       zookeeperQuorum: zk101.2dfire-inc.com:2181,zk102.2dfire-inc.com:2181,zk103.2dfire-inc.com:2181

@@ -109,6 +109,13 @@ public class HbaseSinkDescriptor extends SinkDescriptor {
 
     @Override
     public <T> T transform(ClusterType clusterType) throws Exception {
+        if (ClusterType.FLINK.equals(clusterType)) {
+            return transformFlink();
+        }
+        throw new UnsupportedOperationException("unknow clusterType:" + clusterType);
+    }
+
+    private <T> T transformFlink() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         HbaseProperties hbaseProperties = new HbaseProperties();
         BeanUtils.copyProperties(this, hbaseProperties);
         if (ReadMode.CODE.getMode() == this.readMode) {

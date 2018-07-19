@@ -1,24 +1,28 @@
 package com.dfire.platform.alchemy.connectors.redis;
 
-public class Sentinel{
+import java.io.Serializable;
 
-        private String sentinels;
+public class Sentinel implements Serializable {
 
-        private String master;
+    private static final long serialVersionUID = -4669551617144070538L;
 
-        public String getSentinels() {
-            return sentinels;
-        }
+    private String sentinels;
 
-        public void setSentinels(String sentinels) {
-            this.sentinels = sentinels;
-        }
+    private String master;
 
-        public String getMaster() {
-            return master;
-        }
+    public String getSentinels() {
+        return sentinels;
+    }
 
-        public void setMaster(String master) {
-            this.master = master;
-        }
+    public void setSentinels(String sentinels) {
+        this.sentinels = sentinels;
+    }
+
+    public String getMaster() {
+        return master;
+    }
+
+    public void setMaster(String master) {
+        this.master = master;
+    }
 }

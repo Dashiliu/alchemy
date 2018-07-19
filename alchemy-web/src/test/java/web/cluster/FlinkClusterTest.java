@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.dfire.platform.alchemy.web.cluster.ClusterInfo;
-import com.dfire.platform.alchemy.web.cluster.FlinkDefaultCluster;
+import com.dfire.platform.alchemy.web.cluster.FlinkCluster;
 import com.dfire.platform.alchemy.web.cluster.request.SqlSubmitFlinkRequest;
 import com.dfire.platform.alchemy.web.cluster.response.Response;
 import org.springframework.util.ResourceUtils;
@@ -23,19 +23,19 @@ import org.springframework.util.ResourceUtils;
  */
 public class FlinkClusterTest {
 
-    private FlinkDefaultCluster cluster;
+    private FlinkCluster cluster;
 
     @Before
     public void before() {
         ClusterInfo clusterInfo = new ClusterInfo();
         clusterInfo.setName("test");
-        clusterInfo.setClusterId("daily");
+        clusterInfo.setClusterId("daily-real");
         clusterInfo.setAddress("10.1.21.95");
         clusterInfo.setMode(HighAvailabilityMode.ZOOKEEPER.toString().toLowerCase());
         clusterInfo.setPort(6123);
-        clusterInfo.setStoragePath("hdfs://sunset004.daily.2dfire.info:8020/flink/ha");
+        clusterInfo.setStoragePath("hdfs://sunset009.daily.2dfire.info:8020/flink/ha/real");
         clusterInfo.setZookeeperQuorum("10.1.22.21:2181,10.1.22.22:2181,10.1.22.23:2181");
-        this.cluster = new FlinkDefaultCluster();
+        this.cluster = new FlinkCluster();
         cluster.start(clusterInfo);
 
     }

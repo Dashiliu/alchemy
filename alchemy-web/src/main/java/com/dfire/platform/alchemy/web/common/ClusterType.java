@@ -6,6 +6,14 @@ package com.dfire.platform.alchemy.web.common;
  */
 public enum ClusterType {
 
-    FLINK;
+    FLINK("flink");
+    private String type;
 
+    ClusterType(String type) {
+        this.type = type;
+    }
+
+    public String getType() {
+        return type;
+    }
 }

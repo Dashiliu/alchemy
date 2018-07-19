@@ -1,8 +1,15 @@
 package com.dfire.platform.alchemy.connectors.redis;
 
-public class Codis{
+import java.io.Serializable;
 
-        private String zkAddrs;
+/**
+ * @author dongbinglin
+ */
+public class Codis implements Serializable {
+
+    private static final long serialVersionUID = -5872593113132939832L;
+
+    private String zkAddrs;
 
         /**
          * 分业务维度，由codis管理员统一分配

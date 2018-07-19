@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import com.dfire.platform.alchemy.web.bind.BindPropertiesFactory;
@@ -111,6 +112,19 @@ public class TableDescriptor implements Descriptor {
 
     @Override
     public void validate() throws Exception {
-        //// TODO: 2018/6/8
+        Assert.notEmpty(sources, "source不能为空");
+        Assert.notEmpty(getSinkDescriptors(), "sink不能为空");
+        for (SourceDescriptor sourceDescriptor : sources) {
+            sourceDescriptor.validate();
+        }
+        for (SinkDescriptor sinkDescriptor : getSinkDescriptors()) {
+            sinkDescriptor.validate();
+        }
+        if (CollectionUtils.isEmpty(udfs)) {
+            return;
+        }
+        for (UdfDescriptor udfDescriptor : udfs) {
+            udfDescriptor.validate();
+        }
     }
 }

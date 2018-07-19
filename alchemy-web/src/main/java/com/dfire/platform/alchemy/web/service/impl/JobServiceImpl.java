@@ -3,8 +3,6 @@ package com.dfire.platform.alchemy.web.service.impl;
 import java.util.Date;
 import java.util.Optional;
 
-import com.dfire.magiceye.util.StringUtils;
-import com.dfire.platform.alchemy.web.common.Constants;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -12,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.dfire.magiceye.util.StringUtils;
+import com.dfire.platform.alchemy.web.common.Constants;
 import com.dfire.platform.alchemy.web.common.Status;
 import com.dfire.platform.alchemy.web.common.Valid;
 import com.dfire.platform.alchemy.web.config.Flame;
@@ -96,9 +96,9 @@ public class JobServiceImpl implements JobService {
         acJob.setAcServiceId(jobVM.getAcServiceId() == null ? DEFAUL_SERVICE_ID : jobVM.getAcServiceId());
         acJob.setCreateTime(new Date());
         acJob.setName(jobVM.getName());
-        if(StringUtils.isEmpty(jobVM.getCluster())){
+        if (StringUtils.isEmpty(jobVM.getCluster())) {
             acJob.setCluster(Constants.DEFAULT_FLINK_CLUSTER);
-        }else{
+        } else {
             acJob.setCluster(jobVM.getCluster());
         }
         acJob.setStatus(Status.UN_FIX.getStatus());

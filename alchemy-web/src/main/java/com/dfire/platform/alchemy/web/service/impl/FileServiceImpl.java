@@ -10,7 +10,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
-import com.dfire.platform.alchemy.web.service.FileService;
 import org.apache.http.*;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
@@ -35,6 +34,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import com.dfire.platform.alchemy.web.common.Constants;
+import com.dfire.platform.alchemy.web.service.FileService;
 import com.dfire.platform.alchemy.web.util.JsonUtils;
 
 /**
@@ -43,7 +43,7 @@ import com.dfire.platform.alchemy.web.util.JsonUtils;
  */
 @Component
 @ConfigurationProperties(prefix = "alchemy.file")
-public class FileServiceImpl implements FileService{
+public class FileServiceImpl implements FileService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileServiceImpl.class);
 

@@ -2,11 +2,15 @@ package com.dfire.platform.alchemy.connectors.redis;
 
 import redis.clients.jedis.JedisPoolConfig;
 
+import java.io.Serializable;
+
 /**
  * @author congbai
  * @date 2018/7/12
  */
-public class RedisProperties {
+public class RedisProperties implements Serializable{
+
+    private static final long serialVersionUID = 5445955335510762057L;
 
     private  Codis codis;
 

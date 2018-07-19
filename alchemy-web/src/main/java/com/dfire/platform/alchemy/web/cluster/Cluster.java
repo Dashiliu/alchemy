@@ -12,8 +12,6 @@ import com.dfire.platform.alchemy.web.common.ClusterType;
  */
 public interface Cluster extends DisposableBean {
 
-    String name();
-
     ClusterType clusterType();
 
     void start(ClusterInfo clusterInfo);

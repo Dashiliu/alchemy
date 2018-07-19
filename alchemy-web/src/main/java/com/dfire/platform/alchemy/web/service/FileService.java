@@ -8,8 +8,8 @@ import java.io.InputStream;
  */
 public interface FileService {
 
-    void download(String filePath,String remoteUrl);
+    void download(String filePath, String remoteUrl);
 
-    String upload(String fileName,InputStream inputStream);
+    String upload(String fileName, InputStream inputStream);
 
 }

@@ -1,11 +1,7 @@
 package com.dfire.platform.alchemy.web.cluster;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -30,28 +26,26 @@ public class ClusterManager {
 
     private final Map<String, Cluster> nameClusters;
 
-    public ClusterManager(ClusterProperties clusterProperties, Cluster... clusters) {
+    public ClusterManager(ClusterProperties clusterProperties) {
         this.clusterProperties = clusterProperties;
-        this.nameClusters = init(this.clusterProperties, clusters);
+        this.nameClusters = init(this.clusterProperties);
     }
 
-    private Map<String, Cluster> init(ClusterProperties clusterProperties, Cluster[] clusters) {
+    private Map<String, Cluster> init(ClusterProperties clusterProperties) {
         List<ClusterInfo> clusterInfos = clusterProperties.getClusters();
-        Map<String, Cluster> nameClusters = new HashMap<>(clusters.length);
-        for (Cluster cluster : clusters) {
-            startCluster(cluster, clusterInfos);
-            nameClusters.put(cluster.name(), cluster);
+        Map<String, Cluster> nameClusters = new HashMap<>(clusterInfos.size());
+        ServiceLoader<Cluster> serviceLoader = ServiceLoader.load(Cluster.class);
+        Iterator<Cluster> iterator = serviceLoader.iterator();
+        while (iterator.hasNext()) {
+            Cluster cluster = iterator.next();
+            clusterInfos.forEach(clusterInfo -> {
+                if (cluster.clusterType().getType().equals(clusterInfo.getType())) {
+                    cluster.start(clusterInfo);
+                    nameClusters.put(clusterInfo.getName(), cluster);
+                }
+            });
         }
         return nameClusters;
-    }
-
-    private void startCluster(Cluster cluster, List<ClusterInfo> clusterInfos) {
-        for (ClusterInfo clusterInfo : clusterInfos) {
-            if (StringUtils.equals(cluster.name(), clusterInfo.getName())) {
-                cluster.start(clusterInfo);
-                continue;
-            }
-        }
     }
 
     public Response send(Request message) {

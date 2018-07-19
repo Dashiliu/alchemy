@@ -113,6 +113,13 @@ public class RedisSinkDescriptor extends SinkDescriptor {
 
     @Override
     public <T> T transform(ClusterType clusterType) throws Exception {
+        if (ClusterType.FLINK.equals(clusterType)) {
+            return transformFlink();
+        }
+        throw new UnsupportedOperationException("unknow clusterType:" + clusterType);
+    }
+
+    private <T> T transformFlink() throws Exception {
         RedisProperties redisProperties = new RedisProperties();
         BeanUtils.copyProperties(this, redisProperties);
         if (ReadMode.CODE.getMode() == this.readMode) {
@@ -126,6 +133,8 @@ public class RedisSinkDescriptor extends SinkDescriptor {
     @Override
     public void validate() throws Exception {
         Assert.notNull(database, "redis的database不能为空");
+        Assert.isTrue(codis != null || sentinel != null, "必须配置codis或者sentinel参数");
+        Assert.notNull(value, "必须添加redis逻辑代码");
         if (queueSize != null && queueSize.intValue() > Constants.REDIS_MAX_QUEUE_SIZE) {
             throw new IllegalArgumentException("redis队列最大数是：" + Constants.REDIS_MAX_QUEUE_SIZE);
         }

@@ -1,10 +1,14 @@
 package com.dfire.platform.alchemy.connectors.hbase;
 
+import java.io.Serializable;
+
 /**
  * @author congbai
  * @date 2018/7/12
  */
-public class HbaseProperties {
+public class HbaseProperties implements Serializable{
+
+    private static final long serialVersionUID = -5600020364848439482L;
 
     private  String zookeeper;
 
