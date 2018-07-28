@@ -109,5 +109,5 @@ public final class Constants {
 
     public static final int PAGE_SIZE = 100;
 
-    public static final String DEFAULT_FLINK_CLUSTER = "flink-default";
+    public static final String DEFAULT_FLINK_CLUSTER = "flink_default";
 }
