@@ -273,13 +273,16 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
             HttpURLConnection httpUrl;
             BufferedInputStream bis = null;
             BufferedOutputStream bos = null;
-            File f = new File(descriptor.getJarPath());
             try {
+                if(descriptor.getRemoteUrl()==null){
+                    return;
+                }
+                file.createNewFile();
                 urlfile = new URL(descriptor.getRemoteUrl());
                 httpUrl = (HttpURLConnection)urlfile.openConnection();
                 httpUrl.connect();
                 bis = new BufferedInputStream(httpUrl.getInputStream());
-                bos = new BufferedOutputStream(new FileOutputStream(f));
+                bos = new BufferedOutputStream(new FileOutputStream(file));
                 int len = 2048;
                 byte[] b = new byte[len];
                 while ((len = bis.read(b)) != -1) {
@@ -292,8 +295,13 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
                 LOGGER.error(e.getMessage());
             } finally {
                 try {
-                    bis.close();
-                    bos.close();
+                    if(bis!=null){
+                        bis.close();
+                    }
+                   if(bos!=null){
+                       bos.close();
+                   }
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
