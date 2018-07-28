@@ -7,6 +7,8 @@ import java.util.List;
 
 import com.dfire.platform.alchemy.web.bind.BindPropertiesFactory;
 import com.dfire.platform.alchemy.web.common.*;
+import org.apache.flink.configuration.AkkaOptions;
+import org.apache.flink.configuration.ConfigConstants;
 import org.apache.flink.runtime.jobmanager.HighAvailabilityMode;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,11 +35,10 @@ public class FlinkClusterTest {
         clusterInfo.setAddress("10.1.21.95");
         clusterInfo.setMode(HighAvailabilityMode.ZOOKEEPER.toString().toLowerCase());
         clusterInfo.setPort(6123);
-        clusterInfo.setStoragePath("hdfs://sunset009.daily.2dfire.info:8020/flink/ha/real");
+        clusterInfo.setStoragePath("hdfs://sunset004.daily.2dfire.info:8020/flink/ha/real");
         clusterInfo.setZookeeperQuorum("10.1.22.21:2181,10.1.22.22:2181,10.1.22.23:2181");
         this.cluster = new FlinkCluster();
         cluster.start(clusterInfo);
-
     }
 
     @Test

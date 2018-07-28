@@ -18,7 +18,7 @@ public final class Constants {
     // 连接存活时间
     public static final int KEEP_ALIVE = 15000;
 
-    public static final String FILE_PATH = System.getProperty("user.home") + "/upload/alchemy";
+    public static final String FILE_PATH = System.getProperty("user.home") + "/upload/alchemy/";
 
     public static final String GLOBAL_FILE_NAME = "global.jar";
 

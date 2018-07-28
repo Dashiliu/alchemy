@@ -1,7 +1,0 @@
-/Users/dongbinglin/Code/platform/alchemy/alchemy-connectors/src/main/java/com/dfire/platform/alchemy/connectors/hbase/HBaseOutputFormat.java
-/Users/dongbinglin/Code/platform/alchemy/alchemy-connectors/src/main/java/com/dfire/platform/alchemy/connectors/redis/RedisSinkFunction.java
-/Users/dongbinglin/Code/platform/alchemy/alchemy-connectors/src/main/java/com/dfire/platform/alchemy/connectors/hbase/HbaseTableSink.java
-/Users/dongbinglin/Code/platform/alchemy/alchemy-connectors/src/main/java/com/dfire/platform/alchemy/connectors/redis/RedisTableSink.java
-/Users/dongbinglin/Code/platform/alchemy/alchemy-connectors/src/main/java/com/dfire/platform/alchemy/connectors/elasticsearch/ElasticsearchTableFunction.java
-/Users/dongbinglin/Code/platform/alchemy/alchemy-connectors/src/main/java/com/dfire/platform/alchemy/connectors/elasticsearch/JsonRowStringSchema.java
-/Users/dongbinglin/Code/platform/alchemy/alchemy-connectors/src/main/java/com/dfire/platform/alchemy/connectors/elasticsearch/ElasticsearchTableSink.java

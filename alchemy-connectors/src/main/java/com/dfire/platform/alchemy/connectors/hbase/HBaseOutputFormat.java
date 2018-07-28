@@ -38,13 +38,13 @@ public class HBaseOutputFormat implements OutputFormat<Tuple2<Boolean, Row>> {
     public HBaseOutputFormat(HbaseProperties hbaseProperties, SerializationSchema<Row> serializationSchema, HbaseInvoker hbaseInvoker) {
         this.hbaseProperties=hbaseProperties;
         this.serializationSchema = serializationSchema;
-        this.code = code;
+        this.hbaseInvoker = hbaseInvoker;
     }
 
     public HBaseOutputFormat(HbaseProperties hbaseProperties, SerializationSchema<Row> serializationSchema, String code) {
         this.hbaseProperties=hbaseProperties;
         this.serializationSchema = serializationSchema;
-        this.hbaseInvoker = hbaseInvoker;
+        this.code = code;
     }
 
     @Override

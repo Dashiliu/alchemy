@@ -44,7 +44,7 @@
     <dependency>
       <groupId>org.apache.flink</groupId>
       <artifactId>flink-streaming-scala_2.11</artifactId>
-      <version>1.4.2</version>
+      <version>1.5.0</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -63,16 +63,12 @@
           <artifactId>scala-compiler</artifactId>
           <groupId>org.scala-lang</groupId>
         </exclusion>
-        <exclusion>
-          <artifactId>jsr305</artifactId>
-          <groupId>com.google.code.findbugs</groupId>
-        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.flink</groupId>
       <artifactId>flink-streaming-java_2.11</artifactId>
-      <version>1.4.2</version>
+      <version>1.5.0</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -95,41 +91,17 @@
           <artifactId>commons-math3</artifactId>
           <groupId>org.apache.commons</groupId>
         </exclusion>
-        <exclusion>
-          <artifactId>org.apache.sling.commons.json</artifactId>
-          <groupId>org.apache.sling</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>jsr305</artifactId>
-          <groupId>com.google.code.findbugs</groupId>
-        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.flink</groupId>
       <artifactId>flink-shaded-hadoop2</artifactId>
-      <version>1.4.2</version>
+      <version>1.5.0</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
           <artifactId>servlet-api</artifactId>
           <groupId>javax.servlet</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>commons-compress</artifactId>
-          <groupId>org.apache.commons</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>xz</artifactId>
-          <groupId>org.tukaani</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>avro</artifactId>
-          <groupId>org.apache.avro</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>paranamer</artifactId>
-          <groupId>com.thoughtworks.paranamer</groupId>
         </exclusion>
         <exclusion>
           <artifactId>xmlenc</artifactId>
@@ -138,6 +110,10 @@
         <exclusion>
           <artifactId>commons-net</artifactId>
           <groupId>commons-net</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>commons-el</artifactId>
+          <groupId>commons-el</groupId>
         </exclusion>
         <exclusion>
           <artifactId>java-xmlbuilder</artifactId>
@@ -156,7 +132,7 @@
           <groupId>com.jcraft</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>commons-beanutils-bean-collections</artifactId>
+          <artifactId>commons-beanutils</artifactId>
           <groupId>commons-beanutils</groupId>
         </exclusion>
         <exclusion>
@@ -206,6 +182,7 @@
     </plugins>
   </reporting>
   <properties>
+    <hitsdb.version>0.0.5</hitsdb.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 </project>
