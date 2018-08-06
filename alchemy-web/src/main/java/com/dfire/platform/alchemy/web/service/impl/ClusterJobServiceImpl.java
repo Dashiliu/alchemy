@@ -394,10 +394,13 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
         }
 
         private void updateJobStatusByPage(Pageable pageable) {
-            Page<AcJobHistory> acJobHistories = jobHistoryRepository.findByIsValid(Valid.VALID.getValid(), pageable);
-            acJobHistories.getContent().forEach(acJobHistory -> {
+            List<AcJobHistory> acJobHistories = jobHistoryRepository.findByIsValid(Valid.VALID.getValid(), pageable);
+            if(acJobHistories.isEmpty()){
+                return;
+            }
+            acJobHistories.forEach(acJobHistory -> {
                 Optional<AcJob> acJobOptional = jobRepository.findById(acJobHistory.getAcJobId());
-                if (!acJobOptional.isPresent()) {
+                if (!acJobOptional.isPresent()||Valid.VALID.getValid()!=acJobOptional.get().getIsValid().intValue()) {
                     return;
                 }
                 Response response = clusterManager
@@ -410,10 +413,9 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
                     updateJobStatus(acJobOptional.get().getId(), flinkResponse.getStatus());
                 }
             });
-            if (acJobHistories.hasNext()) {
-                updateJobStatusByPage(acJobHistories.nextPageable());
-            }
             jobRepository.flush();
+            updateJobStatusByPage(PageRequest.of(pageable.getPageNumber()+1, Constants.PAGE_SIZE));
+
         }
 
         private void updateJobStatus(Long acJobId, int status) {

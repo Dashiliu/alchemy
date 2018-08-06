@@ -25,5 +25,5 @@ public interface AcJobHistoryRepository extends JpaRepository<AcJobHistory, Long
 
     List<AcJobHistory> findByAcJobId(Long acJobId, Pageable pageable);
 
-    Page<AcJobHistory> findByIsValid(int isValid, Pageable pageable);
+    List<AcJobHistory> findByIsValid(int isValid, Pageable pageable);
 }
