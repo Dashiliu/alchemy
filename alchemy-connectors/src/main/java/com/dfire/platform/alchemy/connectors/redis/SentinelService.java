@@ -14,14 +14,13 @@ import redis.clients.jedis.Protocol;
  * @author congbai
  * @date 2018/7/12
  */
-public class SentinelService extends RedisBaseService{
+public class SentinelService extends RedisBaseService {
 
     public void init(RedisProperties redisProperties) {
         Set<String> sentinelset = new HashSet<>(Arrays.asList(redisProperties.getSentinel().getSentinels().split(",")));
-        pool = new JedisSentinelPool(redisProperties.getSentinel().getMaster(),
-                sentinelset, redisProperties.getConfig(), Protocol.DEFAULT_TIMEOUT, null, redisProperties.getDatabase());
+        pool = new JedisSentinelPool(redisProperties.getSentinel().getMaster(), sentinelset,
+            redisProperties.getConfig(), Protocol.DEFAULT_TIMEOUT, null, redisProperties.getDatabase());
     }
-
 
     public void destroy() {
         if (pool != null) {

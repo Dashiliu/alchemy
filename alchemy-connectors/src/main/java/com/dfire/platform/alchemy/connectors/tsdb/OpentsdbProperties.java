@@ -6,19 +6,21 @@ package com.dfire.platform.alchemy.connectors.tsdb;
  */
 public class OpentsdbProperties {
 
-    private  String opentsdbUrl;
+    private String opentsdbUrl;
 
-    private  Integer ioThreadCount;
+    private String env;
 
-    private  Integer batchPutBufferSize;
+    private Integer ioThreadCount;
 
-    private  Integer batchPutConsumerThreadCount;
+    private Integer batchPutBufferSize;
 
-    private  Integer batchPutSize;
+    private Integer batchPutConsumerThreadCount;
 
-    private  Integer batchPutTimeLimit;
+    private Integer batchPutSize;
 
-    private  Integer putRequestLimit;
+    private Integer batchPutTimeLimit;
+
+    private Integer putRequestLimit;
 
     public String getOpentsdbUrl() {
         return opentsdbUrl;
@@ -26,6 +28,14 @@ public class OpentsdbProperties {
 
     public void setOpentsdbUrl(String opentsdbUrl) {
         this.opentsdbUrl = opentsdbUrl;
+    }
+
+    public String getEnv() {
+        return env;
+    }
+
+    public void setEnv(String env) {
+        this.env = env;
     }
 
     public Integer getIoThreadCount() {

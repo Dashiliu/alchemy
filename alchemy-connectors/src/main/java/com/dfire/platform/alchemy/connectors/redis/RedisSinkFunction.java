@@ -41,37 +41,35 @@ public class RedisSinkFunction extends RichSinkFunction<Tuple2<Boolean, Row>> {
 
     public RedisSinkFunction(RedisProperties redisProperties, String code) {
         this.code = code;
-        this.redisInvoker=null;
-        this.redisProperties=redisProperties;
+        this.redisInvoker = null;
+        this.redisProperties = redisProperties;
         initQueue(redisProperties);
     }
 
     public RedisSinkFunction(RedisProperties redisProperties, RedisInvoker redisInvoker) {
         this.code = null;
         this.redisInvoker = redisInvoker;
-        this.redisProperties=redisProperties;
+        this.redisProperties = redisProperties;
         initQueue(redisProperties);
     }
 
     private void initQueue(RedisProperties redisProperties) {
-        if(redisProperties.getQueueSize()!=null
-                &&redisProperties.getQueueSize()>0
-                &&redisProperties.getThreadNum()!=null
-                &&redisProperties.getThreadNum()>0){
+        if (redisProperties.getQueueSize() != null && redisProperties.getQueueSize() > 0
+            && redisProperties.getThreadNum() != null && redisProperties.getThreadNum() > 0) {
             this.queue = new ArrayBlockingQueue<>(redisProperties.getQueueSize());
-        }else{
-            this.queue=null;
+        } else {
+            this.queue = null;
         }
     }
 
     @Override
     public void open(Configuration parameters) throws Exception {
-        if(this.redisProperties.getCodis()!=null){
-            this.cacheService=initCodis();
-        }else if(this.redisProperties.getSentinel()!=null){
-            this.cacheService=initSentinel();
+        if (this.redisProperties.getCodis() != null) {
+            this.cacheService = initCodis();
+        } else if (this.redisProperties.getSentinel() != null) {
+            this.cacheService = initSentinel();
         }
-        if(this.queue!=null){
+        if (this.queue != null) {
             initThreadPool();
         }
         if (this.redisInvoker == null) {
@@ -87,7 +85,7 @@ public class RedisSinkFunction extends RichSinkFunction<Tuple2<Boolean, Row>> {
     }
 
     private ICacheService initCodis() {
-        CodisService codisService=new CodisService();
+        CodisService codisService = new CodisService();
         codisService.init(this.redisProperties);
         return codisService;
     }
@@ -112,12 +110,12 @@ public class RedisSinkFunction extends RichSinkFunction<Tuple2<Boolean, Row>> {
 
     @Override
     public void invoke(Tuple2<Boolean, Row> value, Context context) throws Exception {
-        if(value==null||value.f1==null){
+        if (value == null || value.f1 == null) {
             return;
         }
-        if(this.queue==null){
-            redisInvoker.invoke(this.cacheService,RowUtils.createRows((value.f1)));
-        }else{
+        if (this.queue == null) {
+            redisInvoker.invoke(this.cacheService, RowUtils.createRows((value.f1)));
+        } else {
             try {
                 this.queue.put(value.f1);
             } catch (InterruptedException e) {
@@ -127,11 +125,10 @@ public class RedisSinkFunction extends RichSinkFunction<Tuple2<Boolean, Row>> {
         }
     }
 
-
     @Override
     public void close() throws Exception {
         shutDown.set(true);
-        if(this.threadPool!=null){
+        if (this.threadPool != null) {
             this.threadPool.shutdown();
         }
         super.close();
@@ -140,7 +137,7 @@ public class RedisSinkFunction extends RichSinkFunction<Tuple2<Boolean, Row>> {
     class RedisConsumer implements Runnable {
         @Override
         public void run() {
-            final RedisInvoker invoker=redisInvoker;
+            final RedisInvoker invoker = redisInvoker;
             while (!shutDown.get()) {
                 try {
                     Row row = queue.take();

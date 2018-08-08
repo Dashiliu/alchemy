@@ -117,7 +117,7 @@
                         </div>
                         <div  *ngIf="job.status==1">
                             <button type="submit"
-                                    queryParamsHandling="merge" (click)="audit(job.id)"
+                                    queryParamsHandling="merge" (click)="audit(job.id)"  *jhiHasAnyAuthority="'ROLE_ADMIN'"p
                                     class="btn btn-primary btn-sm">
                                 <span class="d-none d-md-inline">审核</span>
                             </button>

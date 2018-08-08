@@ -6,21 +6,21 @@ import java.io.Serializable;
  * @author congbai
  * @date 2018/7/12
  */
-public class HbaseProperties implements Serializable{
+public class HbaseProperties implements Serializable {
 
     private static final long serialVersionUID = -5600020364848439482L;
 
-    private  String zookeeper;
+    private String zookeeper;
 
-    private  String node;
+    private String node;
 
-    private  String tableName;
+    private String tableName;
 
-    private  String family;
+    private String family;
 
-    private  long bufferSize;
+    private long bufferSize;
 
-    private  boolean skipWal;
+    private boolean skipWal;
 
     public String getZookeeper() {
         return zookeeper;

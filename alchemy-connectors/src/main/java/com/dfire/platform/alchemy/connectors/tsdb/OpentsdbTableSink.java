@@ -27,15 +27,15 @@ public class OpentsdbTableSink implements AppendStreamTableSink<Row> {
 
     private TypeInformation[] fieldTypes;
 
-    public OpentsdbTableSink( OpentsdbProperties opentsdbProperties, String code) {
-        this.opentsdbProperties =  Preconditions.checkNotNull(opentsdbProperties, "opentsdbProperties");;
+    public OpentsdbTableSink(OpentsdbProperties opentsdbProperties, String code) {
+        this.opentsdbProperties = Preconditions.checkNotNull(opentsdbProperties, "opentsdbProperties");;
         this.code = code;
     }
 
     public OpentsdbTableSink(OpentsdbProperties opentsdbProperties, OpentsdbInvoker invoker) {
-        this.opentsdbProperties =  Preconditions.checkNotNull(opentsdbProperties, "opentsdbProperties");;
+        this.opentsdbProperties = Preconditions.checkNotNull(opentsdbProperties, "opentsdbProperties");;
         this.code = null;
-        this.invoker=invoker;
+        this.invoker = invoker;
     }
 
     @Override
@@ -64,7 +64,7 @@ public class OpentsdbTableSink implements AppendStreamTableSink<Row> {
         copy.fieldNames = Preconditions.checkNotNull(fieldNames, "fieldNames");
         copy.fieldTypes = Preconditions.checkNotNull(fieldTypes, "fieldTypes");
         Preconditions.checkArgument(fieldNames.length == fieldTypes.length,
-                "Number of provided field names and types does not match.");
+            "Number of provided field names and types does not match.");
         return copy;
     }
 
@@ -76,7 +76,7 @@ public class OpentsdbTableSink implements AppendStreamTableSink<Row> {
 
     private RichSinkFunction createTsdbRich() {
         if (invoker == null) {
-             return new OpentsdbSinkFunction(this.opentsdbProperties, this.code);
+            return new OpentsdbSinkFunction(this.opentsdbProperties, this.code);
         } else {
             return new OpentsdbSinkFunction(this.opentsdbProperties, this.invoker);
         }

@@ -33,15 +33,14 @@ public class RedisTableSink implements UpsertStreamTableSink<Row> {
     public RedisTableSink(RedisProperties redisProperties, String code) {
         this.redisProperties = redisProperties;
         this.code = code;
-        this.redisInvoker=null;
+        this.redisInvoker = null;
     }
 
     public RedisTableSink(RedisProperties redisProperties, RedisInvoker redisInvoker) {
-        this.redisProperties =  Preconditions.checkNotNull(redisProperties, "redisProperties");
+        this.redisProperties = Preconditions.checkNotNull(redisProperties, "redisProperties");
         this.code = null;
-        this.redisInvoker=redisInvoker;
+        this.redisInvoker = redisInvoker;
     }
-
 
     @Override
     public String[] getFieldNames() {
@@ -64,7 +63,7 @@ public class RedisTableSink implements UpsertStreamTableSink<Row> {
         copy.fieldNames = Preconditions.checkNotNull(fieldNames, "fieldNames");
         copy.fieldTypes = Preconditions.checkNotNull(fieldTypes, "fieldTypes");
         Preconditions.checkArgument(fieldNames.length == fieldTypes.length,
-                "Number of provided field names and types does not match.");
+            "Number of provided field names and types does not match.");
         return copy;
     }
 

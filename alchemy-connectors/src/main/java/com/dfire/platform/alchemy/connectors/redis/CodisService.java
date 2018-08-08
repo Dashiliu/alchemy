@@ -14,21 +14,18 @@ public class CodisService extends RedisBaseService {
 
     private RoundRobinJedisPool roundRobinJedisPool;
 
-    public void init(RedisProperties redisProperties){
-        Codis codis=redisProperties.getCodis();
-        roundRobinJedisPool = RoundRobinJedisPool.create().
-                curatorClient(codis.getZkAddrs(),codis.getZkSessionTimeoutMs()).
-                zkProxyDir("/jodis/"+codis.getCodisProxyName()).
-                poolConfig(redisProperties.getConfig()).
-                database( redisProperties.getDatabase() ).
-                password(codis.getPassoword()).
-                timeoutMs(Protocol.DEFAULT_TIMEOUT).
-                build();
+    public void init(RedisProperties redisProperties) {
+        Codis codis = redisProperties.getCodis();
+        roundRobinJedisPool
+            = RoundRobinJedisPool.create().curatorClient(codis.getZkAddrs(), codis.getZkSessionTimeoutMs())
+                .zkProxyDir("/jodis/" + codis.getCodisProxyName()).poolConfig(redisProperties.getConfig())
+                .database(redisProperties.getDatabase()).password(codis.getPassoword())
+                .timeoutMs(Protocol.DEFAULT_TIMEOUT).build();
 
     }
 
     public void destroy() {
-        if( roundRobinJedisPool != null ){
+        if (roundRobinJedisPool != null) {
             roundRobinJedisPool.close();
         }
     }

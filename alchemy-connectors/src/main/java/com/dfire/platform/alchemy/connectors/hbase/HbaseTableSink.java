@@ -24,7 +24,7 @@ public class HbaseTableSink implements UpsertStreamTableSink<Row> {
 
     private final HbaseProperties hbaseProperties;
 
-    private  String code;
+    private String code;
 
     private HbaseInvoker hbaseInvoker;
 
@@ -35,13 +35,12 @@ public class HbaseTableSink implements UpsertStreamTableSink<Row> {
     private TypeInformation[] fieldTypes;
 
     public HbaseTableSink(HbaseProperties hbaseProperties, String code) {
-        this.hbaseProperties=hbaseProperties;
+        this.hbaseProperties = hbaseProperties;
         this.code = Preconditions.checkNotNull(code, "code can not be null ");
     }
 
-    public HbaseTableSink(HbaseProperties hbaseProperties,
-                          HbaseInvoker hbaseInvoker) {
-        this.hbaseProperties=hbaseProperties;
+    public HbaseTableSink(HbaseProperties hbaseProperties, HbaseInvoker hbaseInvoker) {
+        this.hbaseProperties = hbaseProperties;
         this.hbaseInvoker = Preconditions.checkNotNull(hbaseInvoker, "hbaseInvoker can not be null ");
     }
 
@@ -101,9 +100,11 @@ public class HbaseTableSink implements UpsertStreamTableSink<Row> {
 
     private OutputFormatSinkFunction creatHbaseSink() {
         if (this.hbaseInvoker != null) {
-            return new OutputFormatSinkFunction(new HBaseOutputFormat(this.hbaseProperties, this.serializationSchema, this.hbaseInvoker));
+            return new OutputFormatSinkFunction(
+                new HBaseOutputFormat(this.hbaseProperties, this.serializationSchema, this.hbaseInvoker));
         } else {
-            return new OutputFormatSinkFunction(new HBaseOutputFormat(this.hbaseProperties,this.serializationSchema, this.code));
+            return new OutputFormatSinkFunction(
+                new HBaseOutputFormat(this.hbaseProperties, this.serializationSchema, this.code));
         }
     }
 

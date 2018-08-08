@@ -35,14 +35,16 @@ public class HBaseOutputFormat implements OutputFormat<Tuple2<Boolean, Row>> {
 
     private HbaseInvoker hbaseInvoker;
 
-    public HBaseOutputFormat(HbaseProperties hbaseProperties, SerializationSchema<Row> serializationSchema, HbaseInvoker hbaseInvoker) {
-        this.hbaseProperties=hbaseProperties;
+    public HBaseOutputFormat(HbaseProperties hbaseProperties, SerializationSchema<Row> serializationSchema,
+        HbaseInvoker hbaseInvoker) {
+        this.hbaseProperties = hbaseProperties;
         this.serializationSchema = serializationSchema;
         this.hbaseInvoker = hbaseInvoker;
     }
 
-    public HBaseOutputFormat(HbaseProperties hbaseProperties, SerializationSchema<Row> serializationSchema, String code) {
-        this.hbaseProperties=hbaseProperties;
+    public HBaseOutputFormat(HbaseProperties hbaseProperties, SerializationSchema<Row> serializationSchema,
+        String code) {
+        this.hbaseProperties = hbaseProperties;
         this.serializationSchema = serializationSchema;
         this.code = code;
     }
@@ -62,25 +64,24 @@ public class HBaseOutputFormat implements OutputFormat<Tuple2<Boolean, Row>> {
             table.setWriteBufferSize(this.hbaseProperties.getBufferSize());
         }
         if (this.hbaseInvoker == null) {
-            this.hbaseInvoker =  GroovyCompiler.create(this.code, RandomUtils.uuid());
+            this.hbaseInvoker = GroovyCompiler.create(this.code, RandomUtils.uuid());
         }
     }
 
     @Override
     public void writeRecord(Tuple2<Boolean, Row> value) throws IOException {
-        if(value==null||value.f1==null){
+        if (value == null || value.f1 == null) {
             return;
         }
         Object[] rows = RowUtils.createRows((value.f1));
         Put put = new Put(Bytes.toBytes(hbaseInvoker.getRowKey(rows)));
         put.add(Bytes.toBytes(this.hbaseInvoker.getFamily(rows)), Bytes.toBytes(hbaseInvoker.getQualifier(rows)),
             serializationSchema.serialize(value.f1));
-        if(this.hbaseProperties.isSkipWal()){
+        if (this.hbaseProperties.isSkipWal()) {
             put.setDurability(Durability.SKIP_WAL);
         }
         table.put(put);
     }
-
 
     @Override
     public void close() throws IOException {
