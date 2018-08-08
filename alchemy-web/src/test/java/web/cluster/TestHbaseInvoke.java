@@ -13,6 +13,11 @@ public class TestHbaseInvoke implements HbaseInvoker {
     }
 
     @Override
+    public String getFamily(Object[] rows) {
+        return "s";
+    }
+
+    @Override
     public String getQualifier(Object[] rows) {
         return String.valueOf(rows[0]);
     }

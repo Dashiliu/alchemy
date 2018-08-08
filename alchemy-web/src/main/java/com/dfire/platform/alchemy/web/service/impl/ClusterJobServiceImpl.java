@@ -222,6 +222,7 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
             acJobHistory.setAcJobId(acJob.getId());
             acJobHistory.setClusterJobId(submitResponse.getJobId());
             acJobHistory.setCreateTime(new Date());
+            acJobHistory.setIsValid(Valid.VALID.getValid());
             jobHistoryRepository.save(acJobHistory);
         }
 
@@ -410,7 +411,7 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
                 }
                 JobStatusResponse flinkResponse = (JobStatusResponse)response;
                 if (acJobOptional.get().getStatus().intValue() != flinkResponse.getStatus().intValue()) {
-                    updateJobStatus(acJobOptional.get().getId(), flinkResponse.getStatus());
+                    updateJobStatus(acJobOptional, flinkResponse.getStatus());
                 }
             });
             jobRepository.flush();
@@ -418,13 +419,12 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
 
         }
 
-        private void updateJobStatus(Long acJobId, int status) {
-            Optional<AcJob> acJob = jobRepository.findById(acJobId);
+        private void updateJobStatus(Optional<AcJob> acJob, int status) {
             if (Status.AUDIT_FAIL.getStatus() < acJob.get().getStatus()) {
                 acJob.get().setStatus(status);
                 jobRepository.save(acJob.get());
             } else {
-                LOGGER.warn("job :{} status is :{},but flink status is :{}", acJobId, acJob.get().getStatus(), status);
+                LOGGER.warn("job :{} status is :{},but flink status is :{}", acJob.get().getId(), acJob.get().getStatus(), status);
             }
         }
 

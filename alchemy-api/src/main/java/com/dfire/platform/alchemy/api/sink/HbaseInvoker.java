@@ -10,6 +10,8 @@ public interface HbaseInvoker extends Serializable {
 
     String getRowKey(Object[] rows);
 
+    String getFamily(Object[] rows);
+
     String getQualifier(Object[] rows);
 
 }

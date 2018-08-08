@@ -73,7 +73,7 @@ public class HBaseOutputFormat implements OutputFormat<Tuple2<Boolean, Row>> {
         }
         Object[] rows = RowUtils.createRows((value.f1));
         Put put = new Put(Bytes.toBytes(hbaseInvoker.getRowKey(rows)));
-        put.add(Bytes.toBytes(this.hbaseProperties.getFamily()), Bytes.toBytes(hbaseInvoker.getQualifier(rows)),
+        put.add(Bytes.toBytes(this.hbaseInvoker.getFamily(rows)), Bytes.toBytes(hbaseInvoker.getQualifier(rows)),
             serializationSchema.serialize(value.f1));
         if(this.hbaseProperties.isSkipWal()){
             put.setDurability(Durability.SKIP_WAL);

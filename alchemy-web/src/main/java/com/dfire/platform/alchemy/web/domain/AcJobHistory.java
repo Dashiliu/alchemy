@@ -25,7 +25,7 @@ public class AcJobHistory {
     private String clusterJobId;
 
     @Column(name = "is_valid")
-    private int isValid;
+    private Integer isValid;
 
     @Column(name = "create_time")
     private Date createTime = null;
@@ -57,11 +57,11 @@ public class AcJobHistory {
         this.clusterJobId = clusterJobId;
     }
 
-    public int getIsValid() {
+    public Integer getIsValid() {
         return isValid;
     }
 
-    public void setIsValid(int isValid) {
+    public void setIsValid(Integer isValid) {
         this.isValid = isValid;
     }
 

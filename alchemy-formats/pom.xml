@@ -9,62 +9,35 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>alchemy-connectors</artifactId>
+    <artifactId>alchemy-formats</artifactId>
     <packaging>jar</packaging>
-
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <hitsdb.version>0.0.5</hitsdb.version>
-    </properties>
 
     <dependencies>
         <dependency>
-            <groupId>com.aliyun</groupId>
-            <artifactId>hitsdb-client</artifactId>
-            <version>${hitsdb.version}</version>
+            <groupId>io.protostuff</groupId>
+            <artifactId>protostuff-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.dfire.platform</groupId>
-            <artifactId>alchemy-api</artifactId>
-            <version>${project.parent.version}</version>
+            <groupId>io.protostuff</groupId>
+            <artifactId>protostuff-runtime</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.caucho</groupId>
+            <artifactId>hessian</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-streaming-scala_${scala.binary.version}</artifactId>
+            <artifactId>flink-core</artifactId>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-streaming-java_${scala.binary.version}</artifactId>
+            <!-- use a dedicated Scala version to not depend on it -->
+            <artifactId>flink-table_2.11</artifactId>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-kafka-0.10_${scala.binary.version}</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-hbase_${scala.binary.version}</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-elasticsearch5_${scala.binary.version}</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-json</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-shaded-hadoop2</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>servlet-api</artifactId>
-                </exclusion>
-            </exclusions>
-            <scope>provided</scope>
+            <!-- Projects depending on this project, won't depend on flink-table. -->
+            <optional>true</optional>
         </dependency>
     </dependencies>
 
@@ -116,12 +89,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <reporting>
-        <plugins>
-            <plugin>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </reporting>
 </project>
