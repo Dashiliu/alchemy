@@ -1,27 +1,15 @@
 <!-- jar包上传 -->
 <div *ngIf="conf.type ==0">
-    <div  class="row justify-content-center" >
-        <div class="col-8" *ngIf="jarInfo">
-            <div class="ui-g ui-fluid">
-                <div class="ui-g-12 ui-md-2"><input class="form-check-input" type="checkbox" name="rememberMe" id="rememberMe" [(ngModel)]="selected"  checked></div>
-                <div class="ui-g-12 ui-md-4">名称</div>
-                <div class="ui-g-12 ui-md-4">上传时间</div>
-            </div>
-
-        </div>
-        <div class="col-8" *ngIf="jarInfo">
-            <div class="ui-g ui-fluid">
-                <div class="ui-g-12 ui-md-2"></div>
-                <div class="ui-g-12 ui-md-4">{{jarInfo.fileName}}</div>
-                <div class="ui-g-12 ui-md-4">{{jarInfo.uploadTime}}</div>
-            </div>
-        </div>
-    </div>
-    <div *ngIf="selected" class="row justify-content-center">
+    <div class="row justify-content-center">
         <div class="col-8">
 
                 <div>
                     <jhi-alert-error></jhi-alert-error>
+                    <div class="form-group" >
+                        <label class="form-control-label">maven的avg</label>
+                        <input type="text" class="form-control" name="avg"
+                               [(ngModel)]="jarInfo.avg" required>
+                    </div>
                     <div class="form-group" >
                         <label class="form-control-label">执行方法</label>
                         <input type="text" class="form-control" name="entryClass"
@@ -50,109 +38,103 @@
                 </div>
         </div>
     </div>
-    <div class="row justify-content-center">
-        <div class="col-8">
-            <h3>上传jar包</h3>
-            <p-fileUpload mode="basic" name="file" url="./upload/confs/{{conf.acJobId}}"  auto="true" maxFileSize="204857600" (onUpload)="upload($event)"></p-fileUpload>
-        </div>
-    </div>
 
 </div>
 
 
 <!-- 配置 -->
 <div *ngIf="conf.type ==1">
-    <h2>
-        <button class="btn btn-primary float-right jh-create-entity" (click)="add()">
-            <fa-icon [icon]="'plus'"></fa-icon>
-            <span>创建</span>
-        </button>
-    </h2>
+    <!--<h2>-->
+        <!--<button class="btn btn-primary float-right jh-create-entity" (click)="add()">-->
+            <!--<fa-icon [icon]="'plus'"></fa-icon>-->
+            <!--<span>创建</span>-->
+        <!--</button>-->
+    <!--</h2>-->
     <div class="ui-g ui-fluid" *ngIf="conf">
         <div class="ui-g-12 ui-md-2"></div>
         <div class="ui-g-12 ui-md-10">
             <h3>请使用yaml格式在下面的文本中定义配置：</h3>
             <codemirror [(ngModel)]="conf.content.config" [config]="yamlConfig"></codemirror>
             <h2></h2>
-            <h4>如有必要，请使用groovy语言在下面的文本中定义输出逻辑：</h4>
+            <!--<h4>如有必要，请使用groovy语言在下面的文本中定义输出逻辑：</h4>-->
             <!-- 使用ngFor时，编辑器中的指针会消失，所以使用很水的方式实现 -->
-            <div class="ui-g ui-fluid" *ngIf="conf.content.code.length >=1">
-                <codemirror class="ui-g-12 ui-md-10"  [(ngModel)]="conf.content.code[0]" [config]="groovyConfig"></codemirror>
-                <button type="button" (click)="delete(0)"
-                        class="btn btn-danger btn-sm ui-g-12 ui-md-2" style="height: 40px">
-                    <fa-icon [icon]="'times'"></fa-icon>
-                    <span class="d-none d-md-inline">Delete</span>
-                </button>
-            </div>
-            <h3></h3>
-            <div class="ui-g ui-fluid" *ngIf="conf.content.code.length >=2">
-                <codemirror class="ui-g-12 ui-md-10"   [(ngModel)]="conf.content.code[1]" [config]="groovyConfig"></codemirror>
-                <button type="button" (click)="delete(1)"
-                        class="btn btn-danger btn-sm ui-g-12 ui-md-2" style="height: 40px">
-                    <fa-icon [icon]="'times'"></fa-icon>
-                    <span class="d-none d-md-inline">Delete</span>
-                </button>
+            <!--<div class="ui-g ui-fluid" *ngIf="conf.content.code.length >=1">-->
+                <!--<codemirror class="ui-g-12 ui-md-10"  [(ngModel)]="conf.content.code[0]" [config]="groovyConfig"></codemirror>-->
+                <!--<button type="button" (click)="delete(0)"-->
+                        <!--class="btn btn-danger btn-sm ui-g-12 ui-md-2" style="height: 40px">-->
+                    <!--<fa-icon [icon]="'times'"></fa-icon>-->
+                    <!--<span class="d-none d-md-inline">Delete</span>-->
+                <!--</button>-->
+            <!--</div>-->
+            <!--<h3></h3>-->
+            <!--<div class="ui-g ui-fluid" *ngIf="conf.content.code.length >=2">-->
+                <!--<codemirror class="ui-g-12 ui-md-10"   [(ngModel)]="conf.content.code[1]" [config]="groovyConfig"></codemirror>-->
+                <!--<button type="button" (click)="delete(1)"-->
+                        <!--class="btn btn-danger btn-sm ui-g-12 ui-md-2" style="height: 40px">-->
+                    <!--<fa-icon [icon]="'times'"></fa-icon>-->
+                    <!--<span class="d-none d-md-inline">Delete</span>-->
+                <!--</button>-->
 
-            </div>
-            <h3></h3>
-            <div class="ui-g ui-fluid" *ngIf="conf.content.code.length >=3">
-                <codemirror  class="ui-g-12 ui-md-10"  [(ngModel)]="conf.content.code[2]" [config]="groovyConfig"></codemirror>
-                <button type="button" (click)="delete(2)"
-                        class="btn btn-danger btn-sm  ui-g-12 ui-md-2" style="height: 40px">
-                    <fa-icon [icon]="'times'"></fa-icon>
-                    <span class="d-none d-md-inline">Delete</span>
-                </button>
+            <!--</div>-->
+            <!--<h3></h3>-->
+            <!--<div class="ui-g ui-fluid" *ngIf="conf.content.code.length >=3">-->
+                <!--<codemirror  class="ui-g-12 ui-md-10"  [(ngModel)]="conf.content.code[2]" [config]="groovyConfig"></codemirror>-->
+                <!--<button type="button" (click)="delete(2)"-->
+                        <!--class="btn btn-danger btn-sm  ui-g-12 ui-md-2" style="height: 40px">-->
+                    <!--<fa-icon [icon]="'times'"></fa-icon>-->
+                    <!--<span class="d-none d-md-inline">Delete</span>-->
+                <!--</button>-->
 
-            </div>
-            <h3></h3>
-            <div class="ui-g ui-fluid" *ngIf="conf.content.code.length >=4">
-                <codemirror class="ui-g-12 ui-md-10"   [(ngModel)]="conf.content.code[3]" [config]="groovyConfig"></codemirror>
-                <button type="button" (click)="delete(3)"
-                        class="btn btn-danger btn-sm  ui-g-12 ui-md-2" style="height: 40px">
-                    <fa-icon [icon]="'times'"></fa-icon>
-                    <span class="d-none d-md-inline">Delete</span>
-                </button>
+            <!--</div>-->
+            <!--<h3></h3>-->
+            <!--<div class="ui-g ui-fluid" *ngIf="conf.content.code.length >=4">-->
+                <!--<codemirror class="ui-g-12 ui-md-10"   [(ngModel)]="conf.content.code[3]" [config]="groovyConfig"></codemirror>-->
+                <!--<button type="button" (click)="delete(3)"-->
+                        <!--class="btn btn-danger btn-sm  ui-g-12 ui-md-2" style="height: 40px">-->
+                    <!--<fa-icon [icon]="'times'"></fa-icon>-->
+                    <!--<span class="d-none d-md-inline">Delete</span>-->
+                <!--</button>-->
 
-            </div>
-            <h3></h3>
-            <div class="ui-g ui-fluid" *ngIf="conf.content.code.length >=5">
-                <codemirror  class="ui-g-12 ui-md-10"  [(ngModel)]="conf.content.code[4]" [config]="groovyConfig"></codemirror>
-                <button type="button" (click)="delete(4)"
-                        class="btn btn-danger btn-sm ui-g-12 ui-md-2" style="height: 40px">
-                    <fa-icon [icon]="'times'"></fa-icon>
-                    <span class="d-none d-md-inline">Delete</span>
-                </button>
-            </div>
-            <h3></h3>
-            <div class="ui-g ui-fluid" *ngIf="conf.content.code.length >=6">
-                <codemirror class="ui-g-12 ui-md-10"   [(ngModel)]="conf.content.code[5]" [config]="groovyConfig"></codemirror>
-                <button type="button" (click)="delete(5)"
-                        class="btn btn-danger btn-sm ui-g-12 ui-md-2" style="height: 40px">
-                    <fa-icon [icon]="'times'"></fa-icon>
-                    <span class="d-none d-md-inline">Delete</span>
-                </button>
+            <!--</div>-->
+            <!--<h3></h3>-->
+            <!--<div class="ui-g ui-fluid" *ngIf="conf.content.code.length >=5">-->
+                <!--<codemirror  class="ui-g-12 ui-md-10"  [(ngModel)]="conf.content.code[4]" [config]="groovyConfig"></codemirror>-->
+                <!--<button type="button" (click)="delete(4)"-->
+                        <!--class="btn btn-danger btn-sm ui-g-12 ui-md-2" style="height: 40px">-->
+                    <!--<fa-icon [icon]="'times'"></fa-icon>-->
+                    <!--<span class="d-none d-md-inline">Delete</span>-->
+                <!--</button>-->
+            <!--</div>-->
+            <!--<h3></h3>-->
+            <!--<div class="ui-g ui-fluid" *ngIf="conf.content.code.length >=6">-->
+                <!--<codemirror class="ui-g-12 ui-md-10"   [(ngModel)]="conf.content.code[5]" [config]="groovyConfig"></codemirror>-->
+                <!--<button type="button" (click)="delete(5)"-->
+                        <!--class="btn btn-danger btn-sm ui-g-12 ui-md-2" style="height: 40px">-->
+                    <!--<fa-icon [icon]="'times'"></fa-icon>-->
+                    <!--<span class="d-none d-md-inline">Delete</span>-->
+                <!--</button>-->
 
-            </div>
-            <h3></h3>
-            <div class="ui-g ui-fluid" *ngIf="conf.content.code.length >=7">
-                <codemirror  class="ui-g-12 ui-md-10"  [(ngModel)]="conf.content.code[6]" [config]="groovyConfig"></codemirror>
-                <button type="button" (click)="delete(6)"
-                        class="btn btn-danger btn-sm ui-g-12 ui-md-2" style="height: 40px">
-                    <fa-icon [icon]="'times'"></fa-icon>
-                    <span class="d-none d-md-inline">Delete</span>
-                </button>
+            <!--</div>-->
+            <!--<h3></h3>-->
+            <!--<div class="ui-g ui-fluid" *ngIf="conf.content.code.length >=7">-->
+                <!--<codemirror  class="ui-g-12 ui-md-10"  [(ngModel)]="conf.content.code[6]" [config]="groovyConfig"></codemirror>-->
+                <!--<button type="button" (click)="delete(6)"-->
+                        <!--class="btn btn-danger btn-sm ui-g-12 ui-md-2" style="height: 40px">-->
+                    <!--<fa-icon [icon]="'times'"></fa-icon>-->
+                    <!--<span class="d-none d-md-inline">Delete</span>-->
+                <!--</button>-->
 
-            </div>
-            <h3></h3>
-            <div class="ui-g ui-fluid" *ngIf="conf.content.code.length >=8">
-                <codemirror class="ui-g-12 ui-md-10"   [(ngModel)]="conf.content.code[7]" [config]="groovyConfig"></codemirror>
-                <button type="button" (click)="delete(7)"
-                        class="btn btn-danger btn-sm ui-g-12 ui-md-2" style="height: 40px">
-                    <fa-icon [icon]="'times'"></fa-icon>
-                    <span class="d-none d-md-inline">Delete</span>
-                </button>
+            <!--</div>-->
+            <!--<h3></h3>-->
+            <!--<div class="ui-g ui-fluid" *ngIf="conf.content.code.length >=8">-->
+                <!--<codemirror class="ui-g-12 ui-md-10"   [(ngModel)]="conf.content.code[7]" [config]="groovyConfig"></codemirror>-->
+                <!--<button type="button" (click)="delete(7)"-->
+                        <!--class="btn btn-danger btn-sm ui-g-12 ui-md-2" style="height: 40px">-->
+                    <!--<fa-icon [icon]="'times'"></fa-icon>-->
+                    <!--<span class="d-none d-md-inline">Delete</span>-->
+                <!--</button>-->
 
-            </div>
+            <!--</div>-->
             <h3></h3>
 
             <div class="ui-g ui-fluid">
@@ -182,7 +164,8 @@
 <!-- sql -->
 <div *ngIf="conf.type ==2">
     <div class="ui-g ui-fluid" *ngIf="conf">
-        <div class="ui-g-12 ui-md-2"></div>
+        <div class="ui-g-12 ui-md-2">
+        </div>
         <div class="ui-g-12 ui-md-8">
             <h3>请输入sql语句：</h3>
             <codemirror  [(ngModel)]="conf.content.config" [config]="sqlConfig"></codemirror>

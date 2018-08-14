@@ -1,8 +1,5 @@
 package com.dfire.platform.alchemy.web.service.impl;
 
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +12,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -254,59 +254,9 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
                     continue;
                 }
                 JarInfoDescriptor descriptor = buildJar(acJobConf, JarInfoDescriptor.class);
-                downLoadJarIfNeed(descriptor);
                 jarSubmitFlinkRequest.setJarInfoDescriptor(descriptor);
             }
             return jarSubmitFlinkRequest;
-        }
-
-        /**
-         * 从远程文件服务器下载jar包,直接从网上copy的，罪过罪过
-         *
-         * @param descriptor
-         */
-        private void downLoadJarIfNeed(JarInfoDescriptor descriptor) {
-            File file = new File(descriptor.getJarPath());
-            if (file.exists()) {
-                return;
-            }
-            URL urlfile;
-            HttpURLConnection httpUrl;
-            BufferedInputStream bis = null;
-            BufferedOutputStream bos = null;
-            try {
-                if(descriptor.getRemoteUrl()==null){
-                    return;
-                }
-                file.createNewFile();
-                urlfile = new URL(descriptor.getRemoteUrl());
-                httpUrl = (HttpURLConnection)urlfile.openConnection();
-                httpUrl.connect();
-                bis = new BufferedInputStream(httpUrl.getInputStream());
-                bos = new BufferedOutputStream(new FileOutputStream(file));
-                int len = 2048;
-                byte[] b = new byte[len];
-                while ((len = bis.read(b)) != -1) {
-                    bos.write(b, 0, len);
-                }
-                bos.flush();
-                bis.close();
-                httpUrl.disconnect();
-            } catch (Exception e) {
-                LOGGER.error(e.getMessage());
-            } finally {
-                try {
-                    if(bis!=null){
-                        bis.close();
-                    }
-                   if(bos!=null){
-                       bos.close();
-                   }
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
         }
 
         private SqlSubmitFlinkRequest createSqlSubmitFlinkRequest(AcJob acJob, List<AcJobConf> jobConfs)
@@ -396,12 +346,13 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
 
         private void updateJobStatusByPage(Pageable pageable) {
             List<AcJobHistory> acJobHistories = jobHistoryRepository.findByIsValid(Valid.VALID.getValid(), pageable);
-            if(acJobHistories.isEmpty()){
+            if (acJobHistories.isEmpty()) {
                 return;
             }
             acJobHistories.forEach(acJobHistory -> {
                 Optional<AcJob> acJobOptional = jobRepository.findById(acJobHistory.getAcJobId());
-                if (!acJobOptional.isPresent()||Valid.VALID.getValid()!=acJobOptional.get().getIsValid().intValue()) {
+                if (!acJobOptional.isPresent()
+                    || Valid.VALID.getValid() != acJobOptional.get().getIsValid().intValue()) {
                     return;
                 }
                 Response response = clusterManager
@@ -415,7 +366,7 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
                 }
             });
             jobRepository.flush();
-            updateJobStatusByPage(PageRequest.of(pageable.getPageNumber()+1, Constants.PAGE_SIZE));
+            updateJobStatusByPage(PageRequest.of(pageable.getPageNumber() + 1, Constants.PAGE_SIZE));
 
         }
 
@@ -424,7 +375,8 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
                 acJob.get().setStatus(status);
                 jobRepository.save(acJob.get());
             } else {
-                LOGGER.warn("job :{} status is :{},but flink status is :{}", acJob.get().getId(), acJob.get().getStatus(), status);
+                LOGGER.warn("job :{} status is :{},but flink status is :{}", acJob.get().getId(),
+                    acJob.get().getStatus(), status);
             }
         }
 

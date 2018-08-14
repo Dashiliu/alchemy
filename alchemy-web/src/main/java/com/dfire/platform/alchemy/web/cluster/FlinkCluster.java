@@ -12,6 +12,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.bigfatgun.MavenLoaderInfo;
+import com.dfire.platform.alchemy.web.util.MavenJarUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.JobID;
@@ -65,7 +67,7 @@ public class FlinkCluster implements Cluster {
 
     private ClusterClient clusterClient;
 
-    private String globalClassPath;
+    private ClusterInfo clusterInfo;
 
     @Override
     public ClusterType clusterType() {
@@ -74,7 +76,7 @@ public class FlinkCluster implements Cluster {
 
     @Override
     public void start(ClusterInfo clusterInfo) {
-        this.globalClassPath = clusterInfo.getGlobalClassPath();
+        this.clusterInfo=clusterInfo;
         Configuration configuration = new Configuration();
         configuration.setString(HighAvailabilityOptions.HA_MODE,
             HighAvailabilityMode.ZOOKEEPER.toString().toLowerCase());
@@ -145,7 +147,8 @@ public class FlinkCluster implements Cluster {
         }
         LOGGER.trace("start submit jar request,entryClass:{}", message.getJarInfoDescriptor().getEntryClass());
         try {
-            PackagedProgram program = new PackagedProgram(new File(message.getJarInfoDescriptor().getJarPath()),
+            File file=MavenJarUtils.forAvg(message.getJarInfoDescriptor().getAvg()).getJarFile();
+            PackagedProgram program = new PackagedProgram(file,
                 message.getJarInfoDescriptor().getEntryClass(), message.getJarInfoDescriptor().getProgramArgs());
             ClassLoader classLoader = null;
             try {
@@ -158,8 +161,8 @@ public class FlinkCluster implements Cluster {
             FlinkPlan plan
                 = ClusterClient.getOptimizedPlan(optimizer, program, message.getJarInfoDescriptor().getParallelism());
             // set up the execution environment
-            List<URL> jarFiles = createPath(message.getJarInfoDescriptor().getJarPath());
-            JobSubmissionResult submissionResult = clusterClient.run(plan, jarFiles, createGlobalPath(), classLoader);
+            List<URL> jarFiles = createPath(file);
+            JobSubmissionResult submissionResult = clusterClient.run(plan, jarFiles, Collections.emptyList(), classLoader);
             LOGGER.trace(" submit jar request sucess,jobId:{}", submissionResult.getJobID());
             return new SubmitFlinkResponse(true, submissionResult.getJobID().toString());
         } catch (Exception e) {
@@ -238,10 +241,10 @@ public class FlinkCluster implements Cluster {
         }
         StreamGraph streamGraph = execEnv.getStreamGraph();
         streamGraph.setJobName(message.getJobName());
-        List<URL> jarFiles = createPath(message.getJarPath());
-        jarFiles.add(new File(Constants.FILE_PATH + Constants.GLOBAL_FILE_NAME).getAbsoluteFile().toURI().toURL());
+        List<URL> jarFiles = createPath(MavenJarUtils.forAvg(message.getAvg()).getJarFile());
+        jarFiles.addAll(createGlobalPath());
         ClassLoader usercodeClassLoader
-            = JobWithJars.buildUserCodeClassLoader(jarFiles, createGlobalPath(), getClass().getClassLoader());
+            = JobWithJars.buildUserCodeClassLoader(jarFiles, Collections.emptyList(), getClass().getClassLoader());
         try {
             JobSubmissionResult submissionResult
                 = clusterClient.run(streamGraph, jarFiles, Collections.emptyList(), usercodeClassLoader);
@@ -278,36 +281,38 @@ public class FlinkCluster implements Cluster {
         }
     }
 
-    private List<URL> createPath(String filePath) {
+    private List<URL> createPath(File file) {
         List<URL> jarFiles = new ArrayList<>(1);
+        if (file==null) {
+            return jarFiles;
+        }
         try {
-            if (StringUtils.isEmpty(filePath)) {
-                return jarFiles;
-            }
-            URL jarFileUrl = new File(filePath).getAbsoluteFile().toURI().toURL();
+
+            URL jarFileUrl = file.getAbsoluteFile().toURI().toURL();
             jarFiles.add(jarFileUrl);
             JobWithJars.checkJarFile(jarFileUrl);
         } catch (MalformedURLException e) {
-            throw new IllegalArgumentException("JAR file path is invalid '" + filePath + "'", e);
+            throw new IllegalArgumentException("JAR file is invalid '" + file.getAbsolutePath() + "'", e);
         } catch (IOException e) {
-            throw new RuntimeException("Problem with jar file " + filePath, e);
+            throw new RuntimeException("Problem with jar file " + file.getAbsolutePath(), e);
         }
         return jarFiles;
     }
 
     private List<URL> createGlobalPath() {
-        if (StringUtils.isEmpty(this.globalClassPath)) {
+        if (StringUtils.isEmpty(this.clusterInfo.getAvg())) {
             return Collections.emptyList();
         }
         List<URL> jarFiles = new ArrayList<>(1);
+        File file= MavenJarUtils.forAvg(this.clusterInfo.getAvg()).getJarFile();
         try {
-            URL jarFileUrl = new File(this.globalClassPath).getAbsoluteFile().toURI().toURL();
+            URL jarFileUrl =file.getAbsoluteFile().toURI().toURL();
             jarFiles.add(jarFileUrl);
             JobWithJars.checkJarFile(jarFileUrl);
         } catch (MalformedURLException e) {
-            throw new IllegalArgumentException("globalClasspath is invalid '" + this.globalClassPath + "'", e);
+            throw new IllegalArgumentException("JAR avg is invalid '" + this.clusterInfo.getAvg() + "'", e);
         } catch (IOException e) {
-            throw new RuntimeException("Problem with jar file " + this.globalClassPath, e);
+            throw new RuntimeException("Problem with jar file " + file.getAbsolutePath(), e);
         }
         return jarFiles;
     }

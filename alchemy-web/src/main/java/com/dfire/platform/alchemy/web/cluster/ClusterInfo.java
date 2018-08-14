@@ -24,7 +24,7 @@ public class ClusterInfo {
 
     private Integer port;
 
-    private String globalClassPath;
+    private String avg;
 
     public String getName() {
         return name;
@@ -90,11 +90,11 @@ public class ClusterInfo {
         this.port = port;
     }
 
-    public String getGlobalClassPath() {
-        return globalClassPath;
+    public String getAvg() {
+        return avg;
     }
 
-    public void setGlobalClassPath(String globalClassPath) {
-        this.globalClassPath = globalClassPath;
+    public void setAvg(String avg) {
+        this.avg = avg;
     }
 }

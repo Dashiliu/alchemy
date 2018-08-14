@@ -18,6 +18,7 @@ npm-debug.log.*
 # SASS
 ######################
 .sass-cache/
+.m2/
 
 ######################
 # Eclipse

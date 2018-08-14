@@ -58,6 +58,12 @@ public class TsdbData {
             return this;
         }
 
+        public Builder tag(Object key,Object value){
+            this.tags.put(String.valueOf(key),String.valueOf(value));
+            return this;
+        }
+
+
         public Builder tags(Map<String,String> tags){
             this.tags.putAll(tags);
             return this;

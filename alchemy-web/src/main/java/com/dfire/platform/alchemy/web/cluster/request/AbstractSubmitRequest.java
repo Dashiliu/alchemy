@@ -37,4 +37,7 @@ public abstract class AbstractSubmitRequest implements FlinkRequest, SubmitReque
     public void setTest(boolean test) {
         this.test = test;
     }
+
+    public abstract void validate() throws Exception;
+
 }

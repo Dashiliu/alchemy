@@ -22,8 +22,6 @@ public class RedisSinkDescriptor extends SinkDescriptor {
 
     private String name;
 
-    private int readMode = ReadMode.CODE.getMode();
-
     private Sentinel sentinel;
 
     private Codis codis;
@@ -95,14 +93,6 @@ public class RedisSinkDescriptor extends SinkDescriptor {
         this.threadNum = threadNum;
     }
 
-    public int getReadMode() {
-        return readMode;
-    }
-
-    public void setReadMode(int readMode) {
-        this.readMode = readMode;
-    }
-
     public String getValue() {
         return value;
     }
@@ -122,12 +112,7 @@ public class RedisSinkDescriptor extends SinkDescriptor {
     private <T> T transformFlink() throws Exception {
         RedisProperties redisProperties = new RedisProperties();
         BeanUtils.copyProperties(this, redisProperties);
-        if (ReadMode.CODE.getMode() == this.readMode) {
-            return (T)new RedisTableSink(redisProperties, this.value);
-        } else {
-            RedisInvoker redisInvoker = (RedisInvoker)Class.forName(this.value).newInstance();
-            return (T)new RedisTableSink(redisProperties, redisInvoker);
-        }
+        return (T)new RedisTableSink(redisProperties, this.value);
     }
 
     @Override

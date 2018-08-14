@@ -23,6 +23,8 @@ import com.dfire.platform.alchemy.api.util.RowUtils;
  */
 public class HBaseOutputFormat implements OutputFormat<Tuple2<Boolean, Row>> {
 
+    private static final long serialVersionUID = 1L;
+
     private static final String HBASE_QUORUM = "hbase.zookeeper.quorum";
 
     private static final String HBASE_ZNODE_PARENT = "zookeeper.znode.parent";
@@ -34,13 +36,6 @@ public class HBaseOutputFormat implements OutputFormat<Tuple2<Boolean, Row>> {
     private String code;
 
     private HbaseInvoker hbaseInvoker;
-
-    public HBaseOutputFormat(HbaseProperties hbaseProperties, SerializationSchema<Row> serializationSchema,
-        HbaseInvoker hbaseInvoker) {
-        this.hbaseProperties = hbaseProperties;
-        this.serializationSchema = serializationSchema;
-        this.hbaseInvoker = hbaseInvoker;
-    }
 
     public HBaseOutputFormat(HbaseProperties hbaseProperties, SerializationSchema<Row> serializationSchema,
         String code) {
@@ -63,7 +58,10 @@ public class HBaseOutputFormat implements OutputFormat<Tuple2<Boolean, Row>> {
             table.setAutoFlushTo(false);
             table.setWriteBufferSize(this.hbaseProperties.getBufferSize());
         }
-        if (this.hbaseInvoker == null) {
+        try {
+            Class clazz = Class.forName(this.code);
+            this.hbaseInvoker = (HbaseInvoker)clazz.newInstance();
+        } catch (Exception e) {
             this.hbaseInvoker = GroovyCompiler.create(this.code, RandomUtils.uuid());
         }
     }

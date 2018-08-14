@@ -68,31 +68,15 @@ public class JobConfController {
         LOGGER.debug("REST request to get JobConf ,jobid: {}", jobId);
         final List<JobConfDTO> jobDTOList = jobConfService.findByType(jobId, type);
         JobConfDTO jobConfDTO;
-        if (!CollectionUtils.isEmpty(jobDTOList)) {
-            jobConfDTO = jobDTOList.get(0);
-            if (ConfType.JAR.getType() == jobConfDTO.getType()) {
-                jobConfDTO = createIfFileNotExist(jobId, type, jobConfDTO);
-            }
-        } else {
+        if (CollectionUtils.isEmpty(jobDTOList)) {
             jobConfDTO = createJobConfDTO(jobId, type);
+        } else {
+            jobConfDTO = jobDTOList.get(0);
         }
         return new ResponseEntity<>(jobConfDTO, HeaderUtil.createAlert("get jobConf ", null), HttpStatus.OK);
     }
 
-    private JobConfDTO createIfFileNotExist(@RequestParam(value = "jobId") Long jobId,
-        @RequestParam(value = "type") Integer type, JobConfDTO jobConfDTO) {
-        if (jobConfDTO.getContent() != null) {
-            JarInfoDescriptor descriptor
-                = JsonUtils.fromJson(jobConfDTO.getContent().getConfig(), JarInfoDescriptor.class);
-            if (!new File(descriptor.getJarPath()).exists()) {
-                jobConfDTO = createJobConfDTO(jobId, type);
-            }
-        }
-        return jobConfDTO;
-    }
-
-    private JobConfDTO createJobConfDTO(@RequestParam(value = "jobId") Long jobId,
-        @RequestParam(value = "type") Integer type) {
+    private JobConfDTO createJobConfDTO(Long jobId, Integer type) {
         JobConfDTO jobConfDTO;
         jobConfDTO = new JobConfDTO();
         jobConfDTO.setAcJobId(jobId);

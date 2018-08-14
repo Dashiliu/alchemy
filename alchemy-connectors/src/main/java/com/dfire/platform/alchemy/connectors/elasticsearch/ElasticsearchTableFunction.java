@@ -15,6 +15,8 @@ import com.dfire.platform.alchemy.api.util.RandomUtils;
 
 public class ElasticsearchTableFunction implements ElasticsearchSinkFunction<Tuple2<Boolean, Row>>, Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     private static final SimpleDateFormat FORMAT_INDEX = new SimpleDateFormat("yyyy.MM.dd");
 
     private static final String SPLIT = "-";

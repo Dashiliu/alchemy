@@ -1,6 +1,7 @@
 package com.dfire.platform.alchemy.web.cluster.request;
 
 import com.dfire.platform.alchemy.web.descriptor.JarInfoDescriptor;
+import org.springframework.util.Assert;
 
 /**
  * @author congbai
@@ -16,5 +17,11 @@ public class JarSubmitFlinkRequest extends AbstractSubmitRequest {
 
     public void setJarInfoDescriptor(JarInfoDescriptor jarInfoDescriptor) {
         this.jarInfoDescriptor = jarInfoDescriptor;
+    }
+
+    @Override
+    public void validate() throws Exception {
+        Assert.notNull(jarInfoDescriptor, "jar配置不能为空");
+        jarInfoDescriptor.validate();
     }
 }

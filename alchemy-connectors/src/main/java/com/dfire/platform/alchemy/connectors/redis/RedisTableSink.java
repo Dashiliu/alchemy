@@ -12,8 +12,6 @@ import org.apache.flink.table.sinks.UpsertStreamTableSink;
 import org.apache.flink.types.Row;
 import org.apache.flink.util.Preconditions;
 
-import com.dfire.platform.alchemy.api.sink.RedisInvoker;
-
 /**
  * @author congbai
  * @date 07/06/2018
@@ -24,8 +22,6 @@ public class RedisTableSink implements UpsertStreamTableSink<Row> {
 
     private final String code;
 
-    private final RedisInvoker redisInvoker;
-
     private String[] fieldNames;
 
     private TypeInformation[] fieldTypes;
@@ -33,13 +29,6 @@ public class RedisTableSink implements UpsertStreamTableSink<Row> {
     public RedisTableSink(RedisProperties redisProperties, String code) {
         this.redisProperties = redisProperties;
         this.code = code;
-        this.redisInvoker = null;
-    }
-
-    public RedisTableSink(RedisProperties redisProperties, RedisInvoker redisInvoker) {
-        this.redisProperties = Preconditions.checkNotNull(redisProperties, "redisProperties");
-        this.code = null;
-        this.redisInvoker = redisInvoker;
     }
 
     @Override
@@ -54,12 +43,7 @@ public class RedisTableSink implements UpsertStreamTableSink<Row> {
 
     @Override
     public TableSink<Tuple2<Boolean, Row>> configure(String[] fieldNames, TypeInformation<?>[] fieldTypes) {
-        RedisTableSink copy;
-        if (redisInvoker == null) {
-            copy = new RedisTableSink(redisProperties, this.code);
-        } else {
-            copy = new RedisTableSink(redisProperties, this.redisInvoker);
-        }
+        RedisTableSink copy = new RedisTableSink(redisProperties, this.code);
         copy.fieldNames = Preconditions.checkNotNull(fieldNames, "fieldNames");
         copy.fieldTypes = Preconditions.checkNotNull(fieldTypes, "fieldTypes");
         Preconditions.checkArgument(fieldNames.length == fieldTypes.length,
@@ -84,11 +68,7 @@ public class RedisTableSink implements UpsertStreamTableSink<Row> {
     }
 
     private RichSinkFunction creatRedisRich() {
-        if (this.redisInvoker != null) {
-            return new RedisSinkFunction(this.redisProperties, this.redisInvoker);
-        } else {
-            return new RedisSinkFunction(this.redisProperties, this.code);
-        }
+        return new RedisSinkFunction(this.redisProperties, this.code);
     }
 
     @Override

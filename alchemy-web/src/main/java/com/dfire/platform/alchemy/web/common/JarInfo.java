@@ -8,14 +8,7 @@ import java.util.Date;
  */
 public class JarInfo {
 
-    private String fileName;
-
-    private String jarPath;
-
-    /**
-     * 为防止本地文件丢失，将jar包上传到远程文件服务器
-     */
-    private String remoteUrl;
+    private String avg;
 
     private Integer parallelism;
 
@@ -25,28 +18,12 @@ public class JarInfo {
 
     private Date uploadTime;
 
-    public String getFileName() {
-        return fileName;
+    public String getAvg() {
+        return avg;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public String getJarPath() {
-        return jarPath;
-    }
-
-    public void setJarPath(String jarPath) {
-        this.jarPath = jarPath;
-    }
-
-    public String getRemoteUrl() {
-        return remoteUrl;
-    }
-
-    public void setRemoteUrl(String remoteUrl) {
-        this.remoteUrl = remoteUrl;
+    public void setAvg(String avg) {
+        this.avg = avg;
     }
 
     public Integer getParallelism() {

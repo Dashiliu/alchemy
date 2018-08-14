@@ -8,7 +8,7 @@ import java.io.Serializable;
  */
 public class HbaseProperties implements Serializable {
 
-    private static final long serialVersionUID = -5600020364848439482L;
+    private static final long serialVersionUID = 1L;
 
     private String zookeeper;
 

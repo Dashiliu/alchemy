@@ -1,6 +1,5 @@
 package com.dfire.platform.alchemy.web.descriptor;
 
-import java.io.File;
 
 import org.springframework.util.Assert;
 
@@ -12,12 +11,7 @@ import com.dfire.platform.alchemy.web.common.Constants;
  */
 public class JarInfoDescriptor implements Descriptor {
 
-    private String jarPath;
-
-    /**
-     * 为防止本地文件丢失，将jar包上传到远程文件服务器
-     */
-    private String remoteUrl;
+    private String avg;
 
     private Integer parallelism;
 
@@ -25,20 +19,12 @@ public class JarInfoDescriptor implements Descriptor {
 
     private String entryClass;
 
-    public String getJarPath() {
-        return jarPath;
+    public String getAvg() {
+        return avg;
     }
 
-    public void setJarPath(String jarPath) {
-        this.jarPath = jarPath;
-    }
-
-    public String getRemoteUrl() {
-        return remoteUrl;
-    }
-
-    public void setRemoteUrl(String remoteUrl) {
-        this.remoteUrl = remoteUrl;
+    public void setAvg(String avg) {
+        this.avg = avg;
     }
 
     public Integer getParallelism() {
@@ -72,8 +58,7 @@ public class JarInfoDescriptor implements Descriptor {
 
     @Override
     public void validate() throws Exception {
-        Assert.notNull(jarPath, "jar包不能为空");
-        Assert.isTrue(new File(jarPath).exists(), "请重新上传jar包");
+        Assert.notNull(avg, "maven包不能为空");
         Assert.notNull(parallelism, "并发数不能为空");
         Assert.notNull(entryClass, "main函数不能为空");
     }

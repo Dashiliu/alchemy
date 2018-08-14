@@ -1,6 +1,7 @@
 package com.dfire.platform.alchemy.web.cluster.request;
 
 import com.dfire.platform.alchemy.web.descriptor.TableDescriptor;
+import org.springframework.util.Assert;
 
 /**
  * @author congbai
@@ -8,7 +9,7 @@ import com.dfire.platform.alchemy.web.descriptor.TableDescriptor;
  */
 public class SqlSubmitFlinkRequest extends AbstractSubmitRequest {
 
-    private String jarPath;
+    private String avg;
     private Integer parallelism;
     private Long checkpointingInterval;
     private String timeCharacteristic;
@@ -17,12 +18,12 @@ public class SqlSubmitFlinkRequest extends AbstractSubmitRequest {
 
     private TableDescriptor table;
 
-    public String getJarPath() {
-        return jarPath;
+    public String getAvg() {
+        return avg;
     }
 
-    public void setJarPath(String jarPath) {
-        this.jarPath = jarPath;
+    public void setAvg(String avg) {
+        this.avg = avg;
     }
 
     public Integer getParallelism() {
@@ -71,5 +72,12 @@ public class SqlSubmitFlinkRequest extends AbstractSubmitRequest {
 
     public void setTable(TableDescriptor table) {
         this.table = table;
+    }
+
+    @Override
+    public void validate() throws Exception {
+        Assert.notNull(parallelism, "并发数不能为空");
+        Assert.notNull(table, "table不能为空");
+        table.validate();
     }
 }

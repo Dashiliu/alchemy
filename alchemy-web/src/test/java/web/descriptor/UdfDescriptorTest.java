@@ -29,10 +29,10 @@ public class UdfDescriptorTest {
 
     }
 
+
     @Test
     public void transformCode() throws Exception {
         UdfDescriptor udfDescriptor = new UdfDescriptor();
-        udfDescriptor.setReadMode(ReadMode.CODE.getMode());
         udfDescriptor.setName("transformCode");
         udfDescriptor.setValue("import com.dfire.platform.api.function.StreamScalarFunction;\n" + "\n" + "/**\n"
             + " * @author congbai\n" + " * @date 06/06/2018\n" + " */\n"
@@ -48,7 +48,6 @@ public class UdfDescriptorTest {
     @Test
     public void transformClass() throws Exception {
         UdfDescriptor udfDescriptor = new UdfDescriptor();
-        udfDescriptor.setReadMode(ReadMode.JAR.getMode());
         udfDescriptor.setName("transformCode");
         udfDescriptor.setValue("web.descriptor.TestFunction");
         FlinkAllAggregateFunction udf = udfDescriptor.transform(ClusterType.FLINK);

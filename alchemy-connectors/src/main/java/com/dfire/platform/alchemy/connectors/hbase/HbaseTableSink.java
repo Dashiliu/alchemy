@@ -39,11 +39,6 @@ public class HbaseTableSink implements UpsertStreamTableSink<Row> {
         this.code = Preconditions.checkNotNull(code, "code can not be null ");
     }
 
-    public HbaseTableSink(HbaseProperties hbaseProperties, HbaseInvoker hbaseInvoker) {
-        this.hbaseProperties = hbaseProperties;
-        this.hbaseInvoker = Preconditions.checkNotNull(hbaseInvoker, "hbaseInvoker can not be null ");
-    }
-
     @Override
     public String[] getFieldNames() {
         return this.fieldNames;
@@ -56,12 +51,7 @@ public class HbaseTableSink implements UpsertStreamTableSink<Row> {
 
     @Override
     public TableSink<Tuple2<Boolean, Row>> configure(String[] fieldNames, TypeInformation<?>[] fieldTypes) {
-        HbaseTableSink copy;
-        if (hbaseInvoker == null) {
-            copy = new HbaseTableSink(this.hbaseProperties, this.code);
-        } else {
-            copy = new HbaseTableSink(this.hbaseProperties, this.hbaseInvoker);
-        }
+        HbaseTableSink copy = new HbaseTableSink(this.hbaseProperties, this.code);
         copy.fieldNames = Preconditions.checkNotNull(fieldNames, "fieldNames");
         copy.fieldTypes = Preconditions.checkNotNull(fieldTypes, "fieldTypes");
         Preconditions.checkArgument(fieldNames.length == fieldTypes.length,
@@ -99,13 +89,8 @@ public class HbaseTableSink implements UpsertStreamTableSink<Row> {
     }
 
     private OutputFormatSinkFunction creatHbaseSink() {
-        if (this.hbaseInvoker != null) {
-            return new OutputFormatSinkFunction(
-                new HBaseOutputFormat(this.hbaseProperties, this.serializationSchema, this.hbaseInvoker));
-        } else {
-            return new OutputFormatSinkFunction(
-                new HBaseOutputFormat(this.hbaseProperties, this.serializationSchema, this.code));
-        }
+        return new OutputFormatSinkFunction(
+            new HBaseOutputFormat(this.hbaseProperties, this.serializationSchema, this.code));
     }
 
 }

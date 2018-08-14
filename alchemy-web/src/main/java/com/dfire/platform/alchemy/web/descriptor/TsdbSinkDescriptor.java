@@ -3,12 +3,10 @@ package com.dfire.platform.alchemy.web.descriptor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.Assert;
 
-import com.dfire.platform.alchemy.api.sink.OpentsdbInvoker;
 import com.dfire.platform.alchemy.connectors.tsdb.OpentsdbProperties;
 import com.dfire.platform.alchemy.connectors.tsdb.OpentsdbTableSink;
 import com.dfire.platform.alchemy.web.common.ClusterType;
 import com.dfire.platform.alchemy.web.common.Constants;
-import com.dfire.platform.alchemy.web.common.ReadMode;
 
 /**
  * @author congbai
@@ -17,8 +15,6 @@ import com.dfire.platform.alchemy.web.common.ReadMode;
 public class TsdbSinkDescriptor extends SinkDescriptor {
 
     private String name;
-
-    private int readMode = ReadMode.CODE.getMode();
 
     private String opentsdbUrl;
 
@@ -57,26 +53,13 @@ public class TsdbSinkDescriptor extends SinkDescriptor {
     private <T> T transformFlink() throws Exception {
         OpentsdbProperties opentsdbProperties = new OpentsdbProperties();
         BeanUtils.copyProperties(this, opentsdbProperties);
-        if (ReadMode.CODE.getMode() == this.readMode) {
-            return (T)new OpentsdbTableSink(opentsdbProperties, this.value);
-        } else {
-            OpentsdbInvoker redisInvoker = (OpentsdbInvoker)Class.forName(this.value).newInstance();
-            return (T)new OpentsdbTableSink(opentsdbProperties, redisInvoker);
-        }
+        return (T)new OpentsdbTableSink(opentsdbProperties, this.value);
     }
 
     @Override
     public void validate() throws Exception {
         Assert.notNull(opentsdbUrl, "opentsdbUrl不能为空");
         Assert.notNull(value, "写入opentsdb的逻辑不能为空");
-    }
-
-    public int getReadMode() {
-        return readMode;
-    }
-
-    public void setReadMode(int readMode) {
-        this.readMode = readMode;
     }
 
     public String getOpentsdbUrl() {

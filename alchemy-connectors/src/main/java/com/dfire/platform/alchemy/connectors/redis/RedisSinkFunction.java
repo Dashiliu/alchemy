@@ -23,6 +23,8 @@ import com.twodfire.redis.ICacheService;
  */
 public class RedisSinkFunction extends RichSinkFunction<Tuple2<Boolean, Row>> {
 
+    private static final long serialVersionUID = 1L;
+
     protected static final Logger LOG = LoggerFactory.getLogger(RedisSinkFunction.class);
 
     private final RedisProperties redisProperties;
@@ -46,13 +48,6 @@ public class RedisSinkFunction extends RichSinkFunction<Tuple2<Boolean, Row>> {
         initQueue(redisProperties);
     }
 
-    public RedisSinkFunction(RedisProperties redisProperties, RedisInvoker redisInvoker) {
-        this.code = null;
-        this.redisInvoker = redisInvoker;
-        this.redisProperties = redisProperties;
-        initQueue(redisProperties);
-    }
-
     private void initQueue(RedisProperties redisProperties) {
         if (redisProperties.getQueueSize() != null && redisProperties.getQueueSize() > 0
             && redisProperties.getThreadNum() != null && redisProperties.getThreadNum() > 0) {
@@ -72,7 +67,10 @@ public class RedisSinkFunction extends RichSinkFunction<Tuple2<Boolean, Row>> {
         if (this.queue != null) {
             initThreadPool();
         }
-        if (this.redisInvoker == null) {
+        try {
+            Class clazz = Class.forName(code);
+            this.redisInvoker = (RedisInvoker)clazz.newInstance();
+        } catch (Exception e) {
             this.redisInvoker = GroovyCompiler.create(this.code, RandomUtils.uuid());
         }
         super.open(parameters);

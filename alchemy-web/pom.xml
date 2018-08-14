@@ -72,6 +72,7 @@
         <assertj-version>3.9.1</assertj-version>
         <jsp.version>2.0</jsp.version>
         <httpmime.version>4.2</httpmime.version>
+        <maven-classloader.version>1.0.6</maven-classloader.version>
         <!-- Plugin versions -->
         <maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
         <maven-compiler-plugin.version>3.7.0</maven-compiler-plugin.version>
@@ -503,6 +504,12 @@
             <artifactId>validation-api</artifactId>
             <version>${validation-api.version}</version>
         </dependency>
+        <!--maven仓库下载数据-->
+        <dependency>
+            <groupId>com.dfire</groupId>
+            <artifactId>maven-classloader</artifactId>
+            <version>${maven-classloader.version}</version>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -518,6 +525,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -678,27 +692,6 @@
                     <optional>true</optional>
                 </dependency>
             </dependencies>
-            <build>
-                <!--<plugins>-->
-                    <!--<plugin>-->
-                        <!--<groupId>org.apache.maven.plugins</groupId>-->
-                        <!--<artifactId>maven-war-plugin</artifactId>-->
-                        <!--<version>${maven-war-plugin.version}</version>-->
-                        <!--<configuration>-->
-                            <!--<failOnMissingWebXml>false</failOnMissingWebXml>-->
-                            <!--<warSourceDirectory>target/www/</warSourceDirectory>-->
-                            <!--<webResources>-->
-                                <!--<resource>-->
-                                    <!--<directory>src/main/webapp</directory>-->
-                                    <!--<includes>-->
-                                        <!--<include>WEB-INF/**</include>-->
-                                    <!--</includes>-->
-                                <!--</resource>-->
-                            <!--</webResources>-->
-                        <!--</configuration>-->
-                    <!--</plugin>-->
-                <!--</plugins>-->
-            </build>
             <properties>
                 <!-- default Spring profiles -->
                 <profile.no-liquibase>,no-liquibase</profile.no-liquibase>
@@ -713,238 +706,11 @@
                     <artifactId>spring-boot-starter-undertow</artifactId>
                 </dependency>
             </dependencies>
-            <!--<build>-->
-                <!--<plugins>-->
-                    <!--<plugin>-->
-                        <!--<artifactId>maven-clean-plugin</artifactId>-->
-                        <!--<version>${maven-clean-plugin.version}</version>-->
-                        <!--<configuration>-->
-                            <!--<filesets>-->
-                                <!--<fileset>-->
-                                    <!--<directory>target/www/</directory>-->
-                                <!--</fileset>-->
-                            <!--</filesets>-->
-                        <!--</configuration>-->
-                    <!--</plugin>-->
-                    <!--<plugin>-->
-                        <!--<groupId>org.apache.maven.plugins</groupId>-->
-                        <!--<artifactId>maven-war-plugin</artifactId>-->
-                        <!--<version>${maven-war-plugin.version}</version>-->
-                        <!--<configuration>-->
-                            <!--<failOnMissingWebXml>false</failOnMissingWebXml>-->
-                            <!--<warSourceDirectory>target/www/</warSourceDirectory>-->
-                            <!--<webResources>-->
-                                <!--<resource>-->
-                                    <!--<directory>src/main/webapp</directory>-->
-                                    <!--<includes>-->
-                                        <!--<include>WEB-INF/**</include>-->
-                                    <!--</includes>-->
-                                <!--</resource>-->
-                            <!--</webResources>-->
-                        <!--</configuration>-->
-                    <!--</plugin>-->
-                    <!--<plugin>-->
-                        <!--<groupId>org.springframework.boot</groupId>-->
-                        <!--<artifactId>spring-boot-maven-plugin</artifactId>-->
-                        <!--<version>${spring-boot.version}</version>-->
-                        <!--<configuration>-->
-                            <!--<mainClass>${start-class}</mainClass>-->
-                            <!--<executable>true</executable>-->
-                        <!--</configuration>-->
-                        <!--<executions>-->
-                            <!--<execution>-->
-                                <!--<goals>-->
-                                    <!--<goal>build-info</goal>-->
-                                <!--</goals>-->
-                            <!--</execution>-->
-                        <!--</executions>-->
-                    <!--</plugin>-->
-                    <!--<plugin>-->
-                        <!--<groupId>com.github.eirslett</groupId>-->
-                        <!--<artifactId>frontend-maven-plugin</artifactId>-->
-                        <!--<version>${frontend-maven-plugin.version}</version>-->
-                        <!--<executions>-->
-                            <!--<execution>-->
-                                <!--<id>install node and npm</id>-->
-                                <!--<goals>-->
-                                    <!--<goal>install-node-and-npm</goal>-->
-                                <!--</goals>-->
-                                <!--<configuration>-->
-                                    <!--<nodeVersion>${node.version}</nodeVersion>-->
-                                    <!--<npmVersion>${npm.version}</npmVersion>-->
-                                <!--</configuration>-->
-                            <!--</execution>-->
-                            <!--<execution>-->
-                                <!--<id>npm install</id>-->
-                                <!--<goals>-->
-                                    <!--<goal>npm</goal>-->
-                                <!--</goals>-->
-                                <!--<configuration>-->
-                                    <!--<arguments>install</arguments>-->
-                                <!--</configuration>-->
-                            <!--</execution>-->
-                            <!--<execution>-->
-                                <!--<id>webpack build test</id>-->
-                                <!--<goals>-->
-                                    <!--<goal>npm</goal>-->
-                                <!--</goals>-->
-                                <!--<phase>test</phase>-->
-                                <!--<configuration>-->
-                                    <!--<arguments>run webpack:test</arguments>-->
-                                    <!--<npmInheritsProxyConfigFromMaven>false</npmInheritsProxyConfigFromMaven>-->
-                                <!--</configuration>-->
-                            <!--</execution>-->
-                            <!--<execution>-->
-                                <!--<id>webpack build prod</id>-->
-                                <!--<goals>-->
-                                    <!--<goal>npm</goal>-->
-                                <!--</goals>-->
-                                <!--<phase>generate-resources</phase>-->
-                                <!--<configuration>-->
-                                    <!--<arguments>run webpack:prod</arguments>-->
-                                    <!--<npmInheritsProxyConfigFromMaven>false</npmInheritsProxyConfigFromMaven>-->
-                                <!--</configuration>-->
-                            <!--</execution>-->
-                        <!--</executions>-->
-                    <!--</plugin>-->
-                    <!--<plugin>-->
-                        <!--<groupId>pl.project13.maven</groupId>-->
-                        <!--<artifactId>git-commit-id-plugin</artifactId>-->
-                        <!--<version>2.2.4</version>-->
-                        <!--<executions>-->
-                            <!--<execution>-->
-                                <!--<goals>-->
-                                    <!--<goal>revision</goal>-->
-                                <!--</goals>-->
-                            <!--</execution>-->
-                        <!--</executions>-->
-                        <!--<configuration>-->
-                            <!--<failOnNoGitDirectory>false</failOnNoGitDirectory>-->
-                            <!--<generateGitPropertiesFile>true</generateGitPropertiesFile>-->
-                            <!--<includeOnlyProperties>-->
-                                <!--<includeOnlyProperty>^git.commit.id.abbrev$</includeOnlyProperty>-->
-                                <!--<includeOnlyProperty>^git.commit.id.describe$</includeOnlyProperty>-->
-                                <!--<includeOnlyProperty>^git.branch$</includeOnlyProperty>-->
-                            <!--</includeOnlyProperties>-->
-                        <!--</configuration>-->
-                    <!--</plugin>-->
-                <!--</plugins>-->
-            <!--</build>-->
             <properties>
                 <!-- default Spring profiles -->
                 <profile.no-liquibase>,no-liquibase</profile.no-liquibase>
                 <spring.profiles.active>prod${profile.swagger}${profile.no-liquibase}</spring.profiles.active>
             </properties>
-        </profile>
-        <profile>
-            <!--
-                Profile for doing "continuous compilation" with the Scala Maven plugin.
-                It allows automatic compilation of Java classes as soon as they are saved.
-                To use it, run in 3 terminals:
-                - './mvnw -Pcc scala:cc' for continuous compilation of your classes
-                - './mvnw -Pcc -Pdev' for hot reload of Spring boot
-                - 'npm start/yarn start' for hot reload of the HTML/JavaScript asset
-                Everything should hot reload automatically!
-            -->
-            <id>cc</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-undertow</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-devtools</artifactId>
-                    <optional>true</optional>
-                </dependency>
-            </dependencies>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-war-plugin</artifactId>
-                        <version>${maven-war-plugin.version}</version>
-                        <configuration>
-                            <failOnMissingWebXml>false</failOnMissingWebXml>
-                            <warSourceDirectory>src/main/webapp/</warSourceDirectory>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-maven-plugin</artifactId>
-                        <version>${spring-boot.version}</version>
-                        <configuration>
-                            <mainClass>${start-class}</mainClass>
-                            <executable>true</executable>
-                            <fork>true</fork>
-                            <addResources>true</addResources>
-                            <!--
-                            Enable the line below to have remote debugging of your application on port 5005
-                            <jvmArguments>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005</jvmArguments>
-                            -->
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <version>${maven-compiler-plugin.version}</version>
-                        <executions>
-                            <execution>
-                                <id>default-compile</id>
-                                <phase>none</phase>
-                            </execution>
-                            <execution>
-                                <id>default-testCompile</id>
-                                <phase>none</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>net.alchim31.maven</groupId>
-                        <artifactId>scala-maven-plugin</artifactId>
-                        <version>${scala-maven-plugin.version}</version>
-                        <executions>
-                            <execution>
-                                <id>compile</id>
-                                <phase>compile</phase>
-                                <goals>
-                                    <goal>add-source</goal>
-                                    <goal>compile</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>test-compile</id>
-                                <phase>test-compile</phase>
-                                <goals>
-                                    <goal>add-source</goal>
-                                    <goal>testCompile</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <recompileMode>incremental</recompileMode>
-                            <verbose>true</verbose>
-                            <scalaVersion>${scala.version}</scalaVersion>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-            <properties>
-                <!-- default Spring profiles -->
-                <spring.profiles.active>dev,swagger</spring.profiles.active>
-            </properties>
-        </profile>
-        <profile>
-            <!--
-                Profile for monitoring the application with Graphite.
-            -->
-            <id>graphite</id>
-            <dependencies>
-                <dependency>
-                    <groupId>io.dropwizard.metrics</groupId>
-                    <artifactId>metrics-graphite</artifactId>
-                </dependency>
-            </dependencies>
         </profile>
         <profile>
             <!--
@@ -963,38 +729,6 @@
                 <dependency>
                     <groupId>io.prometheus</groupId>
                     <artifactId>simpleclient_dropwizard</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <!--
-                Profile for tracing requests with Zipkin.
-            -->
-            <id>zipkin</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.springframework.cloud</groupId>
-                    <artifactId>spring-cloud-starter-zipkin</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <!--
-                Profile for applying IDE-specific configuration.
-                At the moment it configures MapStruct and Hibernate JPA Metamodel Generator, which you need when working
-                with DTOs and entity filtering.
-            -->
-            <id>IDE</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.mapstruct</groupId>
-                    <artifactId>mapstruct-processor</artifactId>
-                    <version>${mapstruct.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-jpamodelgen</artifactId>
-                    <version>${hibernate.version}</version>
                 </dependency>
             </dependencies>
         </profile>

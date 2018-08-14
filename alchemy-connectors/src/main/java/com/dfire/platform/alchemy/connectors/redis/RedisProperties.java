@@ -10,7 +10,7 @@ import redis.clients.jedis.JedisPoolConfig;
  */
 public class RedisProperties implements Serializable {
 
-    private static final long serialVersionUID = 5445955335510762057L;
+    private static final long serialVersionUID = 1L;
 
     private Codis codis;
 

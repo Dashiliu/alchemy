@@ -13,7 +13,6 @@ import com.dfire.platform.alchemy.api.function.table.FlinkAllTableFunction;
 import com.dfire.platform.alchemy.api.util.GroovyCompiler;
 import com.dfire.platform.alchemy.web.common.ClusterType;
 import com.dfire.platform.alchemy.web.common.Constants;
-import com.dfire.platform.alchemy.web.common.ReadMode;
 
 /**
  * 描述用户自定义函数
@@ -23,22 +22,12 @@ import com.dfire.platform.alchemy.web.common.ReadMode;
  */
 public class UdfDescriptor implements CoreDescriptor {
 
-    private int readMode = ReadMode.CODE.getMode();
-
     private String name;
 
     /**
      * 如果是code读取方式，value就是代码内容 ；如果是jar包方式，则是className
      */
     private String value;
-
-    public int getReadMode() {
-        return readMode;
-    }
-
-    public void setReadMode(int readMode) {
-        this.readMode = readMode;
-    }
 
     @Override
     public String getName() {
@@ -71,56 +60,36 @@ public class UdfDescriptor implements CoreDescriptor {
     }
 
     private <T> T transformFlink() {
-        if (ReadMode.JAR.getMode() == this.readMode) {
-            try {
-                Class clazz = Class.forName(this.value);
-                Object udf = clazz.newInstance();
-                if (udf instanceof StreamScalarFunction) {
-                    StreamScalarFunction<?> streamScalarFunction = (StreamScalarFunction<?>)udf;
-                    FlinkAllScalarFunction scalarFunction = new FlinkAllScalarFunction(streamScalarFunction);
-                    initScalarFuntion(streamScalarFunction, scalarFunction);
-                    return (T)scalarFunction;
-                } else if (udf instanceof StreamTableFunction<?>) {
-                    StreamTableFunction<?> streamTableFunction = (StreamTableFunction)udf;
-                    FlinkAllTableFunction tableFunction = new FlinkAllTableFunction(streamTableFunction);
-                    initTableFunction(streamTableFunction, tableFunction);
-                    return (T)tableFunction;
-                } else if (udf instanceof StreamAggregateFunction<?, ?, ?>) {
-                    StreamAggregateFunction<?, ?, ?> streamAggregateFunction = (StreamAggregateFunction)udf;
-                    FlinkAllAggregateFunction aggregateFunction
-                        = new FlinkAllAggregateFunction((StreamAggregateFunction)udf);
-                    initAggregateFuntion(streamAggregateFunction, aggregateFunction);
-                    return (T)aggregateFunction;
-                }
-            } catch (Exception ex) {
-                throw new IllegalArgumentException("Invalid UDF " + this.name, ex);
-            }
-        } else if (ReadMode.CODE.getMode() == this.readMode) {
-            try {
-                Class<StreamScalarFunction> clazz = GroovyCompiler.compile(this.value, this.name);
-                Object udf = clazz.newInstance();
-                if (udf instanceof StreamScalarFunction) {
-                    StreamScalarFunction streamScalarFunction = (StreamScalarFunction)udf;
-                    FlinkAllScalarFunction scalarFunction = new FlinkAllScalarFunction(this.value, this.name);
-                    initScalarFuntion(streamScalarFunction, scalarFunction);
-                    return (T)scalarFunction;
-                } else if (udf instanceof StreamTableFunction<?>) {
-                    StreamTableFunction<?> streamTableFunction = (StreamTableFunction)udf;
-                    FlinkAllTableFunction tableFunction = new FlinkAllTableFunction(this.value, this.name);
-                    initTableFunction(streamTableFunction, tableFunction);
-                    return (T)tableFunction;
-                } else if (udf instanceof StreamAggregateFunction<?, ?, ?>) {
-                    StreamAggregateFunction<?, ?, ?> streamAggregateFunction = (StreamAggregateFunction)udf;
-                    FlinkAllAggregateFunction aggregateFunction = new FlinkAllAggregateFunction(this.value, this.name);
-                    initAggregateFuntion(streamAggregateFunction, aggregateFunction);
-                    return (T)aggregateFunction;
-                }
-            } catch (Exception e) {
-                throw new IllegalArgumentException("Invalid UDF " + this.name, e);
-            }
-
+        Class clazz = null;
+        try {
+            clazz = Class.forName(this.value);
+        } catch (ClassNotFoundException e) {
+            clazz = GroovyCompiler.compile(this.value, this.name);
         }
-        throw new IllegalArgumentException("Invalid UDF readMode" + this.readMode);
+        try {
+
+            Object udf = clazz.newInstance();
+            if (udf instanceof StreamScalarFunction) {
+                StreamScalarFunction<?> streamScalarFunction = (StreamScalarFunction<?>)udf;
+                FlinkAllScalarFunction scalarFunction = new FlinkAllScalarFunction(streamScalarFunction);
+                initScalarFuntion(streamScalarFunction, scalarFunction);
+                return (T)scalarFunction;
+            } else if (udf instanceof StreamTableFunction<?>) {
+                StreamTableFunction<?> streamTableFunction = (StreamTableFunction)udf;
+                FlinkAllTableFunction tableFunction = new FlinkAllTableFunction(streamTableFunction);
+                initTableFunction(streamTableFunction, tableFunction);
+                return (T)tableFunction;
+            } else if (udf instanceof StreamAggregateFunction<?, ?, ?>) {
+                StreamAggregateFunction<?, ?, ?> streamAggregateFunction = (StreamAggregateFunction)udf;
+                FlinkAllAggregateFunction aggregateFunction
+                    = new FlinkAllAggregateFunction((StreamAggregateFunction)udf);
+                initAggregateFuntion(streamAggregateFunction, aggregateFunction);
+                return (T)aggregateFunction;
+            }
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("Invalid UDF " + this.name, ex);
+        }
+        throw new IllegalArgumentException("Invalid UDF " + this.name);
     }
 
     private void initScalarFuntion(StreamScalarFunction<?> streamScalarFunction,

@@ -1,10 +1,14 @@
 package com.dfire.platform.alchemy.connectors.tsdb;
 
+import java.io.Serializable;
+
 /**
  * @author congbai
  * @date 2018/7/12
  */
-public class OpentsdbProperties {
+public class OpentsdbProperties implements Serializable{
+
+    private static final long serialVersionUID = 1L;
 
     private String opentsdbUrl;
 

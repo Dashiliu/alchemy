@@ -24,36 +24,35 @@ import com.dfire.platform.alchemy.connectors.tsdb.handler.TsdbHandler;
  */
 public class OpentsdbSinkFunction extends RichSinkFunction<Row> {
 
+    private static final long serialVersionUID = 1L;
+
     private static final Logger LOG = LoggerFactory.getLogger(OpentsdbSinkFunction.class);
 
     private final OpentsdbProperties opentsdbProperties;
 
     private final String code;
 
-    private OpentsdbInvoker invoker;
+    private transient OpentsdbInvoker invoker;
 
     private transient TsdbHandler tsdbHandler;
 
     public OpentsdbSinkFunction(OpentsdbProperties opentsdbProperties, String code) {
         this.opentsdbProperties = opentsdbProperties;
         this.code = code;
-        this.invoker = null;
-    }
-
-    public OpentsdbSinkFunction(OpentsdbProperties opentsdbProperties, OpentsdbInvoker invoker) {
-        this.opentsdbProperties = opentsdbProperties;
-        this.code = null;
-        this.invoker = invoker;
     }
 
     @Override
     public void open(Configuration parameters) throws Exception {
-        if (StringUtils.isEmpty(this.opentsdbProperties.getEnv()) || "".equals(this.opentsdbProperties.getEnv())) {
+        if (StringUtils.isEmpty(this.opentsdbProperties.getEnv())
+            || "publish".equals(this.opentsdbProperties.getEnv())) {
             this.tsdbHandler = new HitsdbHandler(this.opentsdbProperties);
         } else {
             this.tsdbHandler = new OpentsdbHandler(this.opentsdbProperties);
         }
-        if (this.invoker == null) {
+        try {
+            Class clazz = Class.forName(code);
+            this.invoker = (OpentsdbInvoker)clazz.newInstance();
+        } catch (Exception e) {
             this.invoker = GroovyCompiler.create(this.code, RandomUtils.uuid());
         }
         super.open(parameters);

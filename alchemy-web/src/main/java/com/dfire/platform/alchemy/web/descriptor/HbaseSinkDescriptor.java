@@ -18,8 +18,6 @@ public class HbaseSinkDescriptor extends SinkDescriptor {
 
     private String name;
 
-    private int readMode = ReadMode.CODE.getMode();
-
     private String zookeeper;
 
     private String node;
@@ -91,14 +89,6 @@ public class HbaseSinkDescriptor extends SinkDescriptor {
         this.skipWal = skipWal;
     }
 
-    public int getReadMode() {
-        return readMode;
-    }
-
-    public void setReadMode(int readMode) {
-        this.readMode = readMode;
-    }
-
     public String getValue() {
         return value;
     }
@@ -118,12 +108,7 @@ public class HbaseSinkDescriptor extends SinkDescriptor {
     private <T> T transformFlink() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         HbaseProperties hbaseProperties = new HbaseProperties();
         BeanUtils.copyProperties(this, hbaseProperties);
-        if (ReadMode.CODE.getMode() == this.readMode) {
-            return (T)new HbaseTableSink(hbaseProperties, this.value);
-        } else {
-            HbaseInvoker hbaseInvoker = (HbaseInvoker)Class.forName(this.value).newInstance();
-            return (T)new HbaseTableSink(hbaseProperties, hbaseInvoker);
-        }
+        return (T)new HbaseTableSink(hbaseProperties, this.value);
     }
 
     @Override

@@ -9,8 +9,6 @@ import org.apache.flink.table.sinks.TableSink;
 import org.apache.flink.types.Row;
 import org.apache.flink.util.Preconditions;
 
-import com.dfire.platform.alchemy.api.sink.OpentsdbInvoker;
-
 /**
  * @author congbai
  * @date 2018/7/10
@@ -21,8 +19,6 @@ public class OpentsdbTableSink implements AppendStreamTableSink<Row> {
 
     private final String code;
 
-    private OpentsdbInvoker invoker;
-
     private String[] fieldNames;
 
     private TypeInformation[] fieldTypes;
@@ -30,12 +26,6 @@ public class OpentsdbTableSink implements AppendStreamTableSink<Row> {
     public OpentsdbTableSink(OpentsdbProperties opentsdbProperties, String code) {
         this.opentsdbProperties = Preconditions.checkNotNull(opentsdbProperties, "opentsdbProperties");;
         this.code = code;
-    }
-
-    public OpentsdbTableSink(OpentsdbProperties opentsdbProperties, OpentsdbInvoker invoker) {
-        this.opentsdbProperties = Preconditions.checkNotNull(opentsdbProperties, "opentsdbProperties");;
-        this.code = null;
-        this.invoker = invoker;
     }
 
     @Override
@@ -55,12 +45,7 @@ public class OpentsdbTableSink implements AppendStreamTableSink<Row> {
 
     @Override
     public TableSink<Row> configure(String[] fieldNames, TypeInformation<?>[] fieldTypes) {
-        OpentsdbTableSink copy;
-        if (invoker == null) {
-            copy = new OpentsdbTableSink(this.opentsdbProperties, this.code);
-        } else {
-            copy = new OpentsdbTableSink(this.opentsdbProperties, this.invoker);
-        }
+        OpentsdbTableSink copy = new OpentsdbTableSink(this.opentsdbProperties, this.code);
         copy.fieldNames = Preconditions.checkNotNull(fieldNames, "fieldNames");
         copy.fieldTypes = Preconditions.checkNotNull(fieldTypes, "fieldTypes");
         Preconditions.checkArgument(fieldNames.length == fieldTypes.length,
@@ -75,11 +60,6 @@ public class OpentsdbTableSink implements AppendStreamTableSink<Row> {
     }
 
     private RichSinkFunction createTsdbRich() {
-        if (invoker == null) {
-            return new OpentsdbSinkFunction(this.opentsdbProperties, this.code);
-        } else {
-            return new OpentsdbSinkFunction(this.opentsdbProperties, this.invoker);
-        }
-
+        return new OpentsdbSinkFunction(this.opentsdbProperties, this.code);
     }
 }

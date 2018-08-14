@@ -110,4 +110,8 @@ public final class Constants {
     public static final int PAGE_SIZE = 100;
 
     public static final String DEFAULT_FLINK_CLUSTER = "flink_default";
+
+    public static final String RELEASE_REPOSITORY_URL="http://nexus.2dfire-dev.com/content/groups/public";
+
+    public static final String SNAP_REPOSITORY_URL ="http://nexus.2dfire-dev.com/content/groups/public-snapshots";
 }

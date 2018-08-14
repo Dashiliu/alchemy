@@ -13,9 +13,7 @@ import { Jar } from '../model/jar.model';
     templateUrl: 'conf.component.html'
 })
 export class ConfComponent {
-    selected: boolean = false;
-
-    jarInfo: Jar;
+    jarInfo: Jar = new Jar();
 
     conf: Conf;
 
@@ -40,20 +38,17 @@ export class ConfComponent {
                 this.conf.content.config = '';
             } else {
                 if (this.conf.type == 0) {
-                    this.jarInfo = JSON.parse(this.conf.content.config);
+                    if (this.conf.content.config && this.conf.content.config.length > 0) {
+                        this.jarInfo = JSON.parse(this.conf.content.config);
+                    } else {
+                        this.jarInfo = new Jar();
+                    }
                 }
             }
         });
     }
 
     ngOnInit() {}
-
-    upload(event) {
-        if (event.xhr.status == 200) {
-            this.jarInfo = new Jar();
-            this.jarInfo = JSON.parse(event.xhr.response);
-        }
-    }
 
     submit() {
         this.conf.content.config = JSON.stringify(this.jarInfo);

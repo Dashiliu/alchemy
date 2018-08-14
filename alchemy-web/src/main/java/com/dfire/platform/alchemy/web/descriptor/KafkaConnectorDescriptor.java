@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.streaming.connectors.kafka.Kafka010JsonTableSource;
 import org.apache.flink.streaming.connectors.kafka.internals.KafkaTopicPartition;
@@ -68,7 +69,7 @@ public class KafkaConnectorDescriptor implements ConnectorDescriptor {
     public void validate() throws Exception {
         Assert.notNull(topic, "kafka的topic不能为空");
         Assert.notNull(properties, "kafka的properties不能为空");
-        Assert.notNull(properties.get(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG),
+        Assert.notNull(PropertiesUtils.fromYamlMap(this.properties).get(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG),
             "kafak的" + ProducerConfig.BOOTSTRAP_SERVERS_CONFIG + "不能为空");
 
     }
@@ -90,33 +91,34 @@ public class KafkaConnectorDescriptor implements ConnectorDescriptor {
         Kafka010JsonTableSource.Builder builder = new Kafka010JsonTableSource.Builder();
         builder.forTopic(this.topic);
         createSchema(schema, builder);
-        switch (this.startupMode) {
-            case KafkaValidator.CONNECTOR_STARTUP_MODE_VALUE_EARLIEST:
-                builder.fromEarliest();
-                break;
-
-            case KafkaValidator.CONNECTOR_STARTUP_MODE_VALUE_LATEST:
-                builder.fromLatest();
-                break;
-
-            case KafkaValidator.CONNECTOR_STARTUP_MODE_VALUE_GROUP_OFFSETS:
-                builder.fromGroupOffsets();
-                break;
-
-            case KafkaValidator.CONNECTOR_STARTUP_MODE_VALUE_SPECIFIC_OFFSETS:
-                final Map<KafkaTopicPartition, Long> offsetMap = new HashMap<>();
-                for (Map.Entry<String, String> entry : this.specificOffsets.entrySet()) {
-                    final KafkaTopicPartition topicPartition
-                        = new KafkaTopicPartition(topic, Integer.parseInt(entry.getKey()));
-                    offsetMap.put(topicPartition, Long.parseLong(entry.getValue()));
-                }
-                builder.fromSpecificOffsets(offsetMap);
-                break;
-            default:
-
-        }
         builder.withKafkaProperties(PropertiesUtils.fromYamlMap(this.properties));
+        if(StringUtils.isNotEmpty(this.startupMode)){
+            switch (this.startupMode) {
+                case KafkaValidator.CONNECTOR_STARTUP_MODE_VALUE_EARLIEST:
+                    builder.fromEarliest();
+                    break;
 
+                case KafkaValidator.CONNECTOR_STARTUP_MODE_VALUE_LATEST:
+                    builder.fromLatest();
+                    break;
+
+                case KafkaValidator.CONNECTOR_STARTUP_MODE_VALUE_GROUP_OFFSETS:
+                    builder.fromGroupOffsets();
+                    break;
+
+                case KafkaValidator.CONNECTOR_STARTUP_MODE_VALUE_SPECIFIC_OFFSETS:
+                    final Map<KafkaTopicPartition, Long> offsetMap = new HashMap<>();
+                    for (Map.Entry<String, String> entry : this.specificOffsets.entrySet()) {
+                        final KafkaTopicPartition topicPartition
+                            = new KafkaTopicPartition(topic, Integer.parseInt(entry.getKey()));
+                        offsetMap.put(topicPartition, Long.parseLong(entry.getValue()));
+                    }
+                    builder.fromSpecificOffsets(offsetMap);
+                    break;
+                default:
+
+            }
+        }
         return (T)builder.build();
     }
 
@@ -145,15 +147,17 @@ public class KafkaConnectorDescriptor implements ConnectorDescriptor {
                 TimestampExtractor timestampExtractor
                     = Timestamps.Type.FIELD.getType().equals(timeAttribute.getTimestamps().getType())
                         ? new ExistingField(timeAttribute.getTimestamps().getFrom()) : new StreamRecordTimestamp();
-                WatermarkStrategy watermarkStrategy = null;
-                if (Watermarks.Type.PERIODIC_ASCENDING.getType().equals(timeAttribute.getWatermarks().getType())) {
-                    watermarkStrategy = new AscendingTimestamps();
-                } else if (Watermarks.Type.PERIODIC_BOUNDED.getType().equals(timeAttribute.getWatermarks().getType())) {
-                    watermarkStrategy = new BoundedOutOfOrderTimestamps(timeAttribute.getWatermarks().getDelay());
-                } else if (Watermarks.Type.FROM_SOURCE.getType().equals(timeAttribute.getWatermarks().getType())) {
-                    watermarkStrategy = PreserveWatermarks.INSTANCE();
+                if(timeAttribute.getWatermarks()!=null){
+                    WatermarkStrategy watermarkStrategy = null;
+                    if (Watermarks.Type.PERIODIC_ASCENDING.getType().equals(timeAttribute.getWatermarks().getType())) {
+                        watermarkStrategy = new AscendingTimestamps();
+                    } else if (Watermarks.Type.PERIODIC_BOUNDED.getType().equals(timeAttribute.getWatermarks().getType())) {
+                        watermarkStrategy = new BoundedOutOfOrderTimestamps(timeAttribute.getWatermarks().getDelay());
+                    } else if (Watermarks.Type.FROM_SOURCE.getType().equals(timeAttribute.getWatermarks().getType())) {
+                        watermarkStrategy = PreserveWatermarks.INSTANCE();
+                    }
+                    builder.withRowtimeAttribute(schema.get(i).getName(), timestampExtractor, watermarkStrategy);
                 }
-                builder.withRowtimeAttribute(schema.get(i).getName(), timestampExtractor, watermarkStrategy);
             }
         }
         builder.withSchema(new TableSchema(columnNames, columnTypes));

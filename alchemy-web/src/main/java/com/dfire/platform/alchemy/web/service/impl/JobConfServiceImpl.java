@@ -2,6 +2,7 @@ package com.dfire.platform.alchemy.web.service.impl;
 
 import java.util.*;
 
+import com.dfire.platform.alchemy.web.cluster.request.JarSubmitFlinkRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -12,9 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import com.dfire.platform.alchemy.web.bind.BindPropertiesFactory;
+import com.dfire.platform.alchemy.web.cluster.request.SqlSubmitFlinkRequest;
 import com.dfire.platform.alchemy.web.common.*;
 import com.dfire.platform.alchemy.web.config.Flame;
-import com.dfire.platform.alchemy.web.descriptor.TableDescriptor;
 import com.dfire.platform.alchemy.web.domain.AcJob;
 import com.dfire.platform.alchemy.web.domain.AcJobConf;
 import com.dfire.platform.alchemy.web.repository.AcJobConfRepository;
@@ -80,9 +81,9 @@ public class JobConfServiceImpl implements JobConfService {
         Content content = jobConfVM.getContent();
         if (ConfType.CONFIG.getType() == jobConfVM.getType()) {
             try {
-                TableDescriptor tableDescriptor = new TableDescriptor();
-                BindPropertiesFactory.bindProperties(tableDescriptor, Constants.BIND_PREFIX, content.getConfig());
-                tableDescriptor.validate();
+                SqlSubmitFlinkRequest sqlSubmitFlinkRequest = new SqlSubmitFlinkRequest();
+                BindPropertiesFactory.bindProperties(sqlSubmitFlinkRequest, Constants.BIND_PREFIX, content.getConfig());
+                sqlSubmitFlinkRequest.validate();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

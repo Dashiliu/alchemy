@@ -9,7 +9,7 @@ import com.dfire.platform.alchemy.api.common.TsdbData;
  * @author congbai
  * @date 2018/8/8
  */
-public interface TsdbHandler extends Serializable {
+public interface TsdbHandler{
 
     void execute(TsdbData tsdbData);
 
