@@ -117,19 +117,19 @@
         <start-class>com.dfire.platform.alchemy.web.AlchemyApp</start-class>
     </properties>
 
-    <distributionManagement>
-        <repository>
-            <id>releases</id>
-            <name>zmsoft release distribution respository</name>
-            <url>http://nexus-ci.cloudapps.2dfire.com/repository/dfire-maven-all/</url>
-        </repository>
-        <snapshotRepository>
-            <id>snapshots</id>
-            <name>zmsoft snapshots distribution respository</name>
-            <url>http://nexus-ci.cloudapps.2dfire.com/repository/dfire-maven-all/</url>
-            <uniqueVersion>true</uniqueVersion>
-        </snapshotRepository>
-    </distributionManagement>
+    <!--<distributionManagement>-->
+        <!--<repository>-->
+            <!--<id>releases</id>-->
+            <!--<name>zmsoft release distribution respository</name>-->
+            <!--<url>http://nexus-ci.cloudapps.2dfire.com/repository/dfire-maven-all/</url>-->
+        <!--</repository>-->
+        <!--<snapshotRepository>-->
+            <!--<id>snapshots</id>-->
+            <!--<name>zmsoft snapshots distribution respository</name>-->
+            <!--<url>http://nexus-ci.cloudapps.2dfire.com/repository/dfire-maven-all/</url>-->
+            <!--<uniqueVersion>true</uniqueVersion>-->
+        <!--</snapshotRepository>-->
+    <!--</distributionManagement>-->
 
     <dependencies>
         <dependency>
