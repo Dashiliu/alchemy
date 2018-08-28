@@ -110,7 +110,7 @@ alchemy:
       mode: zookeeper
       clusterId: flink5
       zookeeperQuorum: zk101.2dfire-inc.com:2181,zk102.2dfire-inc.com:2181,zk103.2dfire-inc.com:2181
-      storagePath: hdfs://10.15.0.1:8020/user/alchemy/flink/ha5
+      storagePath: hdfs://hadoop1005.prod.2dfire.info:8020/user/alchemy/flink/ha5
       address: flink-jobmanager-default
       port: 6123
   job:
