@@ -23,7 +23,7 @@ public class ProtostuffRowDeserializationSchema implements DeserializationSchema
 
     private transient final Schema schema;
 
-    public ProtostuffRowDeserializationSchema(Class clazz, TypeInformation<Row> typeInfo) {
+    public ProtostuffRowDeserializationSchema(TypeInformation<Row> typeInfo,Class clazz) {
         this.schema = RuntimeSchema.getSchema(clazz);
         this.typeInfo = typeInfo;
     }

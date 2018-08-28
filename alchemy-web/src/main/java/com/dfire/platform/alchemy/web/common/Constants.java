@@ -34,7 +34,11 @@ public final class Constants {
 
     public static final String TYPE_VALUE_UDF = "udf";
 
-    public static final String TYPE_VALUE_FORMAT = "format";
+    public static final String TYPE_VALUE_FORMAT_JSON = "json";
+
+    public static final String TYPE_VALUE_FORMAT_HESSIAN = "hessian";
+
+    public static final String TYPE_VALUE_FORMAT_PB = "protostuff";
 
     public static final String CONNECTOR_TYPE_VALUE_KAFKA = "kafka";
 

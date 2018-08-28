@@ -1,7 +1,5 @@
 package com.dfire.platform.alchemy.web.descriptor;
 
-import com.dfire.platform.alchemy.web.common.Constants;
-
 /**
  * @author congbai
  * @date 2018/6/30
@@ -11,6 +9,8 @@ public class FormatDescriptor implements Descriptor {
     private Integer propertyVersion;
 
     private String schema;
+
+    private String className;
 
     private String type;
 
@@ -30,9 +30,17 @@ public class FormatDescriptor implements Descriptor {
         this.schema = schema;
     }
 
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
     @Override
     public String getType() {
-        return Constants.TYPE_VALUE_FORMAT;
+        return this.type;
     }
 
     public void setType(String type) {

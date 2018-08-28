@@ -43,8 +43,8 @@ spring:
 
     dubbo:
             application:
-                name: beaconfire
-                owner: yuntun
+                name: alchemy
+                owner: congbai
             registry:
                 address: zookeeper://zk1.2dfire-daily.com:2181?backup=zk2.2dfire-daily.com:2181,zk3.2dfire-daily.com:2181
             protocol:
