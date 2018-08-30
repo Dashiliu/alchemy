@@ -54,6 +54,20 @@
         <snakeyaml.version>1.18</snakeyaml.version>
     </properties>
 
+    <distributionManagement>
+        <repository>
+            <id>releases</id>
+            <name>zmsoft release distribution respository</name>
+            <url>http://nexus.2dfire-dev.com/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>zmsoft snapshots distribution respository</name>
+            <url>http://nexus.2dfire-dev.com/content/repositories/snapshots/</url>
+            <uniqueVersion>true</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
+
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
