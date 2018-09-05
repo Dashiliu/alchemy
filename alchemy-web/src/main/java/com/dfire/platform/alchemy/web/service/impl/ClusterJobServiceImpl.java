@@ -159,6 +159,7 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
         private void submitRequest(Long id) {
             String key = StringUtils.join(Constants.SUBMIT_LOCK_PREFIX, id);
             if (cacheService.setnx(key, Constants.SUBMIT_LOCK_TIME, key) == 0) {
+                LOGGER.warn("hasn't get lock,jobId:{}", id);
                 return;
             }
             try {
