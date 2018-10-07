@@ -1,6 +1,5 @@
 package com.dfire.platform.alchemy.web.descriptor;
 
-
 import org.springframework.util.Assert;
 
 import com.dfire.platform.alchemy.web.common.Constants;

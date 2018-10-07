@@ -3,12 +3,10 @@ package com.dfire.platform.alchemy.web.descriptor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.Assert;
 
-import com.dfire.platform.alchemy.api.sink.HbaseInvoker;
 import com.dfire.platform.alchemy.connectors.hbase.HbaseProperties;
 import com.dfire.platform.alchemy.connectors.hbase.HbaseTableSink;
 import com.dfire.platform.alchemy.web.common.ClusterType;
 import com.dfire.platform.alchemy.web.common.Constants;
-import com.dfire.platform.alchemy.web.common.ReadMode;
 
 /**
  * @author congbai

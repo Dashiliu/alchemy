@@ -3,14 +3,12 @@ package com.dfire.platform.alchemy.web.descriptor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.Assert;
 
-import com.dfire.platform.alchemy.api.sink.RedisInvoker;
 import com.dfire.platform.alchemy.connectors.redis.Codis;
 import com.dfire.platform.alchemy.connectors.redis.RedisProperties;
 import com.dfire.platform.alchemy.connectors.redis.RedisTableSink;
 import com.dfire.platform.alchemy.connectors.redis.Sentinel;
 import com.dfire.platform.alchemy.web.common.ClusterType;
 import com.dfire.platform.alchemy.web.common.Constants;
-import com.dfire.platform.alchemy.web.common.ReadMode;
 
 import redis.clients.jedis.JedisPoolConfig;
 

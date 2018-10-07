@@ -42,6 +42,8 @@ public final class Constants {
 
     public static final String CONNECTOR_TYPE_VALUE_KAFKA = "kafka";
 
+    public static final String CONNECTOR_TYPE_VALUE_ROCKETMQ = "rocketMQ";
+
     public static final String SINK_TYPE_VALUE_REDIS = "redis";
 
     public static final String SINK_TYPE_VALUE_ES = "elasticsearch";
@@ -49,6 +51,8 @@ public final class Constants {
     public static final String SINK_TYPE_VALUE_HBASE = "hbase";
 
     public static final String SINK_TYPE_VALUE_KAFKA = "kafka";
+
+    public static final String SINK_TYPE_VALUE_ROCKETMQ = "rocketMQ";
 
     public static final String SINK_TYPE_VALUE_OPENTSDB = "opentsdb";
 
