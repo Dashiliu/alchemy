@@ -47,6 +47,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void restart(Long id) {
+        updateStatus(id,Status.AUDIT_PASS.getStatus());
         this.submitService.submit(id);
     }
 
