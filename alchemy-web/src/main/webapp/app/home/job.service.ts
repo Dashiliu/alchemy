@@ -35,15 +35,15 @@ export class JobService {
     }
 
     delete(id: string): Observable<HttpResponse<any>> {
-        return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
+        return this.http.get(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 
     cancel(id: string): Observable<HttpResponse<any>> {
-        return this.http.delete(`${this.resourceUrl}/cancel/${id}`, { observe: 'response' });
+        return this.http.get(`${this.resourceUrl}/cancel/${id}`, { observe: 'response' });
     }
 
     restart(id: string): Observable<HttpResponse<any>> {
-        return this.http.delete(`${this.resourceUrl}/restart/${id}`, { observe: 'response' });
+        return this.http.get(`${this.resourceUrl}/restart/${id}`, { observe: 'response' });
     }
 
     pass(jobId: any, cluster: any): Observable<HttpResponse<any>> {

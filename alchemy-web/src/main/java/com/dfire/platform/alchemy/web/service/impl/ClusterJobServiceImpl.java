@@ -96,10 +96,6 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
             LOGGER.warn("job doesn't exist,id:{}", id);
             return;
         }
-        if (Status.AUDIT_PASS.getStatus() != acJob.get().getStatus()) {
-            LOGGER.warn("can't sumbit job:{} ,because job status is {}", id, acJob.get().getStatus());
-            return;
-        }
         ClusterType clusterType = clusterManager.getClusterType(acJob.get().getCluster());
         if (clusterType == null) {
             LOGGER.warn("clusterType is null,id:{},cluster:{}", id, acJob.get().getCluster());

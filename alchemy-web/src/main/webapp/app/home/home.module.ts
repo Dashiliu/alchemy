@@ -26,7 +26,13 @@ import { JobRestartDialogComponent } from './job-restart-dialog.component';
         ConfComponent,
         ConfDeleteComponent
     ],
-    entryComponents: [JobDeleteDialogComponent, JobAuditDialogComponent, JobSubmitDialogComponent],
+    entryComponents: [
+        JobDeleteDialogComponent,
+        JobCancelDialogComponent,
+        JobRestartDialogComponent,
+        JobAuditDialogComponent,
+        JobSubmitDialogComponent
+    ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class AlchemyHomeModule {}
