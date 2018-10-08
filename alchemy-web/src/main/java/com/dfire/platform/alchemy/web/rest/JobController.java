@@ -6,6 +6,9 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.dfire.platform.alchemy.web.cluster.ClusterInfo;
+import com.dfire.platform.alchemy.web.cluster.ClusterProperties;
+import com.dfire.platform.alchemy.web.common.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -36,9 +39,12 @@ public class JobController {
 
     private final JobService jobService;
 
-    public JobController(AcServiceRepository acServiceRepository, JobService jobService) {
+    private final ClusterProperties clusterProperties;
+
+    public JobController(AcServiceRepository acServiceRepository, JobService jobService, ClusterProperties clusterProperties) {
         this.acServiceRepository = acServiceRepository;
         this.jobService = jobService;
+        this.clusterProperties = clusterProperties;
     }
 
     @PostMapping("/jobs")
@@ -66,10 +72,29 @@ public class JobController {
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
 
+    @GetMapping("/jobs/clusters")
+    public ResponseEntity<List<ClusterInfo>> clusters() {
+        return new ResponseEntity<>(clusterProperties.getClusters(), null, HttpStatus.OK);
+    }
+
     @GetMapping("/jobs/{id}")
     public ResponseEntity<JobDTO> getJob(@PathVariable Long id) {
         final JobDTO jobDTO = jobService.findById(id);
         return new ResponseEntity<>(jobDTO, HeaderUtil.createAlert("A job is deleted  ", null), HttpStatus.OK);
+    }
+
+    @GetMapping("/jobs/cancel/{id}")
+    public ResponseEntity<JobDTO> cancel(@PathVariable Long id) throws URISyntaxException {
+        jobService.updateStatus(id, Status.CANCELED.getStatus());
+        return ResponseEntity.created(new URI("/api/jobs/"))
+            .headers(HeaderUtil.createAlert("A job status is cancel ", null)).build();
+    }
+
+    @GetMapping("/jobs/restart/{id}")
+    public ResponseEntity<JobDTO> restart(@PathVariable Long id) throws URISyntaxException {
+        jobService.restart(id);
+        return ResponseEntity.created(new URI("/api/jobs/"))
+            .headers(HeaderUtil.createAlert("A job status is restart ", null)).build();
     }
 
     @DeleteMapping("/jobs/{id}")

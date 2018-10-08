@@ -90,6 +90,25 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
     }
 
     @Override
+    public void cancel(Long id) {
+        Optional<AcJob> acJob = jobRepository.findById(id);
+        if (!acJob.isPresent()) {
+            LOGGER.warn("job doesn't exist,id:{}", id);
+            return;
+        }
+        if (Status.AUDIT_PASS.getStatus() != acJob.get().getStatus()) {
+            LOGGER.warn("can't sumbit job:{} ,because job status is {}", id, acJob.get().getStatus());
+            return;
+        }
+        ClusterType clusterType = clusterManager.getClusterType(acJob.get().getCluster());
+        if (clusterType == null) {
+            LOGGER.warn("clusterType is null,id:{},cluster:{}", id, acJob.get().getCluster());
+            return;
+        }
+        cancelJob(acJob.get(), clusterType);
+    }
+
+    @Override
     public void afterPropertiesSet() throws Exception {
         this.queue = new ArrayBlockingQueue<>(queueSize);
         this.submitService = Executors.newSingleThreadExecutor(
@@ -112,6 +131,19 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
         for (AcJob job : acJobList) {
             this.queue.put(job.getId());
         }
+    }
+
+    private void cancelJob(AcJob acJob, ClusterType clusterType) {
+        List<AcJobHistory> acJobHistorys = jobHistoryRepository.findByAcJobId(acJob.getId(),
+            new PageRequest(0, 1, new Sort(Sort.Direction.DESC, "updateTime")));
+        if (CollectionUtils.isEmpty(acJobHistorys)) {
+            return;
+        }
+        AcJobHistory acJobHistory = acJobHistorys.get(0);
+        if (ClusterType.FLINK.equals(clusterType)) {
+            clusterManager.send(new CancelFlinkRequest(acJobHistory.getClusterJobId(), acJob.getCluster()));
+        }
+        jobHistoryRepository.deleteJobHistory(acJob.getId());
     }
 
     public int getQueueSize() {
@@ -199,18 +231,6 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
             }
         }
 
-        private void cancelJob(AcJob acJob, ClusterType clusterType) {
-            List<AcJobHistory> acJobHistorys = jobHistoryRepository.findByAcJobId(acJob.getId(),
-                new PageRequest(0, 1, new Sort(Sort.Direction.DESC, "updateTime")));
-            if (CollectionUtils.isEmpty(acJobHistorys)) {
-                return;
-            }
-            AcJobHistory acJobHistory = acJobHistorys.get(0);
-            if (ClusterType.FLINK.equals(clusterType)) {
-                clusterManager.send(new CancelFlinkRequest(acJobHistory.getClusterJobId(), acJob.getCluster()));
-            }
-            jobHistoryRepository.deleteJobHistory(acJob.getId());
-        }
 
         private void updateJobStatus(AcJob acJob, int status) {
             acJob.setStatus(status);

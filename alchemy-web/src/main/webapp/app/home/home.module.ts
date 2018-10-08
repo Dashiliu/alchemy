@@ -10,6 +10,8 @@ import { CodemirrorModule } from 'ng2-codemirror';
 import { JobAuditDialogComponent } from './job-audit.component';
 import { JobSubmitDialogComponent } from './job-submit.component';
 import { FileUploadModule } from 'primeng/fileupload';
+import { JobCancelDialogComponent } from './job-cancel-dialog.component';
+import { JobRestartDialogComponent } from './job-restart-dialog.component';
 
 @NgModule({
     imports: [AlchemySharedModule, FileUploadModule, CodemirrorModule, RouterModule.forChild(HOME_ROUTE)],
@@ -17,6 +19,8 @@ import { FileUploadModule } from 'primeng/fileupload';
         HomeComponent,
         JobCreateComponent,
         JobDeleteDialogComponent,
+        JobCancelDialogComponent,
+        JobRestartDialogComponent,
         JobAuditDialogComponent,
         JobSubmitDialogComponent,
         ConfComponent,

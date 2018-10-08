@@ -15,6 +15,11 @@ export class JobService {
         return this.http.post<Job>(this.resourceUrl, job, { observe: 'response' });
     }
 
+    clusters(req?: any): Observable<HttpResponse<Job[]>> {
+        const options = createRequestOption(req);
+        return this.http.get<any[]>(`${this.resourceUrl}/clusters`, { params: options, observe: 'response' });
+    }
+
     query(req?: any): Observable<HttpResponse<Job[]>> {
         const options = createRequestOption(req);
         return this.http.get<Job[]>(this.resourceUrl, { params: options, observe: 'response' });
@@ -33,8 +38,16 @@ export class JobService {
         return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 
-    pass(jobId: any): Observable<HttpResponse<any>> {
-        const options = createRequestOption({ jobId: jobId });
+    cancel(id: string): Observable<HttpResponse<any>> {
+        return this.http.delete(`${this.resourceUrl}/cancel/${id}`, { observe: 'response' });
+    }
+
+    restart(id: string): Observable<HttpResponse<any>> {
+        return this.http.delete(`${this.resourceUrl}/restart/${id}`, { observe: 'response' });
+    }
+
+    pass(jobId: any, cluster: any): Observable<HttpResponse<any>> {
+        const options = createRequestOption({ jobId: jobId, cluster: cluster });
         const requestURL = SERVER_API_URL + 'management/audits/pass';
 
         return this.http.get<any>(requestURL, {

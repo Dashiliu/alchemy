@@ -10,4 +10,6 @@ public interface ClusterJobService {
 
     void submit(Long id);
 
+    void cancel(Long id);
+
 }

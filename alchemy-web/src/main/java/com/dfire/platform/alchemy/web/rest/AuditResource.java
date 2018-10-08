@@ -37,16 +37,14 @@ public class AuditResource {
 
     private final AuditEventService auditEventService;
 
-    private final ClusterJobService submitService;
-
     private final JobService jobService;
 
     private final JobFailService jobFailService;
 
-    public AuditResource(AuditEventService auditEventService, ClusterJobService submitService, JobService jobService,
-        JobFailService jobFailService) {
+    public AuditResource(AuditEventService auditEventService,
+                         JobService jobService,
+                         JobFailService jobFailService) {
         this.auditEventService = auditEventService;
-        this.submitService = submitService;
         this.jobService = jobService;
         this.jobFailService = jobFailService;
     }
@@ -94,9 +92,9 @@ public class AuditResource {
     }
 
     @GetMapping(value = "/pass", params = {"jobId"})
-    public ResponseEntity<Void> pass(@RequestParam(value = "jobId") @NotEmpty Long acJobId) throws URISyntaxException {
-        this.jobService.updateStatus(acJobId, Status.AUDIT_PASS.getStatus());
-        this.submitService.submit(acJobId);
+    public ResponseEntity<Void> pass(@RequestParam(value = "jobId") @NotEmpty Long acJobId,
+                                     @RequestParam(value = "cluster") @NotEmpty String cluster) throws URISyntaxException {
+        this.jobService.updateCluster(acJobId, cluster);
         return ResponseEntity.created(new URI("/management/audits/pass"))
             .headers(HeaderUtil.createAlert("A job is passed ", null)).build();
     }

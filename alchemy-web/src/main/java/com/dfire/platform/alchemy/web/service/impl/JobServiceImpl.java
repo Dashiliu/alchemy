@@ -3,6 +3,7 @@ package com.dfire.platform.alchemy.web.service.impl;
 import java.util.Date;
 import java.util.Optional;
 
+import com.dfire.platform.alchemy.web.service.ClusterJobService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -34,17 +35,35 @@ public class JobServiceImpl implements JobService {
 
     private final AcJobRepository jobRepository;
 
+    private final ClusterJobService submitService;
+
     private final Flame flame;
 
-    public JobServiceImpl(AcJobRepository jobRepository, Flame flame) {
+    public JobServiceImpl(AcJobRepository jobRepository, ClusterJobService submitService, Flame flame) {
         this.jobRepository = jobRepository;
+        this.submitService = submitService;
         this.flame = flame;
+    }
+
+    @Override
+    public void restart(Long id) {
+        this.submitService.submit(id);
     }
 
     @Override
     public void save(JobVM jobVM) {
         AcJob acJob = createJob(jobVM);
         this.jobRepository.save(acJob);
+    }
+
+    @Override
+    public void updateCluster(Long id, String cluster) {
+        Preconditions.checkNotNull(cluster, "cluster can't be null");
+        Optional<AcJob> acJob = this.jobRepository.findById(id);
+        Preconditions.checkNotNull(acJob.get(), "job don't exist");
+        acJob.get().setStatus(Status.AUDIT_PASS.getStatus());
+        acJob.get().setCluster(cluster);
+        this.jobRepository.saveAndFlush(acJob.get());
     }
 
     @Transactional(readOnly = true)
@@ -62,6 +81,16 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void updateStatus(Long id, int status) {
+        Status statusEnum=Status.fromStatus(status);
+        switch (statusEnum){
+            case AUDIT_PASS:
+                this.submitService.submit(id);
+                break;
+            case CANCELED:
+                this.submitService.cancel(id);
+                break;
+            default:
+        }
         Optional<AcJob> acJob = this.jobRepository.findById(id);
         Preconditions.checkNotNull(acJob.get(), "job don't exist");
         acJob.get().setStatus(status);
@@ -70,6 +99,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void delete(Long id) {
+        this.submitService.cancel(id);
         Optional<AcJob> acJob = this.jobRepository.findById(id);
         Preconditions.checkNotNull(acJob.get(), "job don't exist");
         acJob.get().setIsValid(Valid.DEL.getValid());
@@ -77,6 +107,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public JobDTO findById(Long id) {
         Optional<AcJob> acJob = this.jobRepository.findById(id);
         if (acJob.isPresent()) {

@@ -18,4 +18,13 @@ public enum Status {
     public int getStatus() {
         return status;
     }
+
+    public static Status fromStatus(int status) {
+        for (Status b : values()) {
+            if (b != null && b.getStatus() == status) {
+                return b;
+            }
+        }
+        return null;
+    }
 }

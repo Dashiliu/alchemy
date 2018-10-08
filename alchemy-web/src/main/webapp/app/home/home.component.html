@@ -122,6 +122,18 @@
                                 <span class="d-none d-md-inline">审核</span>
                             </button>
                         </div>
+                        <div  *ngIf="job.status>=5">
+                            <button type="submit"
+                                    queryParamsHandling="merge" (click)="restart(job.id)"
+                                    class="btn btn-primary btn-sm">
+                                <span class="d-none d-md-inline">重启</span>
+                            </button>
+                            <button type="submit"
+                                    queryParamsHandling="merge" (click)="cancel(job.id)"
+                                    class="btn btn-primary btn-sm">
+                                <span class="d-none d-md-inline">取消</span>
+                            </button>
+                        </div>
 
                         <button type="button" (click)="deleteJob(job.id)"
                                 class="btn btn-danger btn-sm">

@@ -14,7 +14,11 @@ import com.dfire.platform.alchemy.web.service.dto.JobDTO;
  */
 public interface JobService {
 
+    void restart(Long id);
+
     void save(JobVM jobVM);
+
+    void updateCluster(Long id,String cluster);
 
     Page<JobDTO> list(Pageable pageable);
 

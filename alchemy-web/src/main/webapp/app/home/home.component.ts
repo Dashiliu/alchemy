@@ -10,6 +10,8 @@ import { NgbModalRef, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { JobDeleteDialogComponent } from './job-delete-dialog.component';
 import { JobAuditDialogComponent } from './job-audit.component';
 import { JobSubmitDialogComponent } from './job-submit.component';
+import { JobCancelDialogComponent } from './job-cancel-dialog.component';
+import { JobRestartDialogComponent } from './job-restart-dialog.component';
 
 @Component({
     selector: 'jhi-home',
@@ -154,6 +156,34 @@ export class HomeComponent implements OnInit {
 
     deleteJob(id: String) {
         const modalRef = this.modalService.open(JobDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+        modalRef.componentInstance.id = id;
+        modalRef.result.then(
+            result => {
+                // Left blank intentionally, nothing to do here
+                this.loadAll();
+            },
+            reason => {
+                // Left blank intentionally, nothing to do here
+            }
+        );
+    }
+
+    cancel(id: String) {
+        const modalRef = this.modalService.open(JobCancelDialogComponent, { size: 'lg', backdrop: 'static' });
+        modalRef.componentInstance.id = id;
+        modalRef.result.then(
+            result => {
+                // Left blank intentionally, nothing to do here
+                this.loadAll();
+            },
+            reason => {
+                // Left blank intentionally, nothing to do here
+            }
+        );
+    }
+
+    restart(id: String) {
+        const modalRef = this.modalService.open(JobRestartDialogComponent, { size: 'lg', backdrop: 'static' });
         modalRef.componentInstance.id = id;
         modalRef.result.then(
             result => {
