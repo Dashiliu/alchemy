@@ -36,14 +36,16 @@ public class ClusterManager {
         Map<String, Cluster> nameClusters = new HashMap<>(clusterInfos.size());
         ServiceLoader<Cluster> serviceLoader = ServiceLoader.load(Cluster.class);
         Iterator<Cluster> iterator = serviceLoader.iterator();
+        Map<String,Cluster> clusterTypeClusterMap=new HashMap<>(4);
         while (iterator.hasNext()) {
             Cluster cluster = iterator.next();
-            clusterInfos.forEach(clusterInfo -> {
-                if (cluster.clusterType().getType().equals(clusterInfo.getType())) {
-                    cluster.start(clusterInfo);
-                    nameClusters.put(clusterInfo.getName(), cluster);
-                }
-            });
+           clusterTypeClusterMap.put(cluster.clusterType().getType(),cluster);
+        }
+        for(ClusterInfo clusterInfo:clusterInfos){
+            Cluster cluster=clusterTypeClusterMap.get(clusterInfo.getType());
+            Cluster instance=cluster.newInstance();
+            instance.start(clusterInfo);
+            nameClusters.put(clusterInfo.getName(), instance);
         }
         return nameClusters;
     }

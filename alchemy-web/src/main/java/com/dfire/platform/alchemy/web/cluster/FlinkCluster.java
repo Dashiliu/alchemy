@@ -69,6 +69,11 @@ public class FlinkCluster implements Cluster {
     private ClusterInfo clusterInfo;
 
     @Override
+    public Cluster newInstance() {
+        return new FlinkCluster();
+    }
+
+    @Override
     public ClusterType clusterType() {
         return ClusterType.FLINK;
     }

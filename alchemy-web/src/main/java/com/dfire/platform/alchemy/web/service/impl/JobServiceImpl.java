@@ -65,6 +65,7 @@ public class JobServiceImpl implements JobService {
         acJob.get().setStatus(Status.AUDIT_PASS.getStatus());
         acJob.get().setCluster(cluster);
         this.jobRepository.saveAndFlush(acJob.get());
+        this.submitService.submit(id);
     }
 
     @Transactional(readOnly = true)
