@@ -35,7 +35,7 @@ export class JobService {
     }
 
     delete(id: string): Observable<HttpResponse<any>> {
-        return this.http.get(`${this.resourceUrl}/${id}`, { observe: 'response' });
+        return this.http.delete(`${this.resourceUrl}/${id}`, { observe: 'response' });
     }
 
     cancel(id: string): Observable<HttpResponse<any>> {
