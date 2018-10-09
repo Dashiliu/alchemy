@@ -119,7 +119,7 @@ public final class Constants {
 
     public static final String DEFAULT_FLINK_CLUSTER = "flink_default";
 
-    public static final String RELEASE_REPOSITORY_URL="http://nexus-ci.cloudapps.2dfire.com/repository/maven-public/";
+    public static final String RELEASE_REPOSITORY_URL="http://nexus-ci.cloudapps.2dfire.com/repository/dfire-maven-all/";
 
-    public static final String SNAP_REPOSITORY_URL ="http://nexus-ci.cloudapps.2dfire.com/repository/maven-public/";
+    public static final String SNAP_REPOSITORY_URL ="http://nexus-ci.cloudapps.2dfire.com/repository/dfire-maven-all/";
 }
