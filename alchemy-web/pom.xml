@@ -519,6 +519,12 @@
             <artifactId>validation-api</artifactId>
             <version>${validation-api.version}</version>
         </dependency>
+        <!--maven仓库下载数据-->
+        <dependency>
+            <groupId>com.dfire</groupId>
+            <artifactId>maven-classloader</artifactId>
+            <version>${maven-classloader.version}</version>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

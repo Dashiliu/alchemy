@@ -12,7 +12,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.bigfatgun.MavenLoaderInfo;
 import com.dfire.platform.alchemy.web.util.MavenJarUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
