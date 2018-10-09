@@ -55,7 +55,5 @@ export class JobAuditDialogComponent {
         this.clusters = data;
     }
 
-    private onError(error) {
-        this.alertService.error(error.error, error.message, null);
-    }
+    private onError(error) {}
 }
