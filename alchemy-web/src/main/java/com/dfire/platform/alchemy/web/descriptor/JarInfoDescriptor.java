@@ -14,7 +14,7 @@ public class JarInfoDescriptor implements Descriptor {
 
     private Integer parallelism;
 
-    private String[] programArgs;
+    private String programArgs;
 
     private String entryClass;
 
@@ -34,11 +34,11 @@ public class JarInfoDescriptor implements Descriptor {
         this.parallelism = parallelism;
     }
 
-    public String[] getProgramArgs() {
+    public String getProgramArgs() {
         return programArgs;
     }
 
-    public void setProgramArgs(String[] programArgs) {
+    public void setProgramArgs(String programArgs) {
         this.programArgs = programArgs;
     }
 

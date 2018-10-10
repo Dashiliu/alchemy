@@ -12,6 +12,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.dfire.platform.alchemy.web.util.JarArgUtils;
 import com.dfire.platform.alchemy.web.util.MavenJarUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -152,8 +153,9 @@ public class FlinkCluster implements Cluster {
         LOGGER.trace("start submit jar request,entryClass:{}", message.getJarInfoDescriptor().getEntryClass());
         try {
             File file=MavenJarUtils.forAvg(message.getJarInfoDescriptor().getAvg()).getJarFile();
+            List<String> programArgs=JarArgUtils.tokenizeArguments(message.getJarInfoDescriptor().getProgramArgs());
             PackagedProgram program = new PackagedProgram(file,
-                message.getJarInfoDescriptor().getEntryClass(), message.getJarInfoDescriptor().getProgramArgs());
+                message.getJarInfoDescriptor().getEntryClass(), programArgs.toArray(new String[programArgs.size()]));
             ClassLoader classLoader = null;
             try {
                 classLoader = program.getUserCodeClassLoader();
