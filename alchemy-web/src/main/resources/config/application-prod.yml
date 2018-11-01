@@ -120,8 +120,8 @@ alchemy:
       clusterId: flink5-4-1-default
       avg: com.dfire.platform:alchemy-connectors:0.0.1-SNAPSHOT
       zookeeperQuorum: zk101.2dfire-inc.com:2181,zk102.2dfire-inc.com:2181,zk103.2dfire-inc.com:2181
-      storagePath: hdfs://hadoop1169.prod.2dfire.info:8020/user/alchemy/flink/ha5-4-1-default
-      address: flink-jobmanager-1-5-4-1
+      storagePath: hdfs://hadoop1169.prod.2dfire.info:8020/user/alchemy/flink/ha5-4-1-default-n
+      address: flink-jobmanager-1-5-4-1-n
       port: 6123
     - name: flink_5_4_8
       type: flink
