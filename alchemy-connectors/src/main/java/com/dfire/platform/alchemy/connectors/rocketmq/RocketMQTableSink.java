@@ -33,7 +33,7 @@ public class RocketMQTableSink implements AppendStreamTableSink<Row> {
 
     @Override
     public TypeInformation<Row> getOutputType() {
-        return new TupleTypeInfo(new RowTypeInfo(getFieldTypes()));
+        return new RowTypeInfo(getFieldTypes());
     }
 
     @Override

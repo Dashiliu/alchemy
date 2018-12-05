@@ -95,6 +95,7 @@ public class RocketMQConsumer<OUT> extends RichParallelSourceFunction<OUT>
         pullConsumerScheduleService = new MQPullConsumerScheduleService(props.getConsumerGroup());
         consumer = pullConsumerScheduleService.getDefaultMQPullConsumer();
 
+
         consumer.setInstanceName(String.valueOf(getRuntimeContext().getIndexOfThisSubtask()));
         buildConsumerConfigs(props, consumer);
     }

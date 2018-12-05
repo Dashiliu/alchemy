@@ -12,8 +12,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.dfire.platform.alchemy.web.util.JarArgUtils;
-import com.dfire.platform.alchemy.web.util.MavenJarUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.JobID;
@@ -23,7 +21,10 @@ import org.apache.flink.client.program.ClusterClient;
 import org.apache.flink.client.program.JobWithJars;
 import org.apache.flink.client.program.PackagedProgram;
 import org.apache.flink.client.program.StandaloneClusterClient;
-import org.apache.flink.configuration.*;
+import org.apache.flink.configuration.AkkaOptions;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.configuration.HighAvailabilityOptions;
+import org.apache.flink.configuration.JobManagerOptions;
 import org.apache.flink.optimizer.DataStatistics;
 import org.apache.flink.optimizer.Optimizer;
 import org.apache.flink.optimizer.costs.DefaultCostEstimator;
@@ -51,6 +52,8 @@ import com.dfire.platform.alchemy.web.common.Constants;
 import com.dfire.platform.alchemy.web.common.ResultMessage;
 import com.dfire.platform.alchemy.web.common.Status;
 import com.dfire.platform.alchemy.web.descriptor.Descriptor;
+import com.dfire.platform.alchemy.web.util.JarArgUtils;
+import com.dfire.platform.alchemy.web.util.MavenJarUtils;
 import com.dfire.platform.alchemy.web.util.PropertiesUtils;
 
 /**
@@ -81,7 +84,7 @@ public class FlinkCluster implements Cluster {
 
     @Override
     public void start(ClusterInfo clusterInfo) {
-        this.clusterInfo=clusterInfo;
+        this.clusterInfo = clusterInfo;
         Configuration configuration = new Configuration();
         configuration.setString(HighAvailabilityOptions.HA_MODE,
             HighAvailabilityMode.ZOOKEEPER.toString().toLowerCase());
@@ -89,7 +92,7 @@ public class FlinkCluster implements Cluster {
         configuration.setString(HighAvailabilityOptions.HA_ZOOKEEPER_QUORUM, clusterInfo.getZookeeperQuorum());
         configuration.setString(HighAvailabilityOptions.HA_STORAGE_PATH, clusterInfo.getStoragePath());
         configuration.setString(JobManagerOptions.ADDRESS, clusterInfo.getAddress());
-        configuration.setString(AkkaOptions.LOOKUP_TIMEOUT,"30 s");
+        configuration.setString(AkkaOptions.LOOKUP_TIMEOUT, "30 s");
         configuration.setInteger(JobManagerOptions.PORT, clusterInfo.getPort());
         try {
             this.clusterClient = new StandaloneClusterClient(configuration);
@@ -152,10 +155,10 @@ public class FlinkCluster implements Cluster {
         }
         LOGGER.trace("start submit jar request,entryClass:{}", message.getJarInfoDescriptor().getEntryClass());
         try {
-            File file=MavenJarUtils.forAvg(message.getJarInfoDescriptor().getAvg()).getJarFile();
-            List<String> programArgs=JarArgUtils.tokenizeArguments(message.getJarInfoDescriptor().getProgramArgs());
-            PackagedProgram program = new PackagedProgram(file,
-                message.getJarInfoDescriptor().getEntryClass(), programArgs.toArray(new String[programArgs.size()]));
+            File file = MavenJarUtils.forAvg(message.getJarInfoDescriptor().getAvg()).getJarFile();
+            List<String> programArgs = JarArgUtils.tokenizeArguments(message.getJarInfoDescriptor().getProgramArgs());
+            PackagedProgram program = new PackagedProgram(file, message.getJarInfoDescriptor().getEntryClass(),
+                programArgs.toArray(new String[programArgs.size()]));
             ClassLoader classLoader = null;
             try {
                 classLoader = program.getUserCodeClassLoader();
@@ -168,7 +171,8 @@ public class FlinkCluster implements Cluster {
                 = ClusterClient.getOptimizedPlan(optimizer, program, message.getJarInfoDescriptor().getParallelism());
             // set up the execution environment
             List<URL> jarFiles = createPath(file);
-            JobSubmissionResult submissionResult = clusterClient.run(plan, jarFiles, Collections.emptyList(), classLoader);
+            JobSubmissionResult submissionResult
+                = clusterClient.run(plan, jarFiles, Collections.emptyList(), classLoader);
             LOGGER.trace(" submit jar request sucess,jobId:{}", submissionResult.getJobID());
             return new SubmitFlinkResponse(true, submissionResult.getJobID().toString());
         } catch (Exception e) {
@@ -243,11 +247,17 @@ public class FlinkCluster implements Cluster {
 
         });
         if (message.isTest()) {
+//            System.out.println(execEnv.getExecutionPlan());
+//            return new SubmitFlinkResponse("");
             execEnv.execute(message.getJobName());
+            return new SubmitFlinkResponse(true,"");
         }
         StreamGraph streamGraph = execEnv.getStreamGraph();
         streamGraph.setJobName(message.getJobName());
-        List<URL> jarFiles = createPath(MavenJarUtils.forAvg(message.getAvg()).getJarFile());
+        List<URL> jarFiles = new ArrayList<>();
+        if (StringUtils.isNotEmpty(message.getAvg())) {
+            jarFiles.addAll(createPath(MavenJarUtils.forAvg(message.getAvg()).getJarFile()));
+        }
         jarFiles.addAll(createGlobalPath());
         ClassLoader usercodeClassLoader
             = JobWithJars.buildUserCodeClassLoader(jarFiles, Collections.emptyList(), getClass().getClassLoader());
@@ -289,7 +299,7 @@ public class FlinkCluster implements Cluster {
 
     private List<URL> createPath(File file) {
         List<URL> jarFiles = new ArrayList<>(1);
-        if (file==null) {
+        if (file == null) {
             return jarFiles;
         }
         try {
@@ -310,9 +320,9 @@ public class FlinkCluster implements Cluster {
             return Collections.emptyList();
         }
         List<URL> jarFiles = new ArrayList<>(1);
-        File file= MavenJarUtils.forAvg(this.clusterInfo.getAvg()).getJarFile();
+        File file = MavenJarUtils.forAvg(this.clusterInfo.getAvg()).getJarFile();
         try {
-            URL jarFileUrl =file.getAbsoluteFile().toURI().toURL();
+            URL jarFileUrl = file.getAbsoluteFile().toURI().toURL();
             jarFiles.add(jarFileUrl);
             JobWithJars.checkJarFile(jarFileUrl);
         } catch (MalformedURLException e) {

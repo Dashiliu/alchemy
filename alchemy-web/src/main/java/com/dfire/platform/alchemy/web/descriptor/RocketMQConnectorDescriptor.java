@@ -174,6 +174,7 @@ public class RocketMQConnectorDescriptor implements ConnectorDescriptor {
             if (typeInformation == null) {
                 throw new UnsupportedOperationException("Unsupported type:" + schema.get(i).getType());
             }
+            columnTypes[i] = typeInformation;
             if (schema.get(i).isProctime()) {
                 proctimeAttribute = schema.get(i).getName();
             } else {
@@ -198,7 +199,6 @@ public class RocketMQConnectorDescriptor implements ConnectorDescriptor {
                         timestampExtractor, watermarkStrategy);
                 }
             }
-            columnTypes[i] = typeInformation;
         }
         TypeInformation<Row> returnType = new RowTypeInfo(columnTypes, columnNames);
         DeserializationSchema<Row> deserializationSchema;
