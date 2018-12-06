@@ -111,7 +111,7 @@ alchemy:
     - name: flink_default
       type: flink
       mode: zookeeper
-      avg:  com.dfire.platform:alchemy-connectors:0.0.1-SNAPSHOT
+      avg:  com.dfire.platform:alchemy-connectors:0.0.1
       clusterId: daily-real
       zookeeperQuorum: 10.1.22.21:2181,10.1.22.22:2181,10.1.22.23:2181
       storagePath: hdfs://sunset004.daily.2dfire.info:8020/flink/ha/real
@@ -120,7 +120,7 @@ alchemy:
     - name: flink_5_4_8
       type: flink
       mode: zookeeper
-      avg:  com.dfire.platform:alchemy-connectors:0.0.1-SNAPSHOT
+      avg:  com.dfire.platform:alchemy-connectors:0.0.1
       clusterId: daily-default-8
       zookeeperQuorum: 10.1.22.21:2181,10.1.22.22:2181,10.1.22.23:2181
       storagePath: hdfs://sunset004.daily.2dfire.info:8020/flink/ha/default-8
