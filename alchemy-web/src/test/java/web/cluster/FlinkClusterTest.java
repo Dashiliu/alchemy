@@ -74,8 +74,8 @@ public class FlinkClusterTest {
     @Test
     public void rocketmq() throws Exception {
         SqlSubmitFlinkRequest sqlSubmitRequest
-            = createSqlRequest("SELECT entityId,goodId, count(id) as cnt \n" + "FROM rocketmq_table_test\n"
-                + "GROUP BY HOP(rideTime, INTERVAL '1' MINUTE,INTERVAL '1' MINUTE), entityId,goodId HAVING count(id) >1", "flinkClusterTest-rocketmq");
+            = createSqlRequest("SELECT entityId,goodId, count(goodId) as cnt \n" + "FROM rocketmq_table_test\n"
+                + "GROUP BY HOP(rideTime, INTERVAL '1' MINUTE,INTERVAL '1' MINUTE), entityId,goodId HAVING count(goodId) >1", "flinkClusterTest-rocketmq");
         sqlSubmitRequest.setTest(true);
         Response resp = this.cluster.send(sqlSubmitRequest);
         assert resp.isSuccess();

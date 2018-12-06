@@ -49,8 +49,6 @@ job:
 #              schema: "ROW(rideId LONG, lon FLOAT, lat FLOAT, rideTime TIMESTAMP)"
         - name: rocketmq_table_test
           schema:
-          - name: id
-            type: VARCHAR
           - name: goodId
             type: VARCHAR
           - name: entityId
@@ -74,7 +72,7 @@ job:
           format:
               property-version: 1
               type: json
-              schema: "ROW(id VARCHAR,entityId VARCHAR,goodId VARCHAR, rideTime TIMESTAMP)"
+              schema: "ROW(entityId VARCHAR,goodId VARCHAR, rideTime TIMESTAMP)"
 #        udfs:
 #        - name: scalarF
 #          value: ${0}
