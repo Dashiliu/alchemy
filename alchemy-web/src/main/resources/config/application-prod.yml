@@ -105,14 +105,14 @@ alchemy:
 #    upload-url: http://upload.2dfire-daily.com/upbigfile
 #    download-url: https://assets.2dfire.com/
   clusters:
-    - name: flink_default
+    - name: flink_cpu
       type: flink
       mode: zookeeper
-      clusterId: flink5
+      clusterId: flink-cpu
       avg: com.dfire.platform:alchemy-connectors:0.0.1
       zookeeperQuorum: zk101.2dfire-inc.com:2181,zk102.2dfire-inc.com:2181,zk103.2dfire-inc.com:2181
-      storagePath: hdfs://hadoop1169.prod.2dfire.info:8020/user/alchemy/flink/ha5
-      address: flink-jobmanager-default
+      storagePath: hdfs://hadoop1169.prod.2dfire.info:8020/user/alchemy/flink/ha-cpu
+      address: flink-jobmanager-cpu
       port: 6123
     - name: flink_5_4_1
       type: flink

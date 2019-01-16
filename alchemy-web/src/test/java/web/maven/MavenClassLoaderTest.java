@@ -1,11 +1,11 @@
 package web.maven;
 
-import com.bigfatgun.MavenClassLoader;
-import com.bigfatgun.MavenLoaderInfo;
-import com.dfire.platform.alchemy.web.common.Constants;
+import java.io.File;
+
 import org.junit.Test;
 
-import java.io.File;
+import com.dfire.platform.alchemy.web.common.MavenLoaderInfo;
+import com.dfire.platform.alchemy.web.util.MavenJarUtils;
 
 /**
  * @author congbai
@@ -14,10 +14,10 @@ import java.io.File;
 public class MavenClassLoaderTest {
 
     @Test
-    public void load(){
-        MavenLoaderInfo mavenLoaderInfo=MavenClassLoader.forGAV("com.dfire.platform:sunset:0.0.1-SNAPSHOT", Constants.RELEASE_REPOSITORY_URL,Constants.SNAP_REPOSITORY_URL);
-        File file=mavenLoaderInfo.getJarFile();
-        assert  file.exists();
+    public void load() {
+        MavenLoaderInfo mavenLoaderInfo = MavenJarUtils.forAvg("com.dfire.platform:mirror:0.0.1-daily-SNAPSHOT");
+        File file = mavenLoaderInfo.getJarFile();
+        assert file.exists();
     }
 
 }

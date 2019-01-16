@@ -69,7 +69,7 @@ public class MavenJarUtils {
                 Preconditions.checkNotNull(repositories);
                 Preconditions.checkArgument(repositories.length > 0, "Must specify at least one remote repository.");
                 this.repositories = ImmutableList.copyOf(repositories);
-                this.localRepositoryDirectory = new File("~/.m2/repository");
+                this.localRepositoryDirectory = new File(System.getProperty("user.home")+"/.m2/repository");
             }
 
             public MavenLoaderInfo forGAV(String gav) {
