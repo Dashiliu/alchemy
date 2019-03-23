@@ -10,6 +10,8 @@ import java.io.IOException;
  */
 public class GeoIpDatabase {
 
+    private static final String REGEX_YAML_PATH = "/GeoLite2-City.mmdb";
+
     private static DatabaseReader databaseReader = null;
 
     private GeoIpDatabase() {
@@ -23,7 +25,7 @@ public class GeoIpDatabase {
     }
 
     private static DatabaseReader databaseBuild() {
-        File database = new File("C:\\Users\\Administrator\\Downloads\\GeoLite2-City\\GeoLite2-City.mmdb");
+        File database = new File(REGEX_YAML_PATH);
         try {
             DatabaseReader reader = new DatabaseReader.Builder(database).build();
             return reader;
