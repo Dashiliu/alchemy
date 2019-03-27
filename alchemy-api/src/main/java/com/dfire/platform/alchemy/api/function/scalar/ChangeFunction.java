@@ -1,6 +1,9 @@
 package com.dfire.platform.alchemy.api.function.scalar;
 
+import com.dfire.platform.alchemy.api.function.BaseFunction;
 import org.apache.flink.table.functions.ScalarFunction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /***
  *
@@ -10,7 +13,16 @@ import org.apache.flink.table.functions.ScalarFunction;
    select change(field_name, 'short')
    select change(field_name, 'string')
  */
-public class ChangeFunction extends ScalarFunction {
+public class ChangeFunction extends ScalarFunction implements BaseFunction{
+
+    private static final String FUNCTION_NANME = "change";
+
+    private static final Logger logger = LoggerFactory.getLogger(ChangeFunction.class);
+
+    @Override
+    public String getFunctionName() {
+        return FUNCTION_NANME;
+    }
 
     public Object eval(String input, String type) {
         if ("integer".equalsIgnoreCase(type) || "int".equalsIgnoreCase(type)) {

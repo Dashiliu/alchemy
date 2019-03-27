@@ -1,5 +1,6 @@
 package com.dfire.platform.alchemy.web.descriptor;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.util.Assert;
 
 import com.dfire.platform.alchemy.connectors.elasticsearch.ElasticsearchTableSink;
@@ -21,6 +22,13 @@ public class EsSinkDescriptor extends SinkDescriptor {
     private String index;
 
     private int bufferSize;
+
+    private String dateFormat;
+
+    /**
+     *  索引从字段里取
+     */
+    private String filedIndex;
 
     @Override
     public String getName() {
@@ -75,15 +83,33 @@ public class EsSinkDescriptor extends SinkDescriptor {
     public void validate() throws Exception {
         Assert.notNull(address, "地址不能为空");
         Assert.notNull(clusterName, "clusterName不能为空");
-        Assert.notNull(index, "索引不能为空");
+        if (StringUtils.isBlank(index) && StringUtils.isBlank(filedIndex)){
+            throw new IllegalArgumentException("索引不能为空");
+        }
     }
 
     private <T> T transformFlink() {
-        return (T)new ElasticsearchTableSink(this.address, this.clusterName, this.index, this.bufferSize);
+        return (T)new ElasticsearchTableSink(this.address, this.clusterName, this.index, this.bufferSize,this.filedIndex,this.dateFormat);
     }
 
     @Override
     public String getType() {
         return Constants.SINK_TYPE_VALUE_ES;
+    }
+
+    public String getDateFormat() {
+        return dateFormat;
+    }
+
+    public void setDateFormat(String dateFormat) {
+        this.dateFormat = dateFormat;
+    }
+
+    public String getFiledIndex() {
+        return filedIndex;
+    }
+
+    public void setFiledIndex(String filedIndex) {
+        this.filedIndex = filedIndex;
     }
 }

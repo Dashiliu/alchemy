@@ -1,8 +1,10 @@
 package com.dfire.platform.alchemy.formats.utils;
 
-import java.lang.reflect.Field;
-
+import com.dfire.platform.alchemy.api.logstash.Grok;
 import org.apache.flink.types.Row;
+
+import java.lang.reflect.Field;
+import java.util.Map;
 
 /**
  * @author congbai
@@ -15,8 +17,8 @@ public class ConvertRowUtils {
         // validate the row
         if (row.getArity() != fieldNames.length) {
             throw new IllegalStateException(
-                String.format("Number of elements in the row '%s' is different from number of field names: %d", row,
-                    fieldNames.length));
+                    String.format("Number of elements in the row '%s' is different from number of field names: %d", row,
+                            fieldNames.length));
         }
 
         for (int i = 0; i < fieldNames.length; i++) {
@@ -56,6 +58,23 @@ public class ConvertRowUtils {
                 e.printStackTrace();
             }
         }
+        return row;
+    }
+
+    public static Row grokConvertToRow(String message, String[] names, String regular) {
+        final Row row = new Row(names.length);
+//        names[names.length+1] = "client_ip";
+        Map<String, Object> grokMap = Grok.match(message, regular);
+        for (int i = 0; i < names.length; i++) {
+            try {
+                final String name = names[i];
+                Object field = grokMap.get(name);
+                row.setField(i, field);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+//        row.setField(names.length,"39.187.114.9");
         return row;
     }
 }

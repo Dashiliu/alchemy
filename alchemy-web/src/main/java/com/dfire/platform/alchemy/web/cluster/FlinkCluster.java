@@ -12,6 +12,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.dfire.platform.alchemy.api.function.BaseFunction;
+import com.dfire.platform.alchemy.api.function.table.GeoIpFunction;
+import com.dfire.platform.alchemy.api.function.table.UserAgentFunction;
+import com.dfire.platform.alchemy.web.descriptor.FunctionFactory;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.JobID;
@@ -36,6 +40,9 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.graph.StreamGraph;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.java.StreamTableEnvironment;
+import org.apache.flink.table.functions.AggregateFunction;
+import org.apache.flink.table.functions.ScalarFunction;
+import org.apache.flink.table.functions.TableFunction;
 import org.apache.flink.table.sources.TableSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -236,6 +243,20 @@ public class FlinkCluster implements Cluster {
 
             });
         }
+
+        if (FunctionFactory.me.getBaseFunctionMap() != null){
+            FunctionFactory.me.getBaseFunctionMap().forEach((name,function) -> {
+                if (function instanceof TableFunction){
+                    env.registerFunction(name,(TableFunction) function);
+                }else if (function instanceof ScalarFunction){
+                    env.registerFunction(name,(ScalarFunction) function);
+                }else if (function instanceof AggregateFunction){
+                    env.registerFunction(name,(AggregateFunction) function);
+                }
+            });
+        }
+
+
         Table table = env.sqlQuery(message.getTable().getSql());
         message.getTable().getSinkDescriptors().forEach(sinkDescriptor -> {
             try {

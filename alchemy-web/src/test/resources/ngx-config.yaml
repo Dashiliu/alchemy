@@ -1,0 +1,58 @@
+job:
+    name: test-nginx
+    #cluster:
+    parallelism: 1
+    timeCharacteristic: EventTime
+    checkpointingInterval: 10000 #ms
+    #avg: com.dfire.platform:sunset-sql:0.0.1-SNAPSHOT
+    #jarPath: /Users/dongbinglin/Code/platform/alchemy/alchemy-connectors/target/alchemy-connectors-1.0-SNAPSHOT.jar
+    table:
+#        sql: select * from  TaxiRides
+        sources:
+          - name: test_nginx_log
+            schema:
+              - name: syslog_host
+                type: VARCHAR
+              - name: syslog_tag
+                type: VARCHAR
+              - name: user_agent
+                type: VARCHAR
+              - name: am_datetime
+                type: VARCHAR
+              - name: request
+                type: VARCHAR
+              - name: url
+                type: VARCHAR
+              - name: request_param
+                type: VARCHAR
+              - name: timestamp
+                type: TIMESTAMP
+                rowtime:
+                  timestamps:
+                    type: "from-field"
+                    from: "timestamp"
+            connector:
+              property-version: 1
+              type: kafka
+              version: 0.10
+              topic: app-log
+            #  startup-mode: earliest-offset
+              properties:
+                 - key: zookeeper.connect
+                   value: zk1.2dfire-daily.com:2181/kafka1
+                 - key: bootstrap.servers
+                   value: 10.1.22.8:9092,10.1.22.7:9092
+                 - key: group.id
+                   value: testGroup
+            format:
+              property-version: 1
+              type: grok
+              regular: \[%{DATA:syslog_host}\] \[%{DATA:syslog_tag}\] "%{IP:remote_addr}" "%{DATA:remote_user}" "\[%{HTTPDATE:time_local}\]" "%{WORD:http_method} %{URIPATH:request}(?:\?%{DATA:request_param}|) HTTP\/%{NUMBER:http_version:float}" "(?:%{NUMBER:status:float}|-)" "(?:%{NUMBER:body_bytes_sent:float}|-)" "%{DATA:http_referer}" "%{DATA:user_agent}" "%{WORD} %{DATA:url}" "%{DATA:host_name}" "%{DATA:http_x_forwarded_for}" "(?:%{NUMBER:request_time:float}|%{DATA})" "%{DATA:remote_port}" "(?:%{DATA:upstream_response_time}|-)" "%{DATA:http_x_readtime}" "(?:/%{DATA:uri}|%{DATA})" "%{DATA:upstream_status}" "%{DATA:upstream_addr}" "%{DATA:nuid}" "%{DATA:request_id}" "%{DATA:http_x_forwarded_proto}"
+        sinks:
+            - name: esSink
+              index: test-applog
+              type: elasticsearch
+              address: 10.1.21.61:9300
+              clusterName: daily
+#              filedIndex: index
+              dateFormat: yyyy.MM.dd.HH

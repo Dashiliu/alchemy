@@ -1,0 +1,7 @@
+com.dfire.platform.alchemy.api.function.table.GeoIpFunction
+com.dfire.platform.alchemy.api.function.table.UserAgentFunction
+com.dfire.platform.alchemy.api.function.table.KvFunction
+com.dfire.platform.alchemy.api.function.scalar.SplitFunction
+com.dfire.platform.alchemy.api.function.scalar.UrldecodeFunction
+com.dfire.platform.alchemy.api.function.scalar.ChangeFunction
+com.dfire.platform.alchemy.api.function.scalar.GsubFunction

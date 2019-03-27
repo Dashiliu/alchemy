@@ -34,17 +34,25 @@ public class ElasticsearchTableSink implements UpsertStreamTableSink<Row> {
 
     private final int bufferSize;
 
+    private final String filedIndex;
+
+    private final String formatDate;
+
     private String[] fieldNames;
 
     private TypeInformation[] fieldTypes;
 
     private JsonRowStringSchema jsonRowSchema;
 
-    public ElasticsearchTableSink(String address, String clusterName, String index, int bufferSize) {
+    public ElasticsearchTableSink(String address, String clusterName,
+                                  String index, int bufferSize,
+                                  String filedIndex,String formatDate) {
         this.address = address;
         this.clusterName = clusterName;
         this.index = index;
         this.bufferSize = bufferSize;
+        this.filedIndex = filedIndex;
+        this.formatDate = formatDate;
     }
 
     @Override
@@ -60,7 +68,7 @@ public class ElasticsearchTableSink implements UpsertStreamTableSink<Row> {
     @Override
     public TableSink<Tuple2<Boolean, Row>> configure(String[] fieldNames, TypeInformation<?>[] fieldTypes) {
         ElasticsearchTableSink copy
-            = new ElasticsearchTableSink(this.address, this.clusterName, this.index, this.bufferSize);
+            = new ElasticsearchTableSink(this.address, this.clusterName, this.index, this.bufferSize,this.filedIndex,this.formatDate);
         copy.fieldNames = Preconditions.checkNotNull(fieldNames, "fieldNames");
         copy.fieldTypes = Preconditions.checkNotNull(fieldTypes, "fieldTypes");
         Preconditions.checkArgument(fieldNames.length == fieldTypes.length,
@@ -106,7 +114,7 @@ public class ElasticsearchTableSink implements UpsertStreamTableSink<Row> {
         List<InetSocketAddress> transports = new ArrayList<>();
         addTransportAddress(transports, this.address);
         return new ElasticsearchSink<>(userConfig, transports,
-            new ElasticsearchTableFunction(this.index, this.jsonRowSchema));
+            new ElasticsearchTableFunction(this.index, this.jsonRowSchema,this.filedIndex,this.formatDate));
     }
 
     private void addTransportAddress(List<InetSocketAddress> transports, String serverList) {

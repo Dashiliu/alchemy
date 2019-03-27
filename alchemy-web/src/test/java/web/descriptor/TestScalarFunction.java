@@ -1,6 +1,7 @@
 package web.descriptor;
 
-import com.dfire.platform.alchemy.api.function.scalar.GeoIpFunction;
+import com.dfire.platform.alchemy.api.function.table.GeoIpFunction;
+import com.dfire.platform.alchemy.api.function.table.UserAgentFunction;
 import org.apache.commons.lang3.StringUtils;
 
 import com.dfire.platform.alchemy.api.function.StreamScalarFunction;
@@ -14,7 +15,6 @@ import org.apache.flink.table.api.TableEnvironment;
 import org.apache.flink.table.api.java.StreamTableEnvironment;
 import org.apache.flink.types.Row;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -36,6 +36,7 @@ public class TestScalarFunction implements StreamScalarFunction<String> {
 
         StreamTableEnvironment tableEnv = TableEnvironment.getTableEnvironment(env);
         tableEnv.registerFunction("geoIp", new GeoIpFunction());
+        tableEnv.registerFunction("userAgent",new UserAgentFunction());
 
         List<Row> data = new ArrayList<>();
         data.add(Row.of(1, 1L, "a/b/c", "100"));

@@ -1,7 +1,8 @@
-package com.dfire.platform.alchemy.api.function.scalar;
+package com.dfire.platform.alchemy.api.function.table;
 
 import com.dfire.platform.alchemy.api.common.Geoip;
-import com.dfire.platform.alchemy.api.util.GeoIpDatabase;
+import com.dfire.platform.alchemy.api.function.BaseFunction;
+import com.dfire.platform.alchemy.api.util.geoip.GeoIpDatabase;
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.model.CityResponse;
 import com.maxmind.geoip2.record.City;
@@ -21,15 +22,22 @@ import java.net.InetAddress;
  * gsub    替换
  * select gsub(field_name)
  */
-public class GeoIpFunction extends TableFunction<Tuple1<Geoip>> {
+public class GeoIpFunction extends TableFunction<Tuple1<Geoip>> implements BaseFunction{
+
+    private static final String FUNCTION_NANME = "geoip";
     private static final Logger logger = LoggerFactory.getLogger(GeoIpFunction.class);
+
+    @Override
+    public String getFunctionName() {
+        return FUNCTION_NANME;
+    }
 
     public void eval(String ip) {
         if (StringUtils.isNotBlank(ip)) {
             try {
 //                File database = new File("C:\\Users\\Administrator\\Downloads\\GeoLite2-City\\GeoLite2-City.mmdb");
 //                DatabaseReader reader = new DatabaseReader.Builder(database).build();
-                DatabaseReader reader = GeoIpDatabase.getDatabaseReader();
+                DatabaseReader reader = GeoIpDatabase.parse();
                 InetAddress ipAddress = InetAddress.getByName(ip);
                 Geoip geoip = new Geoip();
 
@@ -54,7 +62,8 @@ public class GeoIpFunction extends TableFunction<Tuple1<Geoip>> {
                 geoip.setLocation(location1);
                 collect(new Tuple1<>(geoip));
             } catch (Exception e) {
-                e.getStackTrace();
+                logger.error("geo ip "+e);
+//                e.getStackTrace();
             }
         }
     }

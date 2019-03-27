@@ -66,6 +66,10 @@ public class JsonRowStringSchema implements Serializable {
         ObjectNode objectNode = mapper.createObjectNode();
 
         for (int i = 0; i < row.getArity(); i++) {
+            //值为null的字段不需存es，无意义
+            if (row.getField(i) == null){
+                continue;
+            }
             JsonNode node = mapper.valueToTree(row.getField(i));
             objectNode.set(fieldNames[i], node);
         }
@@ -75,5 +79,9 @@ public class JsonRowStringSchema implements Serializable {
         } catch (Exception e) {
             throw new RuntimeException("Failed to serialize row", e);
         }
+    }
+
+    public String[] getFieldNames(){
+        return this.fieldNames;
     }
 }

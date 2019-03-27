@@ -14,6 +14,8 @@ public class FormatDescriptor implements Descriptor {
 
     private String type;
 
+    private String regular;
+
     public Integer getPropertyVersion() {
         return propertyVersion;
     }
@@ -50,5 +52,13 @@ public class FormatDescriptor implements Descriptor {
     @Override
     public void validate() throws Exception {
 
+    }
+
+    public String getRegular() {
+        return regular;
+    }
+
+    public void setRegular(String regular) {
+        this.regular = regular;
     }
 }

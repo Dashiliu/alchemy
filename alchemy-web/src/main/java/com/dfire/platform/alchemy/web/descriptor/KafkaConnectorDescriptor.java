@@ -4,11 +4,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.dfire.platform.alchemy.formats.grok.GrokRowDeserializationSchema;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
+import org.apache.flink.streaming.connectors.kafka.Kafka010AvroTableSource;
 import org.apache.flink.streaming.connectors.kafka.Kafka010JsonTableSource;
 import org.apache.flink.streaming.connectors.kafka.internals.KafkaTopicPartition;
 import org.apache.flink.table.api.TableSchema;
@@ -119,6 +121,12 @@ public class KafkaConnectorDescriptor implements ConnectorDescriptor {
                 buildeProperties(tableSourceBuilder);
                 createDeserialization(returnType, format, tableSourceBuilder);
                 return (T)tableSourceBuilder.build();
+            case Constants.TYPE_VALUE_FORMAT_GROK:
+                AlchemyKafkaTableSource.Builder grokTableSourceBuilder = new AlchemyKafkaTableSource.Builder();
+                TypeInformation<Row> grokReturnType = createSchema(schema, grokTableSourceBuilder);
+                buildeProperties(grokTableSourceBuilder);
+                createDeserialization(grokReturnType, format, grokTableSourceBuilder);
+                return (T)grokTableSourceBuilder.build();
             default:
         }
         return null;
@@ -135,6 +143,10 @@ public class KafkaConnectorDescriptor implements ConnectorDescriptor {
             case Constants.TYPE_VALUE_FORMAT_PB:
                 deserializationSchema
                     = new ProtostuffRowDeserializationSchema(returnType, Class.forName(format.getClassName()));
+                break;
+            case Constants.TYPE_VALUE_FORMAT_GROK:
+                deserializationSchema
+                    = new GrokRowDeserializationSchema(returnType, format.getRegular());
                 break;
             default:
         }
