@@ -1,8 +1,6 @@
 package com.dfire.platform.alchemy.api.function.scalar;
 
 import com.dfire.platform.alchemy.api.function.BaseFunction;
-import com.dfire.platform.alchemy.api.function.table.GeoIpFunction;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.table.functions.ScalarFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +15,7 @@ import java.net.URLDecoder;
  */
 public class UrldecodeFunction extends ScalarFunction implements BaseFunction{
 
-    private static final String FUNCTION_NANME = "urldecode";
+    private static final String FUNCTION_NANME = "URLDECODE";
     private static final Logger logger = LoggerFactory.getLogger(UrldecodeFunction.class);
 
     @Override
@@ -25,14 +23,15 @@ public class UrldecodeFunction extends ScalarFunction implements BaseFunction{
         return FUNCTION_NANME;
     }
 
-    public String eval(String input) {
-        if (StringUtils.isNotBlank(input)) {
+    public String eval(Object input) {
+        if (input != null) {
+            String message = (String)input;
             try {
-                return URLDecoder.decode(input, "UTF-8");
+                return URLDecoder.decode(message, "UTF-8");
             } catch (UnsupportedEncodingException e) {
                 logger.error("URLDecode failed", e);
             }
         }
-        return input;
+        return null;
     }
 }

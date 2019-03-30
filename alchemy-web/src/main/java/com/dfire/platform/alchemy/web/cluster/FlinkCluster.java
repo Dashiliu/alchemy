@@ -1,21 +1,21 @@
 package com.dfire.platform.alchemy.web.cluster;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import com.dfire.platform.alchemy.api.function.BaseFunction;
-import com.dfire.platform.alchemy.api.function.table.GeoIpFunction;
-import com.dfire.platform.alchemy.api.function.table.UserAgentFunction;
+import com.dfire.platform.alchemy.api.function.aggregate.FlinkAllAggregateFunction;
+import com.dfire.platform.alchemy.api.function.scalar.FlinkAllScalarFunction;
+import com.dfire.platform.alchemy.api.function.table.FlinkAllTableFunction;
+import com.dfire.platform.alchemy.web.cluster.request.*;
+import com.dfire.platform.alchemy.web.cluster.response.JobStatusResponse;
+import com.dfire.platform.alchemy.web.cluster.response.Response;
+import com.dfire.platform.alchemy.web.cluster.response.SubmitFlinkResponse;
+import com.dfire.platform.alchemy.web.common.ClusterType;
+import com.dfire.platform.alchemy.web.common.Constants;
+import com.dfire.platform.alchemy.web.common.ResultMessage;
+import com.dfire.platform.alchemy.web.common.Status;
+import com.dfire.platform.alchemy.web.descriptor.Descriptor;
 import com.dfire.platform.alchemy.web.descriptor.FunctionFactory;
+import com.dfire.platform.alchemy.web.util.JarArgUtils;
+import com.dfire.platform.alchemy.web.util.MavenJarUtils;
+import com.dfire.platform.alchemy.web.util.PropertiesUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.JobID;
@@ -47,21 +47,17 @@ import org.apache.flink.table.sources.TableSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dfire.platform.alchemy.api.function.aggregate.FlinkAllAggregateFunction;
-import com.dfire.platform.alchemy.api.function.scalar.FlinkAllScalarFunction;
-import com.dfire.platform.alchemy.api.function.table.FlinkAllTableFunction;
-import com.dfire.platform.alchemy.web.cluster.request.*;
-import com.dfire.platform.alchemy.web.cluster.response.JobStatusResponse;
-import com.dfire.platform.alchemy.web.cluster.response.Response;
-import com.dfire.platform.alchemy.web.cluster.response.SubmitFlinkResponse;
-import com.dfire.platform.alchemy.web.common.ClusterType;
-import com.dfire.platform.alchemy.web.common.Constants;
-import com.dfire.platform.alchemy.web.common.ResultMessage;
-import com.dfire.platform.alchemy.web.common.Status;
-import com.dfire.platform.alchemy.web.descriptor.Descriptor;
-import com.dfire.platform.alchemy.web.util.JarArgUtils;
-import com.dfire.platform.alchemy.web.util.MavenJarUtils;
-import com.dfire.platform.alchemy.web.util.PropertiesUtils;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author congbai
@@ -113,13 +109,13 @@ public class FlinkCluster implements Cluster {
     @Override
     public Response send(Request message) throws Exception {
         if (message instanceof SqlSubmitFlinkRequest) {
-            return sendSqlSubmitRequest((SqlSubmitFlinkRequest)message);
+            return sendSqlSubmitRequest((SqlSubmitFlinkRequest) message);
         } else if (message instanceof JarSubmitFlinkRequest) {
-            return sendJarSubmitRequest((JarSubmitFlinkRequest)message);
+            return sendJarSubmitRequest((JarSubmitFlinkRequest) message);
         } else if (message instanceof CancelFlinkRequest) {
-            return cancelJob((CancelFlinkRequest)message);
+            return cancelJob((CancelFlinkRequest) message);
         } else if (message instanceof JobStatusRequest) {
-            return getJobStatus((JobStatusRequest)message);
+            return getJobStatus((JobStatusRequest) message);
         } else {
             throw new UnsupportedOperationException("unknow message type:" + message.getClass().getName());
         }
@@ -229,11 +225,11 @@ public class FlinkCluster implements Cluster {
                     replaceCodeValue(message, udfDescriptor);
                     udf = udfDescriptor.transform(clusterType());
                     if (udf instanceof FlinkAllTableFunction) {
-                        env.registerFunction(udfDescriptor.getName(), (FlinkAllTableFunction)udf);
+                        env.registerFunction(udfDescriptor.getName(), (FlinkAllTableFunction) udf);
                     } else if (udf instanceof FlinkAllAggregateFunction) {
-                        env.registerFunction(udfDescriptor.getName(), (FlinkAllAggregateFunction)udf);
+                        env.registerFunction(udfDescriptor.getName(), (FlinkAllAggregateFunction) udf);
                     } else if (udf instanceof FlinkAllScalarFunction) {
-                        env.registerFunction(udfDescriptor.getName(), (FlinkAllScalarFunction)udf);
+                        env.registerFunction(udfDescriptor.getName(), (FlinkAllScalarFunction) udf);
                     } else {
                         LOGGER.warn("Unknown UDF {} was found.", udf.getClass().getName());
                     }
@@ -244,14 +240,14 @@ public class FlinkCluster implements Cluster {
             });
         }
 
-        if (FunctionFactory.me.getBaseFunctionMap() != null){
-            FunctionFactory.me.getBaseFunctionMap().forEach((name,function) -> {
-                if (function instanceof TableFunction){
-                    env.registerFunction(name,(TableFunction) function);
-                }else if (function instanceof ScalarFunction){
-                    env.registerFunction(name,(ScalarFunction) function);
-                }else if (function instanceof AggregateFunction){
-                    env.registerFunction(name,(AggregateFunction) function);
+        if (FunctionFactory.me.getBaseFunctionMap() != null) {
+            FunctionFactory.me.getBaseFunctionMap().forEach((name, function) -> {
+                if (function instanceof TableFunction) {
+                    env.registerFunction(name, (TableFunction) function);
+                } else if (function instanceof ScalarFunction) {
+                    env.registerFunction(name, (ScalarFunction) function);
+                } else if (function instanceof AggregateFunction) {
+                    env.registerFunction(name, (AggregateFunction) function);
                 }
             });
         }
@@ -271,7 +267,7 @@ public class FlinkCluster implements Cluster {
 //            System.out.println(execEnv.getExecutionPlan());
 //            return new SubmitFlinkResponse("");
             execEnv.execute(message.getJobName());
-            return new SubmitFlinkResponse(true,"");
+            return new SubmitFlinkResponse(true, "");
         }
         StreamGraph streamGraph = execEnv.getStreamGraph();
         streamGraph.setJobName(message.getJobName());
@@ -307,7 +303,7 @@ public class FlinkCluster implements Cluster {
                 continue;
             }
             if (val instanceof String) {
-                String value = (String)val;
+                String value = (String) val;
                 if (value.matches(MATCH_CODE)) {
                     Pattern pattern = Pattern.compile(REPLACE_CODE);
                     Matcher matcher = pattern.matcher(value);

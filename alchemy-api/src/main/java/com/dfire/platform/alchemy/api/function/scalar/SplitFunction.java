@@ -1,7 +1,6 @@
 package com.dfire.platform.alchemy.api.function.scalar;
 
 import com.dfire.platform.alchemy.api.function.BaseFunction;
-import com.dfire.platform.alchemy.api.function.table.GeoIpFunction;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.table.functions.ScalarFunction;
 import org.slf4j.Logger;
@@ -18,7 +17,7 @@ import java.util.List;
  */
 public class SplitFunction extends ScalarFunction implements BaseFunction{
 
-    private static final String FUNCTION_NANME = "split";
+    private static final String FUNCTION_NANME = "SPLIT";
     private static final Logger logger = LoggerFactory.getLogger(SplitFunction.class);
 
     @Override
@@ -33,4 +32,6 @@ public class SplitFunction extends ScalarFunction implements BaseFunction{
         String[] array = input.split(separator);
         return Arrays.asList(array);
     }
+
+
 }

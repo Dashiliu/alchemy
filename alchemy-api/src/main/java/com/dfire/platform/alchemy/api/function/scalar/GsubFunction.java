@@ -1,7 +1,6 @@
 package com.dfire.platform.alchemy.api.function.scalar;
 
 import com.dfire.platform.alchemy.api.function.BaseFunction;
-import com.dfire.platform.alchemy.api.function.table.GeoIpFunction;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.table.functions.ScalarFunction;
 import org.slf4j.Logger;
@@ -14,7 +13,7 @@ import org.slf4j.LoggerFactory;
  */
 public class GsubFunction extends ScalarFunction implements BaseFunction{
 
-    private static final String FUNCTION_NANME = "gsub";
+    private static final String FUNCTION_NANME = "GSUB";
     private static final Logger logger = LoggerFactory.getLogger(GsubFunction.class);
 
     @Override

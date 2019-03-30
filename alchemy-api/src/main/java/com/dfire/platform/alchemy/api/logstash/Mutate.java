@@ -1,11 +1,19 @@
 package com.dfire.platform.alchemy.api.logstash;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Mutate {
+
+    private static final Logger logger = LoggerFactory.getLogger(Mutate.class);
 
     /***
      * 添加新字段
@@ -137,7 +145,74 @@ public class Mutate {
         }
     }
 
+    public static Object change(Object obj, String type) {
+        try {
+            if (obj != null) {
+                String value = (String) obj;
+                return change(value, type);
+            }
+        } catch (Exception e) {
+            logger.error("change failed", e);
+        }
+        return obj;
+    }
 
+    public static Object urldecode(Object obj){
+        if (obj != null) {
+            try {
+                String input = (String) obj;
+                return URLDecoder.decode(input, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                logger.error("URLDecode failed", e);
+            }
+        }
+        return obj;
+    }
+
+    public static Map<String, Object> kv(String input, String separator, String prefix) {
+        if (StringUtils.isBlank(input)) {
+//            return Collections.emptyMap();
+            return null;
+        }
+        String[] array = input.split(separator);
+        Map<String, Object> map = new HashMap<>(array.length);
+        for (String single : array) {
+            String[] singleArray = single.split("=");
+            if (singleArray.length > 1) {
+                map.put(prefix + singleArray[0], singleArray[1]);
+            }
+        }
+        return map;
+//        return map;
+    }
+
+    private static Object change(String input, String type) {
+        if ("integer".equalsIgnoreCase(type) || "int".equalsIgnoreCase(type)) {
+            try {
+                return Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                return 0;
+            }
+        }
+        if ("long".equalsIgnoreCase(type)) {
+            try {
+                return Long.parseLong(input);
+            } catch (NumberFormatException e) {
+                return 0L;
+            }
+        }
+        if ("short".equalsIgnoreCase(type)) {
+            try {
+                return Short.parseShort(input);
+            } catch (NumberFormatException e) {
+                return (short) 0;
+            }
+        }
+        if ("string".equalsIgnoreCase(type)) {
+            return String.valueOf(input);
+        }
+        return input;
+    }
 
     public static void main(String[] args) {
         Map<String, Object> map = new HashMap<>();

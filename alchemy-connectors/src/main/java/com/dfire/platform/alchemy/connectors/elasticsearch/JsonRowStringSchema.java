@@ -13,8 +13,6 @@
 
 package com.dfire.platform.alchemy.connectors.elasticsearch;
 
-import java.io.Serializable;
-
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.common.typeutils.CompositeType;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
@@ -23,15 +21,34 @@ import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMap
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.flink.types.Row;
 import org.apache.flink.util.Preconditions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Map;
 
 /**
  * @author congbai
  * @date 05/06/2018
  */
 public class JsonRowStringSchema implements Serializable {
-    /** Object mapper that is used to create output JSON objects. */
+
+    private static final Logger logger = LoggerFactory.getLogger(JsonRowStringSchema.class);
+
+    private static final String KVMAP = "kvmap";
+    private static final String DATEFORMAT = "dateformat";
+    private static final String TIMESTAMP = "@timestamp";
+    private static final String FORMAT = "yyyy-MM-dd,HH:mm:ss.SSS";
+    /**
+     * Object mapper that is used to create output JSON objects.
+     */
     private static ObjectMapper mapper = new ObjectMapper();
-    /** Fields names in the input Row object. */
+    /**
+     * Fields names in the input Row object.
+     */
     private final String[] fieldNames;
 
     /**
@@ -49,7 +66,7 @@ public class JsonRowStringSchema implements Serializable {
         for (int i = 0; i < fieldTypes.length; i++) {
             if (fieldTypes[i] instanceof CompositeType) {
                 throw new IllegalArgumentException("JsonRowSerializationSchema cannot encode rows with nested schema, "
-                    + "but field '" + fieldNames[i] + "' is nested: " + fieldTypes[i].toString());
+                        + "but field '" + fieldNames[i] + "' is nested: " + fieldTypes[i].toString());
             }
         }
 
@@ -59,19 +76,38 @@ public class JsonRowStringSchema implements Serializable {
     public String serialize(Row row) {
         if (row.getArity() != fieldNames.length) {
             throw new IllegalStateException(
-                String.format("Number of elements in the row %s is different from number of field names: %d", row,
-                    fieldNames.length));
+                    String.format("Number of elements in the row %s is different from number of field names: %d", row,
+                            fieldNames.length));
         }
 
         ObjectNode objectNode = mapper.createObjectNode();
 
         for (int i = 0; i < row.getArity(); i++) {
             //值为null的字段不需存es，无意义
-            if (row.getField(i) == null){
+            if (row.getField(i) == null) {
                 continue;
             }
             JsonNode node = mapper.valueToTree(row.getField(i));
-            objectNode.set(fieldNames[i], node);
+            //如果字段名称是以kvmap开头，则单独处理
+            if (fieldNames[i].startsWith(KVMAP)) {
+                Map<String, Object> map = (Map<String, Object>) row.getField(i);
+                if (map != null) {
+                    map.forEach((k, v) -> {
+                        objectNode.set(k, mapper.valueToTree(v));
+                    });
+                }
+            } else if (fieldNames[i].equals(DATEFORMAT)) {
+                try {
+                    Date date = new SimpleDateFormat(FORMAT).parse(row.getField(i).toString());
+                    objectNode.set(TIMESTAMP, mapper.valueToTree(date));
+                } catch (ParseException e) {
+                    logger.error("timestamp is fail",e);
+                    objectNode.set(TIMESTAMP, mapper.valueToTree(new Date()));
+                }
+
+            } else {
+                objectNode.set(fieldNames[i], node);
+            }
         }
 
         try {
@@ -81,7 +117,7 @@ public class JsonRowStringSchema implements Serializable {
         }
     }
 
-    public String[] getFieldNames(){
+    public String[] getFieldNames() {
         return this.fieldNames;
     }
 }

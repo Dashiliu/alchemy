@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
  */
 public class UserAgentFunction extends TableFunction<UAModel> implements BaseFunction{
 
-    private static final String FUNCTION_NANME = "useragent";
+    private static final String FUNCTION_NANME = "USERAGENT";
     private static final Logger logger = LoggerFactory.getLogger(UserAgentFunction.class);
 
     @Override

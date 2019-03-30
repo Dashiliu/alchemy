@@ -68,6 +68,10 @@ public class ConvertRowUtils {
         for (int i = 0; i < names.length; i++) {
             try {
                 final String name = names[i];
+                if ("message".equals(name)){
+                    row.setField(i, message);
+                    continue;
+                }
                 Object field = grokMap.get(name);
                 row.setField(i, field);
             } catch (Exception e) {

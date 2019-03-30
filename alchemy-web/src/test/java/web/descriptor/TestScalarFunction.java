@@ -1,6 +1,6 @@
 package web.descriptor;
 
-import com.dfire.platform.alchemy.api.function.table.GeoIpFunction;
+import com.dfire.platform.alchemy.api.function.scalar.GeoIpFunction;
 import com.dfire.platform.alchemy.api.function.table.UserAgentFunction;
 import org.apache.commons.lang3.StringUtils;
 
