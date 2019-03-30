@@ -4,6 +4,7 @@ import com.dfire.platform.alchemy.api.function.BaseFunction;
 import com.dfire.platform.alchemy.api.util.useragent.Client;
 import com.dfire.platform.alchemy.api.util.useragent.UAModel;
 import com.dfire.platform.alchemy.api.util.useragent.UserAgentUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.table.functions.TableFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,9 @@ public class UserAgentFunction extends TableFunction<UAModel> implements BaseFun
     }
 
     public void eval(String value) {
+        if (StringUtils.isBlank(value)){
+            return;
+        }
         try {
             UAModel model = new UAModel();
             Client client = UserAgentUtil.parse(value);
