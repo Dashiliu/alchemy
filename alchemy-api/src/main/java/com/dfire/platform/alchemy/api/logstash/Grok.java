@@ -3,29 +3,39 @@ package com.dfire.platform.alchemy.api.logstash;
 
 import io.krakens.grok.api.GrokCompiler;
 import io.krakens.grok.api.Match;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
 /****
  * grok {
-       match => ["message", "\[%{DATA:syslog_host}\] \[%{DATA:syslog_tag}\] %{DATA:am_datetime} %{LOGLEVEL:am_level}%{SPACE}%{DATA:am_class}(?: traceId\:%{DATA:traceId}|)(?: spandId\:%{DATA:spandId}|)(?: parentId\:%{DATA:parentId}|) (?:%{DATA:am_marker}([。|：|；])|)%{SPACE}(?:json\:%{SPACE}%{GREEDYDATA:am_json}|%{GREEDYDATA:am_msg})(?:exception_msg\:%{GREEDYDATA:exception}|)"]
+ match => ["message", "\[%{DATA:syslog_host}\] \[%{DATA:syslog_tag}\] %{DATA:am_datetime} %{LOGLEVEL:am_level}%{SPACE}%{DATA:am_class}(?: traceId\:%{DATA:traceId}|)(?: spandId\:%{DATA:spandId}|)(?: parentId\:%{DATA:parentId}|) (?:%{DATA:am_marker}([。|：|；])|)%{SPACE}(?:json\:%{SPACE}%{GREEDYDATA:am_json}|%{GREEDYDATA:am_msg})(?:exception_msg\:%{GREEDYDATA:exception}|)"]
  }
  */
 public class Grok {
+    private static final Logger logger = LoggerFactory.getLogger(Grok.class);
 
-	public static Map<String, Object> match(String message, String pattern) {
-		GrokCompiler grokCompiler = GrokCompiler.newInstance();
-		// 进行注册, registerDefaultPatterns()方法注册的是Grok内置的patterns
-		grokCompiler.registerDefaultPatterns();
+    public static Map<String, Object> match(String message, String pattern) {
+
+        Map<String, Object> resultMap = null;
+        try {
+            GrokCompiler grokCompiler = GrokCompiler.newInstance();
+            // 进行注册, registerDefaultPatterns()方法注册的是Grok内置的patterns
+            grokCompiler.registerDefaultPatterns();
         /*
          传入自定义的pattern, 会从已注册的patterns里面进行配对, 例如: TIMESTAMP_ISO8601:timestamp1, TIMESTAMP_ISO8601在注册的
          patterns里面有对应的解析格式, 配对成功后, 会在match时按照固定的解析格式将解析结果存入map中, 此处timestamp1作为输出的key
           */
-		io.krakens.grok.api.Grok grok = grokCompiler.compile(pattern);
-		Match grokMatch = grok.match(message);
-		Map<String, Object> resultMap = grokMatch.capture();
-		return resultMap;
-	}
+            io.krakens.grok.api.Grok grok = grokCompiler.compile(pattern);
+            Match grokMatch = grok.match(message);
+            resultMap = grokMatch.capture();
+        } catch (Exception e) {
+            logger.error("grok fail", e);
+        }
+
+        return resultMap;
+    }
 
 //	public static void main(String[] args) {
 //		String pattern = "\\[%{DATA:syslog_host}\\] \\[%{DATA:syslog_tag}\\] %{DATA:am_datetime} %{LOGLEVEL:am_level}%{SPACE}%{DATA:am_class}(?: traceId\\:%{DATA:traceId}|)(?: spandId\\:%{DATA:spandId}|)(?: parentId\\:%{DATA:parentId}|) (?:%{DATA:am_marker}([。|：|；])|)%{SPACE}(?:json\\:%{SPACE}%{GREEDYDATA:am_json}|%{GREEDYDATA:am_msg})(?:exception_msg\\:%{GREEDYDATA:exception}|)";

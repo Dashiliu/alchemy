@@ -1,13 +1,11 @@
 package com.dfire.platform.alchemy.formats.grok;
 
-import com.caucho.hessian.io.HessianInput;
 import com.dfire.platform.alchemy.formats.utils.ConvertRowUtils;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.types.Row;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 /**
