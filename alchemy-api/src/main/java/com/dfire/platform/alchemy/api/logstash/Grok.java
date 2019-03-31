@@ -1,8 +1,6 @@
 
 package com.dfire.platform.alchemy.api.logstash;
 
-import com.dtstack.jlogstash.date.DateParser;
-import com.dtstack.jlogstash.date.FormatParser;
 import io.krakens.grok.api.GrokCompiler;
 import io.krakens.grok.api.Match;
 
@@ -43,10 +41,5 @@ public class Grok {
 //		System.out.println(Grok.match(message3, pattern3));
 //	}
 
-	public static void main(String[] args) {
-		String input = "30/Mar/2019:16:05:28 +0800";
-        FormatParser dateParser = new FormatParser("dd/MMM/YYYY:HH:mm:ss Z",null, null);
-		System.out.println(dateParser.parse(input).toString());
-	}
 
 }

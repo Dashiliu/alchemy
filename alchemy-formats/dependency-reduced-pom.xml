@@ -60,10 +60,6 @@
           <groupId>org.apache.flink</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>commons-lang3</artifactId>
-          <groupId>org.apache.commons</groupId>
-        </exclusion>
-        <exclusion>
           <artifactId>kryo</artifactId>
           <groupId>com.esotericsoftware.kryo</groupId>
         </exclusion>
@@ -74,10 +70,6 @@
         <exclusion>
           <artifactId>commons-compress</artifactId>
           <groupId>org.apache.commons</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>slf4j-api</artifactId>
-          <groupId>org.slf4j</groupId>
         </exclusion>
         <exclusion>
           <artifactId>jsr305</artifactId>

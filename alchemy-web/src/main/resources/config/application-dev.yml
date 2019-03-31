@@ -108,15 +108,15 @@ alchemy:
 #    upload-url: http://upload.2dfire-daily.com/upbigfile
 #    download-url: https://assets.2dfire.com/
   clusters:
-#    - name: flink_default
-#      type: flink
-#      mode: zookeeper
-#      avg:  com.dfire.platform:alchemy-connectors:0.0.3-SNAPSHOT
-#      clusterId: daily-real
-#      zookeeperQuorum: 10.1.22.21:2181,10.1.22.22:2181,10.1.22.23:2181
-#      storagePath: hdfs://sunset004.daily.2dfire.info:8020/flink/ha/real
-#      address: 10.1.21.95
-#      port: 6123
+    - name: flink_default
+      type: flink
+      mode: zookeeper
+      avg:  com.dfire.platform:alchemy-connectors:0.0.3-SNAPSHOT
+      clusterId: daily-real
+      zookeeperQuorum: 10.1.22.21:2181,10.1.22.22:2181,10.1.22.23:2181
+      storagePath: hdfs://sunset004.daily.2dfire.info:8020/flink/ha/real
+      address: 10.1.21.95
+      port: 6123
     - name: flink_5_4_8
       type: flink
       mode: zookeeper
