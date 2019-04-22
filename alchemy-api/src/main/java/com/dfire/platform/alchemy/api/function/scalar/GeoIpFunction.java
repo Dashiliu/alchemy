@@ -48,23 +48,23 @@ public class GeoIpFunction extends ScalarFunction implements BaseFunction {
             CityResponse response = reader.city(ipAddress);
             Country country = response.getCountry();
             Continent continent = response.getContinent();
-            geoip.setCountryName(country.getNames().get("en"));
-            geoip.setCountryCode(country.getIsoCode());
-            geoip.setContinentCode(continent.getCode());
+            geoip.setCountry_name(country.getNames().get("en"));
+            geoip.setCountry_code(country.getIsoCode());
+            geoip.setContinent_code(continent.getCode());
             geoip.setIp(ip);
             City city = response.getCity();
             Location location = response.getLocation();
             geoip.setLatitude(location.getLatitude());
             geoip.setLongitude(location.getLongitude());
             com.dfire.platform.alchemy.api.common.Location geoLocation = new com.dfire.platform.alchemy.api.common.Location();
-            geoip.setCityName(city.getName());
+            geoip.setCity_name(city.getName());
 
             geoLocation.setLat(location.getLatitude());
             geoLocation.setLon(location.getLongitude());
             List<Subdivision> subdivisions = response.getSubdivisions();
             if (CollectionUtils.isNotEmpty(subdivisions)){
-                geoip.setRegionName(subdivisions.get(0).getNames().get("en"));
-                geoip.setRegionCode(subdivisions.get(0).getIsoCode());
+                geoip.setRegion_name(subdivisions.get(0).getNames().get("en"));
+                geoip.setRegion_code(subdivisions.get(0).getIsoCode());
             }
 
             geoip.setLocation(geoLocation);

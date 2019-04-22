@@ -5,40 +5,48 @@ package com.dfire.platform.alchemy.api.common;
  */
 public class Geoip {
 
-    private String cityName;
-    private String continentCode;
-    private String countryCode;
-    private String countryName;
+    private String city_name;
+    private String continent_code;
+    private String country_code;
+    private String country_name;
     private String ip;
     private Double latitude;
     private Double longitude;
     private Location location;
-    private String regionCode;
-    private String regionName;
+    private String region_code;
+    private String region_name;
     private String timezone;
 
-    public String getCityName() {
-        return cityName;
+    public String getCity_name() {
+        return city_name;
     }
 
-    public void setCityName(String cityName) {
-        this.cityName = cityName;
+    public void setCity_name(String city_name) {
+        this.city_name = city_name;
     }
 
-    public String getContinentCode() {
-        return continentCode;
+    public String getContinent_code() {
+        return continent_code;
     }
 
-    public void setContinentCode(String continentCode) {
-        this.continentCode = continentCode;
+    public void setContinent_code(String continent_code) {
+        this.continent_code = continent_code;
     }
 
-    public String getCountryName() {
-        return countryName;
+    public String getCountry_code() {
+        return country_code;
     }
 
-    public void setCountryName(String countryName) {
-        this.countryName = countryName;
+    public void setCountry_code(String country_code) {
+        this.country_code = country_code;
+    }
+
+    public String getCountry_name() {
+        return country_name;
+    }
+
+    public void setCountry_name(String country_name) {
+        this.country_name = country_name;
     }
 
     public String getIp() {
@@ -73,20 +81,20 @@ public class Geoip {
         this.location = location;
     }
 
-    public String getRegionCode() {
-        return regionCode;
+    public String getRegion_code() {
+        return region_code;
     }
 
-    public void setRegionCode(String regionCode) {
-        this.regionCode = regionCode;
+    public void setRegion_code(String region_code) {
+        this.region_code = region_code;
     }
 
-    public String getRegionName() {
-        return regionName;
+    public String getRegion_name() {
+        return region_name;
     }
 
-    public void setRegionName(String regionName) {
-        this.regionName = regionName;
+    public void setRegion_name(String region_name) {
+        this.region_name = region_name;
     }
 
     public String getTimezone() {
@@ -95,13 +103,5 @@ public class Geoip {
 
     public void setTimezone(String timezone) {
         this.timezone = timezone;
-    }
-
-    public String getCountryCode() {
-        return countryCode;
-    }
-
-    public void setCountryCode(String countryCode) {
-        this.countryCode = countryCode;
     }
 }
