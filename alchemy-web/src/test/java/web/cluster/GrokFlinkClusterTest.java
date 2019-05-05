@@ -32,8 +32,8 @@ public class GrokFlinkClusterTest {
         clusterInfo.setAddress("10.1.21.95");
         clusterInfo.setMode(HighAvailabilityMode.ZOOKEEPER.toString().toLowerCase());
         clusterInfo.setPort(6123);
-        clusterInfo.setAvg("com.dfire.platform:alchemy-connectors:0.0.1-SNAPSHOT");
-        clusterInfo.setStoragePath("hdfs://sunset004.daily.2dfire.info:8020/flink/ha/real");
+        clusterInfo.setAvg("com.dfire.platform:alchemy-connectors:0.0.7");
+        clusterInfo.setStoragePath("hdfs://sunset002.daily.2dfire.info:8020/flink/ha/real");
         clusterInfo.setZookeeperQuorum("10.1.22.21:2181,10.1.22.22:2181,10.1.22.23:2181");
         this.cluster = new FlinkCluster();
         cluster.start(clusterInfo);

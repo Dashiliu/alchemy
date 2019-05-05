@@ -13,7 +13,7 @@ import org.elasticsearch.client.Requests;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 
-public class ElasticsearchTableFunction implements ElasticsearchSinkFunction<Tuple2<Boolean, Row>>, Serializable {
+public class ElasticsearchTableFunction implements ElasticsearchSinkFunction<Row>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -40,14 +40,12 @@ public class ElasticsearchTableFunction implements ElasticsearchSinkFunction<Tup
     }
 
     @Override
-    public void process(Tuple2<Boolean, Row> booleanRowTuple2, RuntimeContext runtimeContext,
+    public void process(Row row, RuntimeContext runtimeContext,
                         RequestIndexer requestIndexer) {
-        if (booleanRowTuple2 == null || booleanRowTuple2.f1 == null) {
+        if (row == null ) {
             return;
         }
-        if (booleanRowTuple2.f0) {
-            requestIndexer.add(createIndexRequest(booleanRowTuple2.f1));
-        }
+        requestIndexer.add(createIndexRequest(row));
     }
 
     private IndexRequest createIndexRequest(Row row) {
