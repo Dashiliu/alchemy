@@ -1,15 +1,13 @@
 package com.dfire.platform.alchemy.api.function.scalar;
 
 import com.dfire.platform.alchemy.api.function.BaseFunction;
-import com.dfire.platform.alchemy.api.logstash.Grok;
+import com.dfire.platform.alchemy.api.logstash.GrokProxy;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.table.functions.ScalarFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 /***
@@ -30,7 +28,7 @@ public class GrokFunction extends ScalarFunction implements BaseFunction, Serial
         if (StringUtils.isBlank(message)){
             return null;
         }
-        return Grok.match(message,pattern);
+        return GrokProxy.getInstance().match(message,pattern);
     }
 
 }

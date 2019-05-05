@@ -1,6 +1,6 @@
 package com.dfire.platform.alchemy.formats.utils;
 
-import com.dfire.platform.alchemy.api.logstash.Grok;
+import com.dfire.platform.alchemy.api.logstash.GrokProxy;
 import org.apache.flink.types.Row;
 
 import java.lang.reflect.Field;
@@ -64,7 +64,7 @@ public class ConvertRowUtils {
     public static Row grokConvertToRow(String message, String[] names, String regular) {
         final Row row = new Row(names.length);
 //        names[names.length+1] = "client_ip";
-        Map<String, Object> grokMap = Grok.match(message, regular);
+        Map<String, Object> grokMap = GrokProxy.getInstance().match(message, regular);
         for (int i = 0; i < names.length; i++) {
             try {
                 final String name = names[i];
