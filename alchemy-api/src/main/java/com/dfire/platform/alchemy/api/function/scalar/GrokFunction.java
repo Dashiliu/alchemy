@@ -17,7 +17,6 @@ import java.util.Map;
 public class GrokFunction extends ScalarFunction implements BaseFunction, Serializable {
 
     private static final String FUNCTION_NANME = "GROK";
-    private static final Logger logger = LoggerFactory.getLogger(GrokFunction.class);
 
     @Override
     public String getFunctionName() {

@@ -1,5 +1,6 @@
 package com.dfire.platform.alchemy.web.cluster;
 
+import com.dfire.platform.alchemy.web.descriptor.FunctionFactory;
 import com.dfire.platform.alchemy.api.function.aggregate.FlinkAllAggregateFunction;
 import com.dfire.platform.alchemy.api.function.scalar.FlinkAllScalarFunction;
 import com.dfire.platform.alchemy.api.function.table.FlinkAllTableFunction;
@@ -12,7 +13,6 @@ import com.dfire.platform.alchemy.web.common.Constants;
 import com.dfire.platform.alchemy.web.common.ResultMessage;
 import com.dfire.platform.alchemy.web.common.Status;
 import com.dfire.platform.alchemy.web.descriptor.Descriptor;
-import com.dfire.platform.alchemy.web.descriptor.FunctionFactory;
 import com.dfire.platform.alchemy.web.util.JarArgUtils;
 import com.dfire.platform.alchemy.web.util.MavenJarUtils;
 import com.dfire.platform.alchemy.web.util.PropertiesUtils;
@@ -261,7 +261,6 @@ public class FlinkCluster implements Cluster {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-
         });
         if (message.isTest()) {
 //            System.out.println(execEnv.getExecutionPlan());

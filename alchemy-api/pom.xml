@@ -11,7 +11,6 @@
 
     <artifactId>alchemy-api</artifactId>
     <packaging>jar</packaging>
-    <version>0.0.7</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

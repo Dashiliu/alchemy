@@ -16,7 +16,6 @@ import java.util.Map;
 public class MapKVFunction extends ScalarFunction implements BaseFunction, Serializable {
 
     private static final String FUNCTION_NANME = "MAPKVCHANGE";
-    private static final Logger logger = LoggerFactory.getLogger(MapKVFunction.class);
 
     @Override
     public String getFunctionName() {

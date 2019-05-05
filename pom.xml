@@ -16,6 +16,7 @@
     <version>0.0.7</version>
     <modules>
         <module>alchemy-api</module>
+        <module>alchemy-benchmarks</module>
         <module>alchemy-web</module>
         <module>alchemy-connectors</module>
         <module>alchemy-formats</module>
