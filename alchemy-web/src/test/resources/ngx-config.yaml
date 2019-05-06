@@ -89,6 +89,43 @@ job:
               property-version: 1
               type: grok
               regular: \[%{DATA:syslog_host}\] \[%{DATA:syslog_tag}\] "%{IP:remote_addr}" "%{DATA:remote_user}" "\[%{HTTPDATE:time_local}\]" "%{WORD:http_method} %{URIPATH:request}(?:\?%{DATA:request_param}|) HTTP\/%{NUMBER:http_version:float}" "(?:%{NUMBER:status:integer}|-)" "(?:%{NUMBER:body_bytes_sent:integer}|-)" "%{DATA:http_referer}" "%{DATA:user_agent}" "%{WORD} %{DATA:url}" "%{DATA:host_name}" "%{DATA:http_x_forwarded_for}" "(?:%{NUMBER:request_time:float}|%{DATA})" "%{DATA:remote_port}" "(?:%{DATA:upstream_response_time}|-)" "%{DATA:http_x_readtime}" "(?:/%{DATA:uri}|%{DATA})" "%{DATA:upstream_status}" "%{DATA:upstream_addr}" "%{DATA:nuid}" "%{DATA:request_id}" "%{DATA:http_x_forwarded_proto}"
+        udfs:
+            - name: change
+              type: logstash
+              value: com.dfire.platform.alchemy.function.logstash.ChangeFunction
+            - name: DATEFORMAT
+              type: logstash
+              value: com.dfire.platform.alchemy.function.logstash.DateFormatFunction
+            - name: GEOIP
+              type: logstash
+              value: com.dfire.platform.alchemy.function.logstash.GeoIpFunction
+            - name: GROK
+              type: logstash
+              value: com.dfire.platform.alchemy.function.logstash.GrokFunction
+            - name: GSUB
+              type: logstash
+              value: com.dfire.platform.alchemy.function.logstash.GsubFunction
+            - name: KV
+              type: logstash
+              value: com.dfire.platform.alchemy.function.logstash.KvFunction
+            - name: MAPCHANGE
+              type: logstash
+              value: com.dfire.platform.alchemy.function.logstash.MapFunction
+            - name: MAPKVCHANGE
+              type: logstash
+              value: com.dfire.platform.alchemy.function.logstash.MapKVFunction
+            - name: REMOVE
+              type: logstash
+              value: com.dfire.platform.alchemy.function.logstash.RemoveMapFunction
+            - name: SPLIT
+              type: logstash
+              value: com.dfire.platform.alchemy.function.logstash.SplitFunction
+            - name: URLDECODE
+              type: logstash
+              value: com.dfire.platform.alchemy.function.logstash.UrldecodeFunction
+            - name: USERAGENT
+              type: logstash
+              value: com.dfire.platform.alchemy.function.logstash.UserAgentFunction
         sinks:
             - name: esSink
               index: sg-ngx-acc

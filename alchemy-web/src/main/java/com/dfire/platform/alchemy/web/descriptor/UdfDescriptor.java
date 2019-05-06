@@ -54,7 +54,7 @@ public class UdfDescriptor implements CoreDescriptor {
 
     @Override
     public String getType() {
-        return Constants.TYPE_VALUE_UDF;
+        return this.type;
     }
 
     @Override
