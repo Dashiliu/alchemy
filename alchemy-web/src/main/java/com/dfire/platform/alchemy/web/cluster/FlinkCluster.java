@@ -277,6 +277,9 @@ public class FlinkCluster implements Cluster {
     }
 
     private  void addUrl(String name , List<URL> urls) throws MalformedURLException {
+        if (StringUtils.isEmpty(name)){
+            return;
+        }
         String avg = AlchemyProperties.get(name);
         if (StringUtils.isEmpty(avg)) {
             LOGGER.info("{} is not exist  in alchemy properties" , name);
