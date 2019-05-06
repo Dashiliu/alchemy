@@ -4,7 +4,8 @@ job:
     parallelism: 1
     timeCharacteristic: EventTime
     #checkpointingInterval: 10000 #ms
-    #avg: com.dfire.platform:sunset-sql:0.0.1-SNAPSHOT
+    avgs:
+        - com.dfire.platform:sunset-sql:0.0.1-SNAPSHOT
     #jarPath: /Users/dongbinglin/Code/platform/alchemy/alchemy-connectors/target/alchemy-connectors-1.0-SNAPSHOT.jar
     table:
 #        sql: select * from  TaxiRides

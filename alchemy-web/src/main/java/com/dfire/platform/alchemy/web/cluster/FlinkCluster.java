@@ -1,9 +1,5 @@
 package com.dfire.platform.alchemy.web.cluster;
 
-import com.dfire.platform.alchemy.web.descriptor.FunctionFactory;
-import com.dfire.platform.alchemy.api.function.aggregate.FlinkAllAggregateFunction;
-import com.dfire.platform.alchemy.api.function.scalar.FlinkAllScalarFunction;
-import com.dfire.platform.alchemy.api.function.table.FlinkAllTableFunction;
 import com.dfire.platform.alchemy.web.cluster.request.*;
 import com.dfire.platform.alchemy.web.cluster.response.JobStatusResponse;
 import com.dfire.platform.alchemy.web.cluster.response.Response;
@@ -13,6 +9,7 @@ import com.dfire.platform.alchemy.web.common.Constants;
 import com.dfire.platform.alchemy.web.common.ResultMessage;
 import com.dfire.platform.alchemy.web.common.Status;
 import com.dfire.platform.alchemy.web.descriptor.Descriptor;
+import com.dfire.platform.alchemy.web.util.AlchemyProperties;
 import com.dfire.platform.alchemy.web.util.JarArgUtils;
 import com.dfire.platform.alchemy.web.util.MavenJarUtils;
 import com.dfire.platform.alchemy.web.util.PropertiesUtils;
@@ -43,6 +40,7 @@ import org.apache.flink.table.api.java.StreamTableEnvironment;
 import org.apache.flink.table.functions.AggregateFunction;
 import org.apache.flink.table.functions.ScalarFunction;
 import org.apache.flink.table.functions.TableFunction;
+import org.apache.flink.table.sinks.TableSink;
 import org.apache.flink.table.sources.TableSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -166,7 +164,7 @@ public class FlinkCluster implements Cluster {
             try {
                 classLoader = program.getUserCodeClassLoader();
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.warn(e.getMessage());
             }
 
             Optimizer optimizer = new Optimizer(new DataStatistics(), new DefaultCostEstimator(), new Configuration());
@@ -210,9 +208,11 @@ public class FlinkCluster implements Cluster {
         } else {
             execEnv.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime);
         }
+        List<URL> urls =new ArrayList<>();
         message.getTable().getSources().forEach(consumer -> {
             try {
                 TableSource tableSource = consumer.transform(clusterType());
+                addUrl(consumer.getConnectorDescriptor().getType() , urls);
                 env.registerTableSource(consumer.getName(), tableSource);
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -220,19 +220,20 @@ public class FlinkCluster implements Cluster {
         });
         if (CollectionUtils.isNotEmpty(message.getTable().getUdfs())) {
             message.getTable().getUdfs().forEach(udfDescriptor -> {
-                Object udf = null;
+                Object udf;
                 try {
                     replaceCodeValue(message, udfDescriptor);
                     udf = udfDescriptor.transform(clusterType());
-                    if (udf instanceof FlinkAllTableFunction) {
-                        env.registerFunction(udfDescriptor.getName(), (FlinkAllTableFunction) udf);
-                    } else if (udf instanceof FlinkAllAggregateFunction) {
-                        env.registerFunction(udfDescriptor.getName(), (FlinkAllAggregateFunction) udf);
-                    } else if (udf instanceof FlinkAllScalarFunction) {
-                        env.registerFunction(udfDescriptor.getName(), (FlinkAllScalarFunction) udf);
+                    if (udf instanceof TableFunction) {
+                        env.registerFunction(udfDescriptor.getName(), (TableFunction) udf);
+                    } else if (udf instanceof AggregateFunction) {
+                        env.registerFunction(udfDescriptor.getName(), (AggregateFunction) udf);
+                    } else if (udf instanceof ScalarFunction) {
+                        env.registerFunction(udfDescriptor.getName(), (ScalarFunction) udf);
                     } else {
-                        LOGGER.warn("Unknown UDF {} was found.", udf.getClass().getName());
+                        throw new RuntimeException("Unknown UDF {} was found."+udf.getClass().getName());
                     }
+                    addUrl(udfDescriptor.getType() , urls);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -240,52 +241,50 @@ public class FlinkCluster implements Cluster {
             });
         }
 
-        if (FunctionFactory.me.getBaseFunctionMap() != null) {
-            FunctionFactory.me.getBaseFunctionMap().forEach((name, function) -> {
-                if (function instanceof TableFunction) {
-                    env.registerFunction(name, (TableFunction) function);
-                } else if (function instanceof ScalarFunction) {
-                    env.registerFunction(name, (ScalarFunction) function);
-                } else if (function instanceof AggregateFunction) {
-                    env.registerFunction(name, (AggregateFunction) function);
-                }
-            });
-        }
-
-
         Table table = env.sqlQuery(message.getTable().getSql());
         message.getTable().getSinkDescriptors().forEach(sinkDescriptor -> {
             try {
                 replaceCodeValue(message, sinkDescriptor);
-                table.writeToSink(sinkDescriptor.transform(clusterType()));
+                TableSink tableSink = sinkDescriptor.transform(clusterType());
+                table.writeToSink(tableSink);
+                addUrl(sinkDescriptor.getType() , urls);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });
         if (message.isTest()) {
-//            System.out.println(execEnv.getExecutionPlan());
-//            return new SubmitFlinkResponse("");
             execEnv.execute(message.getJobName());
             return new SubmitFlinkResponse(true, "");
         }
         StreamGraph streamGraph = execEnv.getStreamGraph();
         streamGraph.setJobName(message.getJobName());
-        List<URL> jarFiles = new ArrayList<>();
-        if (StringUtils.isNotEmpty(message.getAvg())) {
-            jarFiles.addAll(createPath(MavenJarUtils.forAvg(message.getAvg()).getJarFile()));
+        if (CollectionUtils.isNotEmpty(message.getAvgs())) {
+            urls.addAll(createPath(message.getAvgs()));
         }
-        jarFiles.addAll(createGlobalPath());
+        urls.addAll(createGlobalPath());
         ClassLoader usercodeClassLoader
-            = JobWithJars.buildUserCodeClassLoader(jarFiles, Collections.emptyList(), getClass().getClassLoader());
+            = JobWithJars.buildUserCodeClassLoader(urls, Collections.emptyList(), getClass().getClassLoader());
         try {
             JobSubmissionResult submissionResult
-                = clusterClient.run(streamGraph, jarFiles, Collections.emptyList(), usercodeClassLoader);
+                = clusterClient.run(streamGraph, urls, Collections.emptyList(), usercodeClassLoader);
             LOGGER.trace(" submit sql request success,jobId:{}", submissionResult.getJobID());
             return new SubmitFlinkResponse(true, submissionResult.getJobID().toString());
         } catch (Exception e) {
             String term = e.getMessage() == null ? "." : (": " + e.getMessage());
             LOGGER.error(" submit sql request fail", e);
             return new SubmitFlinkResponse(term);
+        }
+    }
+
+    private  void addUrl(String name , List<URL> urls) throws MalformedURLException {
+        String avg = AlchemyProperties.get(name);
+        if (StringUtils.isEmpty(avg)) {
+            LOGGER.info("{} is not exist  in alchemy properties" , name);
+            return;
+        }
+        URL url = MavenJarUtils.forAvg(avg).getJarFile().getAbsoluteFile().toURI().toURL();
+        if (!urls.contains(url)){
+            urls.add(url);
         }
     }
 
@@ -313,6 +312,22 @@ public class FlinkCluster implements Cluster {
         }
     }
 
+    private List<URL> createPath(List<String> avgs) throws MalformedURLException {
+        List<URL> jarFiles = new ArrayList<>(avgs.size());
+        for (String avg : avgs){
+            try {
+                URL jarFileUrl =  MavenJarUtils.forAvg(avg).getJarFile().getAbsoluteFile().toURI().toURL();
+                jarFiles.add(jarFileUrl);
+                JobWithJars.checkJarFile(jarFileUrl);
+            } catch (MalformedURLException e) {
+                throw new IllegalArgumentException("avg is invalid '" +avg + "'", e);
+            } catch (IOException e) {
+                throw new RuntimeException("Problem with avg " + avg, e);
+            }
+        }
+        return jarFiles;
+    }
+
     private List<URL> createPath(File file) {
         List<URL> jarFiles = new ArrayList<>(1);
         if (file == null) {
@@ -331,22 +346,11 @@ public class FlinkCluster implements Cluster {
         return jarFiles;
     }
 
-    private List<URL> createGlobalPath() {
-        if (StringUtils.isEmpty(this.clusterInfo.getAvg())) {
+    private List<URL> createGlobalPath() throws MalformedURLException {
+        if (CollectionUtils.isEmpty(this.clusterInfo.getAvgs())) {
             return Collections.emptyList();
         }
-        List<URL> jarFiles = new ArrayList<>(1);
-        File file = MavenJarUtils.forAvg(this.clusterInfo.getAvg()).getJarFile();
-        try {
-            URL jarFileUrl = file.getAbsoluteFile().toURI().toURL();
-            jarFiles.add(jarFileUrl);
-            JobWithJars.checkJarFile(jarFileUrl);
-        } catch (MalformedURLException e) {
-            throw new IllegalArgumentException("JAR avg is invalid '" + this.clusterInfo.getAvg() + "'", e);
-        } catch (IOException e) {
-            throw new RuntimeException("Problem with jar file " + file.getAbsolutePath(), e);
-        }
-        return jarFiles;
+        return createPath(this.clusterInfo.getAvgs());
     }
 
     @Override

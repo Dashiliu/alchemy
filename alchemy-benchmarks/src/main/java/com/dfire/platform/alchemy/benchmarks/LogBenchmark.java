@@ -19,12 +19,12 @@
 package com.dfire.platform.alchemy.benchmarks;
 
 
-import com.dfire.platform.alchemy.api.function.scalar.*;
-import com.dfire.platform.alchemy.api.function.table.UserAgentFunction;
+
 import com.dfire.platform.alchemy.benchmarks.function.EmptyTableSink;
 import com.dfire.platform.alchemy.benchmarks.function.LogTableSource;
 import com.dfire.platform.alchemy.benchmarks.generate.NginxGenerateLog;
 import com.dfire.platform.alchemy.formats.grok.GrokRowDeserializationSchema;
+import com.dfire.platform.alchemy.function.logstash.*;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
@@ -36,12 +36,11 @@ import org.apache.flink.types.Row;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.OperationsPerInvocation;
 import org.openjdk.jmh.runner.Runner;
-import org.openjdk.jmh.runner.RunnerException;
+
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.VerboseMode;
 
-import java.io.IOException;
 
 @OperationsPerInvocation(value = LogBenchmark.RECORDS_PER_INVOCATION)
 public class LogBenchmark extends BenchmarkBase {

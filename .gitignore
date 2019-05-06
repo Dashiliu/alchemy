@@ -71,6 +71,8 @@ classes/
 ######################
 /log/
 /target/
+target
+dependency-reduced-pom.xml
 
 ######################
 # Gradle

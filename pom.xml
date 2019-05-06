@@ -13,13 +13,14 @@
     <groupId>com.dfire.platform</groupId>
     <artifactId>alchemy</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.7</version>
+    <version>0.0.8-SNAPSHOT</version>
     <modules>
         <module>alchemy-api</module>
         <module>alchemy-benchmarks</module>
-        <module>alchemy-web</module>
         <module>alchemy-connectors</module>
         <module>alchemy-formats</module>
+        <module>alchemy-function</module>
+        <module>alchemy-web</module>
     </modules>
 
     <name>alchemy</name>
@@ -56,6 +57,9 @@
         <springfox.version>2.7.0</springfox.version>
         <spring.version>5.0.6.RELEASE</spring.version>
         <snakeyaml.version>1.18</snakeyaml.version>
+        <grok.version>0.1.9</grok.version>
+        <geoip2.version>2.12.0</geoip2.version>
+        <slf4j-api.version>1.7.7</slf4j-api.version>
     </properties>
 
     <dependencies>
@@ -69,6 +73,11 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j-api.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.twodfire</groupId>
                 <artifactId>twodfire-redis</artifactId>
@@ -380,6 +389,17 @@
                 <artifactId>snakeyaml</artifactId>
                 <version>${snakeyaml.version}</version>
             </dependency>
+            <dependency>
+                <groupId>io.krakens</groupId>
+                <artifactId>java-grok</artifactId>
+                <version>${grok.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.maxmind.geoip2</groupId>
+                <artifactId>geoip2</artifactId>
+                <version>${geoip2.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -406,6 +426,10 @@
                 <plugin>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>3.0.2</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>3.0.0</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-install-plugin</artifactId>

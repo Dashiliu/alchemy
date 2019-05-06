@@ -5,7 +5,7 @@
   <parent>
     <artifactId>alchemy</artifactId>
     <groupId>com.dfire.platform</groupId>
-    <version>0.0.7</version>
+    <version>0.0.8-SNAPSHOT</version>
   </parent>
 
   <artifactId>alchemy-benchmarks</artifactId>
@@ -18,7 +18,18 @@
   <dependencies>
     <dependency>
       <groupId>com.dfire.platform</groupId>
-      <artifactId>alchemy-formats</artifactId>
+      <artifactId>alchemy-formats-grok</artifactId>
+      <version>${project.parent.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.dfire.platform</groupId>
+          <artifactId>alchemy-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.dfire.platform</groupId>
+      <artifactId>alchemy-function-logstash</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
     <dependency>

@@ -56,7 +56,7 @@ public final class Constants {
 
     public static final String SINK_TYPE_VALUE_ROCKETMQ = "rocketMQ";
 
-    public static final String SINK_TYPE_VALUE_OPENTSDB = "opentsdb";
+    public static final String SINK_TYPE_VALUE_OPENTSDB = "tsdb";
 
     // Regex for acceptable logins
     public static final String LOGIN_REGEX = "^[_.@A-Za-z0-9-]*$";

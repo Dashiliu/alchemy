@@ -5,7 +5,7 @@
     <parent>
         <artifactId>alchemy</artifactId>
         <groupId>com.dfire.platform</groupId>
-        <version>0.0.7</version>
+        <version>0.0.8-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -145,12 +145,62 @@
         </dependency>
         <dependency>
             <groupId>com.dfire.platform</groupId>
-            <artifactId>alchemy-formats</artifactId>
+            <artifactId>alchemy-formats-grok</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>com.dfire.platform</groupId>
-            <artifactId>alchemy-connectors</artifactId>
+            <artifactId>alchemy-formats-hessian</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.dfire.platform</groupId>
+            <artifactId>alchemy-formats-protostuff</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.dfire.platform</groupId>
+            <artifactId>alchemy-formats-json</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.dfire.platform</groupId>
+            <artifactId>alchemy-function-common</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.dfire.platform</groupId>
+            <artifactId>alchemy-function-logstash</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.dfire.platform</groupId>
+            <artifactId>alchemy-connectors-elasticsearch</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.dfire.platform</groupId>
+            <artifactId>alchemy-connectors-hbase</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.dfire.platform</groupId>
+            <artifactId>alchemy-connectors-kafka</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.dfire.platform</groupId>
+            <artifactId>alchemy-connectors-redis</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.dfire.platform</groupId>
+            <artifactId>alchemy-connectors-rocketmq</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.dfire.platform</groupId>
+            <artifactId>alchemy-connectors-tsdb</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
@@ -164,6 +214,10 @@
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-streaming-java_${scala.binary.version}</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table_${scala.binary.version}</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
@@ -541,6 +595,12 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <defaultGoal>spring-boot:run</defaultGoal>
         <finalName>alchemy</finalName>
         <plugins>

@@ -3,14 +3,15 @@ package web.descriptor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+import com.dfire.platform.alchemy.function.aggregate.FlinkAllAggregateFunction;
+import com.dfire.platform.alchemy.function.scalar.FlinkAllScalarFunction;
 import org.apache.flink.table.functions.FunctionContext;
 import org.junit.Test;
 
-import com.dfire.platform.alchemy.api.function.aggregate.FlinkAllAggregateFunction;
-import com.dfire.platform.alchemy.api.function.scalar.FlinkAllScalarFunction;
+
 import com.dfire.platform.alchemy.web.common.ClusterType;
-import com.dfire.platform.alchemy.web.common.ReadMode;
 import com.dfire.platform.alchemy.web.descriptor.UdfDescriptor;
+import web.descriptor.function.TestScalarFunction;
 
 /**
  * @author congbai
@@ -26,7 +27,7 @@ public class UdfDescriptorTest {
         clazz.asSubclass(testScalarFunction.getClass().getInterfaces()[0]);
         Constructor c = clazz.getConstructor(testScalarFunction.getClass().getInterfaces()[0]);
         FlinkAllScalarFunction flinkAllScalarFunction = (FlinkAllScalarFunction)c.newInstance(testScalarFunction);
-
+        assert  flinkAllScalarFunction != null;
     }
 
 

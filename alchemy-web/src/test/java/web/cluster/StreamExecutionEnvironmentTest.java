@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
+import com.dfire.platform.alchemy.function.aggregate.FlinkAllAggregateFunction;
 import org.apache.flink.api.common.JobSubmissionResult;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -29,7 +30,6 @@ import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.junit.Test;
 
-import com.dfire.platform.alchemy.api.function.aggregate.FlinkAllAggregateFunction;
 import com.dfire.platform.alchemy.web.util.PropertiesUtils;
 
 /**
@@ -142,7 +142,7 @@ public class StreamExecutionEnvironmentTest {
         configuration.setString(HighAvailabilityOptions.HA_ZOOKEEPER_QUORUM,
             "10.1.22.21:2181,10.1.22.22:2181,10.1.22.23:2181");
         configuration.setString(HighAvailabilityOptions.HA_STORAGE_PATH,
-            "hdfs://sunset004.daily.2dfire.info:8020/flink/ha");
+            "hdfs://sunset002.daily.2dfire.info:8020/flink/ha");
         configuration.setString(JobManagerOptions.ADDRESS, "10.1.21.95");
         configuration.setInteger(JobManagerOptions.PORT, 6123);
 

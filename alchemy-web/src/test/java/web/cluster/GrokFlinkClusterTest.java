@@ -32,18 +32,12 @@ public class GrokFlinkClusterTest {
         clusterInfo.setAddress("10.1.21.95");
         clusterInfo.setMode(HighAvailabilityMode.ZOOKEEPER.toString().toLowerCase());
         clusterInfo.setPort(6123);
-        clusterInfo.setAvg("com.dfire.platform:alchemy-connectors:0.0.7");
+        clusterInfo.setAvg("org.apache.flink:flink-table_2.11:1.5.4");
         clusterInfo.setStoragePath("hdfs://sunset002.daily.2dfire.info:8020/flink/ha/real");
         clusterInfo.setZookeeperQuorum("10.1.22.21:2181,10.1.22.22:2181,10.1.22.23:2181");
         this.cluster = new FlinkCluster();
         cluster.start(clusterInfo);
     }
-
-    @Test
-    public void sendJar() {
-
-    }
-
 
     @Test
     public void ngxTestSql() throws Exception {

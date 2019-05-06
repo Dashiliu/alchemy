@@ -1,15 +1,15 @@
 package com.dfire.platform.alchemy.web.descriptor;
 
+import com.dfire.platform.alchemy.function.StreamAggregateFunction;
+import com.dfire.platform.alchemy.function.StreamScalarFunction;
+import com.dfire.platform.alchemy.function.StreamTableFunction;
+import com.dfire.platform.alchemy.function.aggregate.FlinkAllAggregateFunction;
+import com.dfire.platform.alchemy.function.scalar.FlinkAllScalarFunction;
+import com.dfire.platform.alchemy.function.table.FlinkAllTableFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.springframework.util.Assert;
 
-import com.dfire.platform.alchemy.api.function.StreamAggregateFunction;
-import com.dfire.platform.alchemy.api.function.StreamScalarFunction;
-import com.dfire.platform.alchemy.api.function.StreamTableFunction;
-import com.dfire.platform.alchemy.api.function.aggregate.FlinkAllAggregateFunction;
-import com.dfire.platform.alchemy.api.function.scalar.FlinkAllScalarFunction;
-import com.dfire.platform.alchemy.api.function.table.FlinkAllTableFunction;
 import com.dfire.platform.alchemy.api.util.GroovyCompiler;
 import com.dfire.platform.alchemy.web.common.ClusterType;
 import com.dfire.platform.alchemy.web.common.Constants;
@@ -29,6 +29,8 @@ public class UdfDescriptor implements CoreDescriptor {
      */
     private String value;
 
+    private String type;
+
     @Override
     public String getName() {
         return name;
@@ -36,6 +38,10 @@ public class UdfDescriptor implements CoreDescriptor {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     @Override
@@ -67,7 +73,6 @@ public class UdfDescriptor implements CoreDescriptor {
             clazz = GroovyCompiler.compile(this.value, this.name);
         }
         try {
-
             Object udf = clazz.newInstance();
             if (udf instanceof StreamScalarFunction) {
                 StreamScalarFunction<?> streamScalarFunction = (StreamScalarFunction<?>)udf;
@@ -85,11 +90,12 @@ public class UdfDescriptor implements CoreDescriptor {
                     = new FlinkAllAggregateFunction((StreamAggregateFunction)udf);
                 initAggregateFuntion(streamAggregateFunction, aggregateFunction);
                 return (T)aggregateFunction;
+            }else{
+                return (T) udf;
             }
         } catch (Exception ex) {
             throw new IllegalArgumentException("Invalid UDF " + this.name, ex);
         }
-        throw new IllegalArgumentException("Invalid UDF " + this.name);
     }
 
     private void initScalarFuntion(StreamScalarFunction<?> streamScalarFunction,

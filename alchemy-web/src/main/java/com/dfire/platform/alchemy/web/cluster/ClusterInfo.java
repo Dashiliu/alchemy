@@ -2,6 +2,9 @@ package com.dfire.platform.alchemy.web.cluster;
 
 import org.apache.flink.runtime.jobmanager.HighAvailabilityMode;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author congbai
  * @date 01/06/2018
@@ -24,7 +27,7 @@ public class ClusterInfo {
 
     private Integer port;
 
-    private String avg;
+    private List<String> avgs;
 
     public String getName() {
         return name;
@@ -90,11 +93,17 @@ public class ClusterInfo {
         this.port = port;
     }
 
-    public String getAvg() {
-        return avg;
+    public List<String> getAvgs() {
+        return avgs;
     }
 
     public void setAvg(String avg) {
-        this.avg = avg;
+        List<String> avgs =new ArrayList<>(1);
+        avgs.add(avg);
+        this.avgs = avgs;
+    }
+
+    public void setAvgs(List<String> avgs) {
+        this.avgs = avgs;
     }
 }

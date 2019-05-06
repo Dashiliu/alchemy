@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.dfire.platform.alchemy.formats.grok.GrokRowDeserializationSchema;
+import com.dfire.platform.alchemy.formats.hessian.HessianRowDeserializationSchema;
+import com.dfire.platform.alchemy.formats.protostuff.ProtostuffRowDeserializationSchema;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
@@ -28,8 +30,6 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.springframework.util.Assert;
 
 import com.dfire.platform.alchemy.connectors.kafka.AlchemyKafkaTableSource;
-import com.dfire.platform.alchemy.formats.hessian.HessianRowDeserializationSchema;
-import com.dfire.platform.alchemy.formats.protostuff.ProtostuffRowDeserializationSchema;
 import com.dfire.platform.alchemy.web.common.*;
 import com.dfire.platform.alchemy.web.util.PropertiesUtils;
 

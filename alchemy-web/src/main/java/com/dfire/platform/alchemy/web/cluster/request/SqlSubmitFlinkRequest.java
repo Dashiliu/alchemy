@@ -3,13 +3,15 @@ package com.dfire.platform.alchemy.web.cluster.request;
 import com.dfire.platform.alchemy.web.descriptor.TableDescriptor;
 import org.springframework.util.Assert;
 
+import java.util.List;
+
 /**
  * @author congbai
  * @date 04/06/2018
  */
 public class SqlSubmitFlinkRequest extends AbstractSubmitRequest {
 
-    private String avg;
+    private List<String> avgs;
     private Integer parallelism;
     private Long checkpointingInterval;
     private String timeCharacteristic;
@@ -18,12 +20,12 @@ public class SqlSubmitFlinkRequest extends AbstractSubmitRequest {
 
     private TableDescriptor table;
 
-    public String getAvg() {
-        return avg;
+    public List<String> getAvgs() {
+        return avgs;
     }
 
-    public void setAvg(String avg) {
-        this.avg = avg;
+    public void setAvgs(List<String> avgs) {
+        this.avgs = avgs;
     }
 
     public Integer getParallelism() {
