@@ -213,6 +213,7 @@ public class FlinkCluster implements Cluster {
             try {
                 TableSource tableSource = consumer.transform(clusterType());
                 addUrl(consumer.getConnectorDescriptor().getType() , urls);
+                addUrl(consumer.getFormat().getType() , urls);
                 env.registerTableSource(consumer.getName(), tableSource);
             } catch (Exception e) {
                 throw new RuntimeException(e);

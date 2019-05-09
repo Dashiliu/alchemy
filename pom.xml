@@ -13,7 +13,7 @@
     <groupId>com.dfire.platform</groupId>
     <artifactId>alchemy</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.8-SNAPSHOT</version>
+    <version>0.0.8</version>
     <modules>
         <module>alchemy-api</module>
         <module>alchemy-benchmarks</module>
