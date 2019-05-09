@@ -31,9 +31,13 @@ public class ElasticsearchTableSink implements AppendStreamTableSink<Row> {
 
     private final int bufferSize;
 
+    private final Long flushInterval;
+
     private final String filedIndex;
 
     private final String formatDate;
+
+    private final Map<String, Object> properties;
 
     private String[] fieldNames;
 
@@ -41,14 +45,16 @@ public class ElasticsearchTableSink implements AppendStreamTableSink<Row> {
 
     private JsonRowStringSchema jsonRowSchema;
 
-    public ElasticsearchTableSink(String address, String clusterName, String index, int bufferSize, String filedIndex,
-        String formatDate) {
+    public ElasticsearchTableSink(String address, String clusterName, String index, int bufferSize, Long flushInterval, String filedIndex,
+                                  String formatDate, Map<String, Object> properties) {
         this.address = address;
         this.clusterName = clusterName;
         this.index = index;
         this.bufferSize = bufferSize;
+        this.flushInterval=flushInterval;
         this.filedIndex = filedIndex;
         this.formatDate = formatDate;
+        this.properties = properties;
     }
 
     @Override
@@ -69,7 +75,7 @@ public class ElasticsearchTableSink implements AppendStreamTableSink<Row> {
     @Override
     public TableSink<Row> configure(String[] fieldNames, TypeInformation<?>[] fieldTypes) {
         ElasticsearchTableSink copy = new ElasticsearchTableSink(this.address, this.clusterName, this.index,
-            this.bufferSize, this.filedIndex, this.formatDate);
+            this.bufferSize, this.flushInterval, this.filedIndex, this.formatDate, this.properties);
         copy.fieldNames = Preconditions.checkNotNull(fieldNames, "fieldNames");
         copy.fieldTypes = Preconditions.checkNotNull(fieldTypes, "fieldTypes");
         Preconditions.checkArgument(fieldNames.length == fieldTypes.length,
@@ -82,13 +88,26 @@ public class ElasticsearchTableSink implements AppendStreamTableSink<Row> {
     }
 
     private ElasticsearchSink<Row> createEsSink() {
-        Map<String, String> userConfig = new HashMap<>();
-        userConfig.put("cluster.name", this.clusterName);
-        userConfig.put(ElasticsearchSink.CONFIG_KEY_BULK_FLUSH_MAX_SIZE_MB, String.valueOf(this.bufferSize));
+        Map<String, String> userConfig = createUserConfig();
         List<InetSocketAddress> transports = new ArrayList<>();
         addTransportAddress(transports, this.address);
         return new ElasticsearchSink<>(userConfig, transports,
             new ElasticsearchTableFunction(this.index, this.jsonRowSchema, this.filedIndex, this.formatDate));
+    }
+
+    private Map<String, String> createUserConfig() {
+        Map<String, String> userConfig  =new HashMap<>();
+        userConfig.put("cluster.name", this.clusterName);
+        userConfig.put(ElasticsearchSink.CONFIG_KEY_BULK_FLUSH_MAX_SIZE_MB, String.valueOf(this.bufferSize));
+        if (this.flushInterval != null){
+            userConfig.put(ElasticsearchSink.CONFIG_KEY_BULK_FLUSH_INTERVAL_MS, String.valueOf(this.flushInterval));
+        }
+        if (this.properties != null) {
+            for (Map.Entry<String,Object> entry : this.properties.entrySet()){
+                userConfig.put(entry.getKey(), String.valueOf(entry.getValue()));
+            }
+        }
+        return userConfig;
     }
 
     private void addTransportAddress(List<InetSocketAddress> transports, String serverList) {

@@ -7,6 +7,8 @@ import com.dfire.platform.alchemy.connectors.elasticsearch.ElasticsearchTableSin
 import com.dfire.platform.alchemy.web.common.ClusterType;
 import com.dfire.platform.alchemy.web.common.Constants;
 
+import java.util.Map;
+
 /**
  * @author congbai
  * @date 03/06/2018
@@ -23,12 +25,16 @@ public class EsSinkDescriptor extends SinkDescriptor {
 
     private int bufferSize;
 
+    private Long flushInterval;
+
     private String dateFormat;
 
     /**
      *  索引从字段里取
      */
     private String filedIndex;
+
+    private Map<String, Object> properties;
 
     @Override
     public String getName() {
@@ -71,6 +77,22 @@ public class EsSinkDescriptor extends SinkDescriptor {
         this.bufferSize = bufferSize;
     }
 
+    public Long getFlushInterval() {
+        return flushInterval;
+    }
+
+    public void setFlushInterval(Long flushInterval) {
+        this.flushInterval = flushInterval;
+    }
+
+    public Map<String, Object> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(Map<String, Object> properties) {
+        this.properties = properties;
+    }
+
     @Override
     public <T> T transform(ClusterType clusterType) throws Exception {
         if (ClusterType.FLINK.equals(clusterType)) {
@@ -89,7 +111,7 @@ public class EsSinkDescriptor extends SinkDescriptor {
     }
 
     private <T> T transformFlink() {
-        return (T)new ElasticsearchTableSink(this.address, this.clusterName, this.index, this.bufferSize,this.filedIndex,this.dateFormat);
+        return (T)new ElasticsearchTableSink(this.address, this.clusterName, this.index, this.bufferSize, this.flushInterval ,this.filedIndex,this.dateFormat,this.properties);
     }
 
     @Override
