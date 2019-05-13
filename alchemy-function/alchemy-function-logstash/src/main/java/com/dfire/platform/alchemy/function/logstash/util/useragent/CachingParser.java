@@ -40,7 +40,7 @@ import java.util.Map;
 public class CachingParser extends Parser {
 
   // TODO: Make configurable
-  private static final int       CACHE_SIZE     = 1000;
+  private static final int       CACHE_SIZE     = 20000;
 
   private Map<String, Client>    cacheClient    = null;
   private Map<String, UserAgent> cacheUserAgent = null;
@@ -139,5 +139,13 @@ public class CachingParser extends Parser {
   }
 
   // ------------------------------------------
+
+  public static void main(String[] args) throws IOException {
+    CachingParser cachingParser =new CachingParser();
+    for ( int i =0 ; i < 10000; i++){
+      cachingParser.parse("Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/7.0.4(0x17000428) NetType/4G Language/"+i);
+    }
+    System.in.read();
+  }
 
 }

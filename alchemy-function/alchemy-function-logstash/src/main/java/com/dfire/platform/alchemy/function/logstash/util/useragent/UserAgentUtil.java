@@ -31,7 +31,7 @@ public class UserAgentUtil {
     static {
         try {
             if (uaParser == null) {
-                uaParser = new Parser();
+                uaParser = new CachingParser();
             }
         } catch (IOException e) {
             logger.error("create us parser error.", e);
