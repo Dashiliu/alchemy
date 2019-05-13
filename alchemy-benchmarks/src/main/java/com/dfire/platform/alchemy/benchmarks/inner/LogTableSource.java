@@ -1,4 +1,4 @@
-package com.dfire.platform.alchemy.benchmarks.function;
+package com.dfire.platform.alchemy.benchmarks.inner;
 
 import com.dfire.platform.alchemy.benchmarks.generate.GenerateLog;
 import org.apache.flink.api.common.serialization.DeserializationSchema;

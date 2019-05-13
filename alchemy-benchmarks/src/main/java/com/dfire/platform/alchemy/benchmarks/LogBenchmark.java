@@ -20,8 +20,8 @@ package com.dfire.platform.alchemy.benchmarks;
 
 
 
-import com.dfire.platform.alchemy.benchmarks.function.EmptyTableSink;
-import com.dfire.platform.alchemy.benchmarks.function.LogTableSource;
+import com.dfire.platform.alchemy.benchmarks.inner.EmptyTableSink;
+import com.dfire.platform.alchemy.benchmarks.inner.LogTableSource;
 import com.dfire.platform.alchemy.benchmarks.generate.NginxGenerateLog;
 import com.dfire.platform.alchemy.formats.grok.GrokRowDeserializationSchema;
 import com.dfire.platform.alchemy.function.logstash.*;

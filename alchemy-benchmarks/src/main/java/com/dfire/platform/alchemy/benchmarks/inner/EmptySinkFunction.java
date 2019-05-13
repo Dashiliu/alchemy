@@ -1,4 +1,4 @@
-package com.dfire.platform.alchemy.benchmarks.function;
+package com.dfire.platform.alchemy.benchmarks.inner;
 
 import java.util.concurrent.atomic.LongAdder;
 

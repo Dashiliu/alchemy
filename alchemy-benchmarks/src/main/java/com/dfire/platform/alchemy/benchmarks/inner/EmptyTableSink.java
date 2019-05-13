@@ -1,4 +1,4 @@
-package com.dfire.platform.alchemy.benchmarks.function;
+package com.dfire.platform.alchemy.benchmarks.inner;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;

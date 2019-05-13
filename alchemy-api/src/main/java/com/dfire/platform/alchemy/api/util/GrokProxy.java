@@ -50,5 +50,4 @@ public class GrokProxy {
         }
         return resultMap;
     }
-
 }

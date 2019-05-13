@@ -36,7 +36,6 @@ public class ElasticsearchTableFunction implements ElasticsearchSinkFunction<Row
         }else {
             this.dateFormat = new SimpleDateFormat("yyyy.MM.dd");
         }
-
     }
 
     @Override
