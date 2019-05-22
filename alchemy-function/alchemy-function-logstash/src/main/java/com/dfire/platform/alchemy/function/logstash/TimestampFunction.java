@@ -13,27 +13,25 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-
 /**
- * 把某个字段根据指定的分隔符拆分成多个值，以list格式返回
- * select split(field_name, '/')
+ * Created by yuntun on 2019/5/14 0014.
  */
-public class DateFormatFunction extends ScalarFunction implements BaseFunction {
+public class TimestampFunction extends ScalarFunction implements BaseFunction {
 
     private static final Logger logger = LoggerFactory.getLogger(DateFormatFunction.class);
 
-    private static final String FUNCTION_NANME = "DATEFORMAT";
+    private static final String FUNCTION_NANME = "TIMESTAMP";
 
     private static final String FORMAT = "yyyy-MM-dd,HH:mm:ss.SSS";
 
-    private static final ThreadLocal<SimpleDateFormat> DATE_FORMA = new ThreadLocal<SimpleDateFormat>() {
+    private static final ThreadLocal<SimpleDateFormat> DATE_FORMA = new ThreadLocal<SimpleDateFormat>(){
         @Override
         protected SimpleDateFormat initialValue() {
             return new SimpleDateFormat(FORMAT);
         }
     };
 
-    private Map<String, FastDateFormat> dateFormats = new HashMap<>();
+    private Map<String,FastDateFormat> dateFormats = new HashMap<>();
 
     @Override
     public String getFunctionName() {
@@ -41,42 +39,21 @@ public class DateFormatFunction extends ScalarFunction implements BaseFunction {
     }
 
     public String eval(String input, String srcFormat) {
-        if (StringUtils.isBlank(input) || StringUtils.isBlank(srcFormat)) {
+        if (StringUtils.isBlank(input) || StringUtils.isBlank(srcFormat)){
             return input;
         }
 
         FastDateFormat fastDateFormat = dateFormats.get(srcFormat);
         if (fastDateFormat == null) {
             fastDateFormat = FastDateFormat.getInstance(srcFormat);
-            dateFormats.put(srcFormat, fastDateFormat);
+            dateFormats.put(srcFormat , fastDateFormat);
         }
         try {
             Date date = fastDateFormat.parse(input);
             return DATE_FORMA.get().format(date);
         } catch (ParseException e) {
-            logger.error("date format fail", e);
+            logger.error("date format fail",e);
         }
         return input;
-    }
-
-    public String eval(String input) {
-        if (StringUtils.isBlank(input)) {
-            return input;
-        }
-        try {
-            return DATE_FORMA.get().format(new Date(Long.parseLong(input)));
-        } catch (Exception e) {
-            logger.error("date format fail", e);
-        }
-        return input;
-    }
-
-    public String eval() {
-        try {
-            return DATE_FORMA.get().format(new Date());
-        } catch (Exception e) {
-            logger.error("date format fail", e);
-        }
-        return null;
     }
 }

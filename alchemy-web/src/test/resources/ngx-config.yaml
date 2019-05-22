@@ -38,7 +38,7 @@ job:
                 type: VARCHAR
               - name: user_agent
                 type: VARCHAR
-              - name: url
+              - name: http_url
                 type: VARCHAR
               - name: host_name
                 type: VARCHAR
@@ -88,7 +88,7 @@ job:
             format:
               property-version: 1
               type: grok
-              regular: \[%{DATA:syslog_host}\] \[%{DATA:syslog_tag}\] "%{IP:remote_addr}" "%{DATA:remote_user}" "\[%{HTTPDATE:time_local}\]" "%{WORD:http_method} %{URIPATH:request}(?:\?%{DATA:request_param}|) HTTP\/%{NUMBER:http_version:float}" "(?:%{NUMBER:status:integer}|-)" "(?:%{NUMBER:body_bytes_sent:integer}|-)" "%{DATA:http_referer}" "%{DATA:user_agent}" "%{WORD} %{DATA:url}" "%{DATA:host_name}" "%{DATA:http_x_forwarded_for}" "(?:%{NUMBER:request_time:float}|%{DATA})" "%{DATA:remote_port}" "(?:%{DATA:upstream_response_time}|-)" "%{DATA:http_x_readtime}" "(?:/%{DATA:uri}|%{DATA})" "%{DATA:upstream_status}" "%{DATA:upstream_addr}" "%{DATA:nuid}" "%{DATA:request_id}" "%{DATA:http_x_forwarded_proto}"
+              regular: \[%{DATA:syslog_host}\] \[%{DATA:syslog_tag}\] "%{IP:remote_addr}" "%{DATA:remote_user}" "\[%{HTTPDATE:time_local}\]" "%{WORD:http_method} %{URIPATH:request}(?:\?%{DATA:request_param}|) HTTP\/%{NUMBER:http_version:float}" "(?:%{NUMBER:status:integer}|-)" "(?:%{NUMBER:body_bytes_sent:integer}|-)" "%{DATA:http_referer}" "%{DATA:user_agent}" "%{WORD} %{DATA:http_url}" "%{DATA:host_name}" "%{DATA:http_x_forwarded_for}" "(?:%{NUMBER:request_time:float}|%{DATA})" "%{DATA:remote_port}" "(?:%{DATA:upstream_response_time}|-)" "%{DATA:http_x_readtime}" "(?:/%{DATA:uri}|%{DATA})" "%{DATA:upstream_status}" "%{DATA:upstream_addr}" "%{DATA:nuid}" "%{DATA:request_id}"
         udfs:
             - name: change
               type: logstash
@@ -132,5 +132,6 @@ job:
               type: elasticsearch
               address: 10.1.21.61:9300
               clusterName: daily
+              bufferSize: 2  #1M
 #              filedIndex: index
               dateFormat: yyyy.MM.dd.HH

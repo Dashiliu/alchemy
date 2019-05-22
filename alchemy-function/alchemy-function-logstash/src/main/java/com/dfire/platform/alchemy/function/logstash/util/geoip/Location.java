@@ -1,4 +1,4 @@
-package com.dfire.platform.alchemy.function.logstash;
+package com.dfire.platform.alchemy.function.logstash.util.geoip;
 
 /**
  * Created by yuntun on 2019/3/22 0022.
