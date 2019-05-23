@@ -1,7 +1,7 @@
 package web.descriptor;
 
 import com.dfire.platform.alchemy.web.bind.BindPropertiesFactory;
-import com.dfire.platform.alchemy.web.cluster.request.SqlSubmitFlinkRequest;
+import com.dfire.platform.alchemy.web.cluster.flink.SqlSubmitFlinkRequest;
 import com.dfire.platform.alchemy.web.descriptor.ConnectorDescriptor;
 import org.junit.Test;
 

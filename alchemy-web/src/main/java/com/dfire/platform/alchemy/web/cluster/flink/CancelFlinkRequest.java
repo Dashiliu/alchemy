@@ -1,4 +1,4 @@
-package com.dfire.platform.alchemy.web.cluster.request;
+package com.dfire.platform.alchemy.web.cluster.flink;
 
 /**
  * @author congbai

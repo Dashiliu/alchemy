@@ -1,11 +1,10 @@
 package com.dfire.platform.alchemy.connectors.elasticsearch;
 
 import com.dfire.platform.alchemy.api.util.RandomUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.flink.api.common.functions.RuntimeContext;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.connectors.elasticsearch.ElasticsearchSinkFunction;
 import org.apache.flink.streaming.connectors.elasticsearch.RequestIndexer;
+import org.apache.flink.table.shaded.org.apache.commons.lang3.StringUtils;
 import org.apache.flink.types.Row;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Requests;

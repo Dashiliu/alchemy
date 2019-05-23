@@ -1,4 +1,6 @@
-package com.dfire.platform.alchemy.web.cluster.response;
+package com.dfire.platform.alchemy.web.cluster.flink;
+
+import com.dfire.platform.alchemy.web.cluster.response.Response;
 
 /**
  * @author congbai

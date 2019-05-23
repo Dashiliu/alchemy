@@ -1,9 +1,10 @@
-package com.dfire.platform.alchemy.web.cluster.request;
-
-import com.dfire.platform.alchemy.web.descriptor.TableDescriptor;
-import org.springframework.util.Assert;
+package com.dfire.platform.alchemy.web.cluster.flink;
 
 import java.util.List;
+
+import org.springframework.util.Assert;
+
+import com.dfire.platform.alchemy.web.descriptor.TableDescriptor;
 
 /**
  * @author congbai

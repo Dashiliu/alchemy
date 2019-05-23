@@ -3,6 +3,10 @@ package com.dfire.platform.alchemy.web.descriptor;
 import java.util.List;
 import java.util.Map;
 
+import com.dfire.platform.alchemy.web.common.Side;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.typeutils.RowTypeInfo;
+import org.apache.flink.table.typeutils.TypeStringUtils;
 import org.springframework.util.Assert;
 
 import com.dfire.platform.alchemy.web.bind.BindPropertiesFactory;
@@ -19,13 +23,13 @@ public class SourceDescriptor implements CoreDescriptor {
 
     private String name;
 
-    private List<Field> input;
-
     private List<Field> schema;
 
     private Map<String, Object> connector;
 
     private volatile ConnectorDescriptor connectorDescriptor;
+
+    private Side side;
 
     private FormatDescriptor format;
 
@@ -38,20 +42,22 @@ public class SourceDescriptor implements CoreDescriptor {
         this.name = name;
     }
 
+    public RowTypeInfo getRowTypeInfo(){
+        String[] columnNames = new String[schema.size()];
+        TypeInformation[] columnTypes = new TypeInformation[schema.size()];
+        for (int i = 0; i < schema.size(); i++) {
+            columnNames[i] = schema.get(i).getName();
+            columnTypes[i] = TypeStringUtils.readTypeInfo(schema.get(i).getType());
+        }
+        return new RowTypeInfo(columnTypes, columnNames);
+    }
+
     @Override
     public <T> T transform(ClusterType clusterType) throws Exception {
         if (ClusterType.FLINK.equals(clusterType)) {
             return transformFlink();
         }
         throw new UnsupportedOperationException("unknow clusterType:" + clusterType);
-    }
-
-    public List<Field> getInput() {
-        return input;
-    }
-
-    public void setInput(List<Field> input) {
-        this.input = input;
     }
 
     public List<Field> getSchema() {
@@ -112,6 +118,14 @@ public class SourceDescriptor implements CoreDescriptor {
     @Override
     public String getType() {
         return Constants.TYPE_VALUE_SOURCE;
+    }
+
+    public Side getSide() {
+        return side;
+    }
+
+    public void setSide(Side side) {
+        this.side = side;
     }
 
     @Override

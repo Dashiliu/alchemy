@@ -1,5 +1,6 @@
 package com.dfire.platform.alchemy.web.descriptor;
 
+import com.dfire.platform.alchemy.api.util.GroovyCompiler;
 import com.dfire.platform.alchemy.function.StreamAggregateFunction;
 import com.dfire.platform.alchemy.function.StreamScalarFunction;
 import com.dfire.platform.alchemy.function.StreamTableFunction;
@@ -10,9 +11,7 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.springframework.util.Assert;
 
-import com.dfire.platform.alchemy.api.util.GroovyCompiler;
 import com.dfire.platform.alchemy.web.common.ClusterType;
-import com.dfire.platform.alchemy.web.common.Constants;
 
 /**
  * 描述用户自定义函数
@@ -60,52 +59,44 @@ public class UdfDescriptor implements CoreDescriptor {
     @Override
     public void validate() throws Exception {
         Assert.notNull(name, "函数名不能为空");
-        Assert.notNull(value, "函数体不能为空");
-        Class clazz = GroovyCompiler.compile(value, name);
-        clazz.newInstance();
     }
 
     private <T> T transformFlink() {
-        Class clazz = null;
         try {
-            clazz = Class.forName(this.value);
-        } catch (ClassNotFoundException e) {
-            clazz = GroovyCompiler.compile(this.value, this.name);
-        }
-        try {
+            Class clazz = GroovyCompiler.compile(this.getValue(), this.getName());
             Object udf = clazz.newInstance();
             if (udf instanceof StreamScalarFunction) {
                 StreamScalarFunction<?> streamScalarFunction = (StreamScalarFunction<?>)udf;
                 FlinkAllScalarFunction scalarFunction = new FlinkAllScalarFunction(streamScalarFunction);
                 initScalarFuntion(streamScalarFunction, scalarFunction);
-                return (T)scalarFunction;
+                return (T) scalarFunction;
             } else if (udf instanceof StreamTableFunction<?>) {
                 StreamTableFunction<?> streamTableFunction = (StreamTableFunction)udf;
                 FlinkAllTableFunction tableFunction = new FlinkAllTableFunction(streamTableFunction);
                 initTableFunction(streamTableFunction, tableFunction);
-                return (T)tableFunction;
+                return (T) tableFunction;
             } else if (udf instanceof StreamAggregateFunction<?, ?, ?>) {
                 StreamAggregateFunction<?, ?, ?> streamAggregateFunction = (StreamAggregateFunction)udf;
                 FlinkAllAggregateFunction aggregateFunction
                     = new FlinkAllAggregateFunction((StreamAggregateFunction)udf);
                 initAggregateFuntion(streamAggregateFunction, aggregateFunction);
-                return (T)aggregateFunction;
+                return (T) aggregateFunction;
             }else{
                 return (T) udf;
             }
         } catch (Exception ex) {
-            throw new IllegalArgumentException("Invalid UDF " + this.name, ex);
+            throw new IllegalArgumentException("Invalid UDF " + this.getName(), ex);
         }
     }
 
     private void initScalarFuntion(StreamScalarFunction<?> streamScalarFunction,
-        FlinkAllScalarFunction flinkAllScalarFunction) {
+                                   FlinkAllScalarFunction flinkAllScalarFunction) {
         flinkAllScalarFunction.setResultType(TypeExtractor.createTypeInfo(streamScalarFunction,
             StreamScalarFunction.class, streamScalarFunction.getClass(), 0));
     }
 
     private void initAggregateFuntion(StreamAggregateFunction<?, ?, ?> streamAggregateFunction,
-        FlinkAllAggregateFunction aggregateFunction) {
+                                      FlinkAllAggregateFunction aggregateFunction) {
         aggregateFunction.setProducedType(TypeExtractor.createTypeInfo(streamAggregateFunction,
             StreamAggregateFunction.class, streamAggregateFunction.getClass(), 0));
         aggregateFunction.setAccumulatorType(TypeExtractor.createTypeInfo(streamAggregateFunction,

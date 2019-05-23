@@ -1,7 +1,8 @@
-package com.dfire.platform.alchemy.web.cluster.request;
+package com.dfire.platform.alchemy.web.cluster.flink;
+
+import org.springframework.util.Assert;
 
 import com.dfire.platform.alchemy.web.descriptor.JarInfoDescriptor;
-import org.springframework.util.Assert;
 
 /**
  * @author congbai

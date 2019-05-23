@@ -2,8 +2,8 @@ package web.cluster;
 
 import com.dfire.platform.alchemy.web.bind.BindPropertiesFactory;
 import com.dfire.platform.alchemy.web.cluster.ClusterInfo;
-import com.dfire.platform.alchemy.web.cluster.FlinkCluster;
-import com.dfire.platform.alchemy.web.cluster.request.SqlSubmitFlinkRequest;
+import com.dfire.platform.alchemy.web.cluster.flink.FlinkCluster;
+import com.dfire.platform.alchemy.web.cluster.flink.SqlSubmitFlinkRequest;
 import com.dfire.platform.alchemy.web.cluster.response.Response;
 import com.dfire.platform.alchemy.web.common.Constants;
 import org.apache.flink.runtime.jobmanager.HighAvailabilityMode;

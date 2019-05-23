@@ -60,6 +60,8 @@
         <grok.version>0.1.9</grok.version>
         <geoip2.version>2.12.0</geoip2.version>
         <slf4j-api.version>1.7.7</slf4j-api.version>
+        <lettuce.version>5.0.5.RELEASE</lettuce.version>
+        <vertx.version>3.7.0</vertx.version>
     </properties>
 
     <dependencies>
@@ -398,6 +400,23 @@
                 <groupId>com.maxmind.geoip2</groupId>
                 <artifactId>geoip2</artifactId>
                 <version>${geoip2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.lettuce</groupId>
+                <artifactId>lettuce-core</artifactId>
+                <version>${lettuce.version}</version>
+            </dependency>
+
+            <!--vertx -->
+            <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-jdbc-client</artifactId>
+                <version>${vertx.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-sql-common</artifactId>
+                <version>${vertx.version}</version>
             </dependency>
 
         </dependencies>

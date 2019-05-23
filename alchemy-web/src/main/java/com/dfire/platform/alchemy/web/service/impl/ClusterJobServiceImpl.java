@@ -7,6 +7,9 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.dfire.platform.alchemy.web.cluster.flink.CancelFlinkRequest;
+import com.dfire.platform.alchemy.web.cluster.flink.JarSubmitFlinkRequest;
+import com.dfire.platform.alchemy.web.cluster.flink.SqlSubmitFlinkRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +27,7 @@ import com.dfire.platform.alchemy.web.cluster.ClusterManager;
 import com.dfire.platform.alchemy.web.cluster.request.*;
 import com.dfire.platform.alchemy.web.cluster.response.JobStatusResponse;
 import com.dfire.platform.alchemy.web.cluster.response.Response;
-import com.dfire.platform.alchemy.web.cluster.response.SubmitFlinkResponse;
+import com.dfire.platform.alchemy.web.cluster.flink.SubmitFlinkResponse;
 import com.dfire.platform.alchemy.web.common.*;
 import com.dfire.platform.alchemy.web.config.Flame;
 import com.dfire.platform.alchemy.web.descriptor.JarInfoDescriptor;
