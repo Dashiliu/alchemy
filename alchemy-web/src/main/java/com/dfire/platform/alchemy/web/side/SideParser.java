@@ -2,7 +2,6 @@ package com.dfire.platform.alchemy.web.side;
 
 import java.util.*;
 
-import com.dfire.platform.alchemy.web.common.Field;
 import org.apache.calcite.config.Lex;
 import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.parser.SqlParseException;
@@ -343,6 +342,9 @@ public class SideParser {
     }
 
     public static SqlNode changeTableName(SqlNode sqlNode, String alias) {
+        if (sqlNode == null){
+            return null;
+        }
         SqlKind sqlKind = sqlNode.getKind();
         switch (sqlKind) {
             case IDENTIFIER:
@@ -377,7 +379,7 @@ public class SideParser {
         }
     }
 
-    private static SqlNode[] createEqualNodes(SqlKind sqlKind) {
+    public static SqlNode[] createEqualNodes(SqlKind sqlKind) {
         SqlNode[] nodes = new SqlNode[2];
         if (SqlKind.AND == sqlKind) {
             nodes[0] = SqlLiteral.createExactNumeric("1", new SqlParserPos(0, 0));

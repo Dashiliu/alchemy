@@ -60,7 +60,7 @@ public class MysqlAsyncReqRow extends AsyncReqRow<List<JsonObject>> {
 
     private String modifySql(SideTableInfo sideTable) throws SqlParseException {
         SqlParser.Config config = SqlParser.configBuilder().setLex(Lex.MYSQL).build();
-        SqlParser sqlParser = SqlParser.create(sql, config);
+        SqlParser sqlParser = SqlParser.create(sideTable.getSql(), config);
         SqlNode sqlNode = sqlParser.parseStmt();
         if (SqlKind.SELECT != sqlNode.getKind()){
             throw new UnsupportedOperationException("MysqlAsyncReqRow only support query sql, sql:" + sideTable.getSql());
@@ -73,6 +73,12 @@ public class MysqlAsyncReqRow extends AsyncReqRow<List<JsonObject>> {
         nodes.addAll(conditionNodes);
         if (whereNode != null){
             nodes.add(whereNode);
+        }else{
+            SqlBinaryOperator equal
+                = new SqlBinaryOperator("=", SqlKind.EQUALS, 30, true, ReturnTypes.BOOLEAN_NULLABLE,
+                InferTypes.FIRST_KNOWN, OperandTypes.COMPARABLE_UNORDERED_COMPARABLE_UNORDERED);
+            SqlBasicCall andEqual = new SqlBasicCall(equal, SideParser.createEqualNodes(SqlKind.AND), new SqlParserPos(0, 0));
+            nodes.add(andEqual);
         }
         SqlBasicCall sqlBasicCall = new SqlBasicCall(and , nodes.toArray(new SqlNode[nodes.size()]), new SqlParserPos(0, 0));
         sqlSelect.setWhere(sqlBasicCall);
@@ -84,15 +90,16 @@ public class MysqlAsyncReqRow extends AsyncReqRow<List<JsonObject>> {
             = new SqlBinaryOperator("=", SqlKind.EQUALS, 30, true, ReturnTypes.BOOLEAN_NULLABLE,
             InferTypes.FIRST_KNOWN, OperandTypes.COMPARABLE_UNORDERED_COMPARABLE_UNORDERED);
         List<SqlBasicCall> nodes = new ArrayList<>(conditions.size());
+        int num = 0;
         for(String condition : conditions){
             List<String> fields = new ArrayList<>(2);
             fields.add(alias.getAlias());
             fields.add(condition);
             SqlIdentifier leftIdentifier = new SqlIdentifier(fields, new SqlParserPos(0, 0));
-            SqlIdentifier rightIdentifier = new SqlIdentifier(fields, new SqlParserPos(0, 0));
+            SqlDynamicParam sqlDynamicParam = new SqlDynamicParam(num++, new SqlParserPos(0, 0));
             SqlNode[] sqlNodes = new SqlNode[2];
             sqlNodes[0] = leftIdentifier;
-            sqlNodes[1] = rightIdentifier;
+            sqlNodes[1] = sqlDynamicParam;
             SqlBasicCall andEqual = new SqlBasicCall(equal, sqlNodes , new SqlParserPos(0, 0));
             nodes.add(andEqual);
         }
@@ -111,7 +118,7 @@ public class MysqlAsyncReqRow extends AsyncReqRow<List<JsonObject>> {
             .put("max_pool_size",
                 mysqlProperties.getMaxPoolSize() == null ? DEFAULT_MAX_DB_CONN_POOL_SIZE
                     : mysqlProperties.getMaxPoolSize())
-            .put("user", mysqlProperties.getUserName()).put("password", mysqlProperties.getPassword());
+            .put("user", mysqlProperties.getUsername()).put("password", mysqlProperties.getPassword());
 
         VertxOptions vo = new VertxOptions();
         vo.setEventLoopPoolSize(DEFAULT_VERTX_EVENT_LOOP_POOL_SIZE);
@@ -142,7 +149,6 @@ public class MysqlAsyncReqRow extends AsyncReqRow<List<JsonObject>> {
                 return;
             }
             final SQLConnection connection = conn.result();
-            String sql = this.getSideTable().getSql();
             connection.queryWithParams(sql, params, rs -> {
                 if (rs.failed()) {
                     LOG.error("Cannot retrieve the data from the database", rs.cause());
@@ -174,7 +180,7 @@ public class MysqlAsyncReqRow extends AsyncReqRow<List<JsonObject>> {
         if (!optionalValue.isPresent()) {
             dealMissKey(input, this.getSideTable().getJoinType(), resultFuture);
         } else {
-            resultFuture.complete(fillData(input, optionalValue.get()));
+            resultFuture.complete(fillRecord(input, optionalValue.get()));
         }
     }
 
@@ -200,16 +206,16 @@ public class MysqlAsyncReqRow extends AsyncReqRow<List<JsonObject>> {
     }
 
     @Override
-    public List<Row> fillData(Row input, List<JsonObject> jsonArrays) {
+    public List<Row> fillRecord(Row input, List<JsonObject> jsonArrays) {
         List<Row> rowList = Lists.newArrayList();
         for (JsonObject value : jsonArrays) {
-            Row row = fillData(input, value);
+            Row row = fillRecord(input, value);
             rowList.add(row);
         }
         return rowList;
     }
 
-    private Row fillData(Row input, JsonObject value) {
+    private Row fillRecord(Row input, JsonObject value) {
         RowTypeInfo sideTable = this.getSideTable().getSideType();
         int sideSize = sideTable.getArity();
         int inputSize = input.getArity();

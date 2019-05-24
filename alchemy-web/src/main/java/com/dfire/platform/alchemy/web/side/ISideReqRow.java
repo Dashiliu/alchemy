@@ -35,7 +35,7 @@ public interface ISideReqRow<T> {
     default void dealMissKey(Row input , JoinType joinType , ResultFuture<Row> resultFuture){
         if(joinType == JoinType.LEFT){
             //Reserved left table data
-            List<Row> row = fillData(input, null);
+            List<Row> row = fillRecord(input, null);
             resultFuture.complete(row);
         }else{
             resultFuture.complete(null);
@@ -43,6 +43,6 @@ public interface ISideReqRow<T> {
     }
 
 
-    List<Row> fillData(Row input , T value);
+    List<Row> fillRecord(Row input , T value);
 }
 

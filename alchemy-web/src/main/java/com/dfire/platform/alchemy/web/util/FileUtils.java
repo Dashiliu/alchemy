@@ -1,6 +1,7 @@
 package com.dfire.platform.alchemy.web.util;
 
 import org.apache.flink.client.program.JobWithJars;
+import org.springframework.util.CollectionUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -8,6 +9,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -62,6 +64,9 @@ public class FileUtils {
     }
 
     public static List<URL> createPath(List<String> avgs) throws MalformedURLException {
+        if (CollectionUtils.isEmpty(avgs)){
+            return new ArrayList<>(0);
+        }
         List<URL> jarFiles = new ArrayList<>(avgs.size());
         for (String avg : avgs){
             try {

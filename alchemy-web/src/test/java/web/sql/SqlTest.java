@@ -62,5 +62,12 @@ public class SqlTest {
         return nodes;
     }
 
+    @Test
+    public void param() throws SqlParseException {
+        String sql = "select a.name as name , a.age , sex,  a.id , LOG2(a.height) ,a.* from test a where a.age = ?";
+        SqlParser sqlParser = SqlParser.create(sql, config);
+        SqlNode sqlNode = sqlParser.parseStmt();
+    }
+
 
 }

@@ -138,14 +138,10 @@ public class SubmitSqlHandler implements Handler<SqlSubmitFlinkRequest, SubmitFl
             return env.sqlQuery(request.getTable().getSql());
         }else{
             Deque<SqlNode> deque = SideParser.parse(request.getTable().getSql());
-            SqlNode last;
+            SqlNode last = deque.pollLast();
             SqlSelect modifyNode = null;
             SqlNode fullNode = deque.peekFirst();
-            while ((last = deque.pollLast()) != null) {
-                if (modifyNode != null){
-                    SideParser.rewrite(last,modifyNode);
-                    modifyNode = null;
-                }
+            while (true) {
                 if (last.getKind() == SqlKind.SELECT) {
                     SqlSelect sqlSelect = (SqlSelect) last;
                     SqlNode node = sqlSelect.getFrom();
@@ -155,7 +151,7 @@ public class SubmitSqlHandler implements Handler<SqlSubmitFlinkRequest, SubmitFl
                     SqlJoin sqlJoin = (SqlJoin) node;
                     Alias sideAlias = SideParser.getTableName(sqlJoin.getRight());
                     Alias leftAlias = SideParser.getTableName(sqlJoin.getLeft());
-                    if (isSide(sideSources.keySet() , sideAlias.getTable())){
+                    if (isSide(sideSources.keySet() , leftAlias.getTable())){
                         throw new UnsupportedOperationException("side table must be right table");
                     }
                     if(!isSide(sideSources.keySet() , sideAlias.getTable())){
@@ -168,6 +164,19 @@ public class SubmitSqlHandler implements Handler<SqlSubmitFlinkRequest, SubmitFl
                     }
                     SqlSelect newSelect = SideParser.newSelect(sqlSelect , newTable.getTable() , newTable.getAlias(),false ,true);
                     modifyNode = newSelect;
+                }
+                SqlNode node = deque.pollLast();
+                if (node == null){
+                    if (modifyNode != null){
+                        fullNode = modifyNode;
+                    }
+                    break;
+                }else{
+                    last = node;
+                    if (modifyNode != null){
+                        SideParser.rewrite(node,modifyNode);
+                        modifyNode = null;
+                    }
                 }
             }
             return env.sqlQuery(fullNode.toString());
@@ -251,7 +260,9 @@ public class SubmitSqlHandler implements Handler<SqlSubmitFlinkRequest, SubmitFl
                 }
                 TableSource tableSource = consumer.transform(ClusterType.FLINK);
                 addUrl(consumer.getConnectorDescriptor().getType(), urls);
-                addUrl(consumer.getFormat().getType(), urls);
+                if (consumer.getFormat() != null){
+                    addUrl(consumer.getFormat().getType(), urls);
+                }
                 env.registerTableSource(consumer.getName(), tableSource);
                 tableSources.put(consumer.getName() , tableSource);
             } catch (Exception e) {

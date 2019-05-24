@@ -1,6 +1,7 @@
 package com.dfire.platform.alchemy.web.cluster.flink;
 
 import com.dfire.platform.alchemy.web.cluster.Handler;
+import com.dfire.platform.alchemy.web.cluster.request.JobStatusRequest;
 import org.apache.flink.client.program.ClusterClient;
 
 import com.dfire.platform.alchemy.web.cluster.Cluster;
@@ -48,10 +49,10 @@ public class FlinkCluster implements Cluster {
         SubmitJarHandler submitJarHandler =new SubmitJarHandler(clusterClient);
         SubmitSqlHandler submitSqlHandler =new SubmitSqlHandler(clusterClient,clusterInfo);
         Map<String,Handler> handles =new HashMap<>(4);
-        handles.put(cancelHandler.getClass().getName() , cancelHandler);
-        handles.put(statusHandler.getClass().getName() , statusHandler);
-        handles.put(submitJarHandler.getClass().getName() , submitJarHandler);
-        handles.put(submitSqlHandler.getClass().getName() , submitSqlHandler);
+        handles.put(CancelFlinkRequest.class.getName() , cancelHandler);
+        handles.put(JobStatusRequest.class.getName() , statusHandler);
+        handles.put(JarSubmitFlinkRequest.class.getName() , submitJarHandler);
+        handles.put(SqlSubmitFlinkRequest.class.getName() , submitSqlHandler);
         return handles;
     }
 

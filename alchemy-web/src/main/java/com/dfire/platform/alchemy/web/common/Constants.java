@@ -44,7 +44,11 @@ public final class Constants {
 
     public static final String CONNECTOR_TYPE_VALUE_KAFKA = "kafka";
 
+    public static final String CONNECTOR_TYPE_VALUE_MYSQL = "mysql";
+
     public static final String CONNECTOR_TYPE_VALUE_ROCKETMQ = "rocketMQ";
+
+    public static final String CONNECTOR_TYPE_VALUE_CSV = "csv";
 
     public static final String SINK_TYPE_VALUE_REDIS = "redis";
 
@@ -57,6 +61,8 @@ public final class Constants {
     public static final String SINK_TYPE_VALUE_ROCKETMQ = "rocketMQ";
 
     public static final String SINK_TYPE_VALUE_OPENTSDB = "tsdb";
+
+    public static final String SINK_TYPE_VALUE_PRINT = "print";
 
     // Regex for acceptable logins
     public static final String LOGIN_REGEX = "^[_.@A-Za-z0-9-]*$";

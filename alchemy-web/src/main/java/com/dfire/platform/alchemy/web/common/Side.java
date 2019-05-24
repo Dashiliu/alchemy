@@ -27,7 +27,7 @@ public class Side implements Serializable {
     /**
      * The max number of async i/o operation that can be triggered
      */
-    private int capacity;
+    private int capacity = Runtime.getRuntime().availableProcessors() * 2;
 
     private boolean partition = false;
 

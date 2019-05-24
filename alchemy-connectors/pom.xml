@@ -24,6 +24,7 @@
         <module>alchemy-connectors-redis</module>
         <module>alchemy-connectors-rocketmq</module>
         <module>alchemy-connectors-tsdb</module>
+        <module>alchemy-connectors-mysql</module>
     </modules>
     <reporting>
         <plugins>

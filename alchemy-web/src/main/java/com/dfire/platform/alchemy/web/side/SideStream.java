@@ -11,6 +11,7 @@ import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.streaming.api.datastream.AsyncDataStream;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.table.api.Table;
+import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.api.java.StreamTableEnvironment;
 import org.apache.flink.table.typeutils.TypeStringUtils;
 import org.apache.flink.types.Row;
@@ -40,37 +41,37 @@ public class SideStream {
             leftStream = leftStream.keyBy(equalFields.toArray(new String[equalFields.size()]));
         }
         RowTypeInfo sideType = createSideType(rightSelect.getSelectList() , sideSource.getSchema());
-        RowTypeInfo returnType = createReturnType(leftStream.getType(),sideType);
-        SideTableInfo sideTable = createSideTable(returnType, sideType, sqlJoin.getJoinType(),  rightSelect, equalFields , sideAlias, sideSource.getSide());
+        RowTypeInfo returnType = createReturnType(leftTable.getSchema(),sideType);
+        SideTableInfo sideTable = createSideTable(leftTable.getSchema(), sideType, sqlJoin.getJoinType(),  rightSelect, equalFields , sideAlias, sideSource.getSide());
         DataStream<Row> returnStream;
         if(sideSource.getSide().isAsync()){
-            AsyncReqRow reqRow =ReqRowFactory.getAsync(ClusterType.FLINK, sideTable, sideSource);
+            AsyncReqRow reqRow =sideSource.transform(ClusterType.FLINK , sideTable);
             returnStream = AsyncDataStream.orderedWait(leftStream, reqRow, sideSource.getSide().getTimeout(), TimeUnit.MILLISECONDS, sideSource.getSide().getCapacity());
         }else{
-            SyncReqRow syncReqRow = ReqRowFactory.getSync(ClusterType.FLINK , sideTable, sideSource);
+            SyncReqRow syncReqRow = sideSource.transform(ClusterType.FLINK , sideTable);
             returnStream = leftStream.flatMap(syncReqRow);
         }
         returnStream.getTransformation().setOutputType(returnType);
         return returnStream;
     }
 
-    private static SideTableInfo createSideTable(RowTypeInfo leftType, RowTypeInfo sideType, JoinType joinType, SqlSelect rightSelect, List<String> equalFields, Alias sideAlias, Side side) {
-        List<Integer> indexFields = createFieldIndex(leftType, equalFields);
+    private static SideTableInfo createSideTable(TableSchema leftSchema, RowTypeInfo sideType, JoinType joinType, SqlSelect rightSelect, List<String> equalFields, Alias sideAlias, Side side) {
+        List<Integer> indexFields = createFieldIndex(leftSchema, equalFields);
         SideTableInfo sideTable = new SideTableInfo();
         sideTable.setConditionIndexs(indexFields);
         sideTable.setConditions(equalFields);
         sideTable.setSide(side);
         sideTable.setJoinType(joinType);
-        sideTable.setRowSize(leftType.getArity() + sideType.getArity());
+        sideTable.setRowSize(leftSchema.getColumnCount() + sideType.getArity());
         sideTable.setSideAlias(sideAlias);
         sideTable.setSideType(sideType);
         sideTable.setSql(rightSelect.toString());
         return sideTable;
     }
 
-    private static List<Integer> createFieldIndex(RowTypeInfo leftType, List<String> equalFields) {
+    private static List<Integer> createFieldIndex(TableSchema leftType, List<String> equalFields) {
         List<Integer> indexFields = new ArrayList<>(equalFields.size());
-        String[] names = leftType.getFieldNames();
+        String[] names = leftType.getColumnNames();
         for(String field : equalFields){
             for(int i = 0 ; i < names.length ; i++){
                 if (field.equalsIgnoreCase(names[i])){
@@ -82,17 +83,17 @@ public class SideStream {
         return indexFields;
     }
 
-    private static RowTypeInfo createReturnType(TypeInformation<Row> type, RowTypeInfo sideType) {
-        RowTypeInfo leftTypeInfo = (RowTypeInfo) type;
-        int leftArity = type.getArity();
+    private static RowTypeInfo createReturnType(TableSchema leftTable, RowTypeInfo sideType) {
+        String[] leftFields = leftTable.getColumnNames();
+        TypeInformation[] leftTypes = leftTable.getTypes();
+        int leftArity = leftFields.length;
         int rightArity = sideType.getArity();
         int size = leftArity + rightArity;
         String[] columnNames = new String[size];
         TypeInformation[] columnTypes = new TypeInformation[size];
-        String[] fileNames = leftTypeInfo.getFieldNames();
         for (int i =0 ; i < leftArity ; i++){
-            columnNames[i] = fileNames[i];
-            columnTypes[i] = leftTypeInfo.getTypeAt(i);
+            columnNames[i] = leftFields[i];
+            columnTypes[i] = leftTypes[i];
         }
         for(int i = 0 ; i < rightArity ; i++){
             columnNames[leftArity + i] = sideType.getFieldNames()[i];
@@ -125,7 +126,7 @@ public class SideStream {
             size = selectField.size();
         }
         Map<String , TypeInformation> types = new HashMap<>(size);
-        for (int i =0 ; i < size ; i ++){
+        for (int i =0 ; i < fields.size() ; i ++){
             if (all){
                 types.put(fields.get(i).getName() ,  TypeStringUtils.readTypeInfo(fields.get(i).getType()));
             }else{

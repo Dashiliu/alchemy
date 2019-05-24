@@ -13,7 +13,7 @@ public interface CoreDescriptor extends Descriptor {
     <T> T transform(ClusterType clusterType) throws Exception;
 
     default <T,R> T transform(ClusterType clusterType, R param) throws Exception{
-        return transform(clusterType, null);
+        return transform(clusterType);
     }
 
 }

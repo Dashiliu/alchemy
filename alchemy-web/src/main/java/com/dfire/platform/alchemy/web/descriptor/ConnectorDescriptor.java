@@ -12,4 +12,8 @@ import com.dfire.platform.alchemy.web.common.Field;
 public interface ConnectorDescriptor extends Descriptor {
 
     <T> T buildSource(ClusterType clusterType, List<Field> schema, FormatDescriptor format) throws Exception;
+
+    default <T,R> T buildSource(ClusterType clusterType, List<Field> schema, FormatDescriptor format, R param) throws Exception{
+        return buildSource(clusterType, schema, format);
+    }
 }

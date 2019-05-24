@@ -1,11 +1,14 @@
 package com.dfire.platform.alchemy.web.common;
 
+import java.io.Serializable;
+
 /**
  * @author congbai
  * @date 2019/5/20
  */
-public class Alias {
+public class Alias implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     private String table;
 
     private String alias;

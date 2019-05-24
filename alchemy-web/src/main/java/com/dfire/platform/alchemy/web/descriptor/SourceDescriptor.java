@@ -42,20 +42,18 @@ public class SourceDescriptor implements CoreDescriptor {
         this.name = name;
     }
 
-    public RowTypeInfo getRowTypeInfo(){
-        String[] columnNames = new String[schema.size()];
-        TypeInformation[] columnTypes = new TypeInformation[schema.size()];
-        for (int i = 0; i < schema.size(); i++) {
-            columnNames[i] = schema.get(i).getName();
-            columnTypes[i] = TypeStringUtils.readTypeInfo(schema.get(i).getType());
-        }
-        return new RowTypeInfo(columnTypes, columnNames);
-    }
-
     @Override
     public <T> T transform(ClusterType clusterType) throws Exception {
         if (ClusterType.FLINK.equals(clusterType)) {
             return transformFlink();
+        }
+        throw new UnsupportedOperationException("unknow clusterType:" + clusterType);
+    }
+
+    @Override
+    public <T, R> T transform(ClusterType clusterType, R param) throws Exception {
+        if (ClusterType.FLINK.equals(clusterType)) {
+            return transformFlink(param);
         }
         throw new UnsupportedOperationException("unknow clusterType:" + clusterType);
     }
@@ -141,8 +139,12 @@ public class SourceDescriptor implements CoreDescriptor {
     }
 
     private <T> T transformFlink() throws Exception {
+        return transformFlink(null);
+    }
+
+    private <T, R> T transformFlink(R param) throws Exception {
         if (this.getConnectorDescriptor() != null) {
-            return this.getConnectorDescriptor().buildSource(ClusterType.FLINK, this.schema, this.format);
+            return this.getConnectorDescriptor().buildSource(ClusterType.FLINK, this.schema, this.format, param);
         }
         return null;
     }

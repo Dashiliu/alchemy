@@ -11,3 +11,6 @@ com.dfire.platform.alchemy.web.descriptor.TsdbSinkDescriptor
 com.dfire.platform.alchemy.web.descriptor.UdfDescriptor
 com.dfire.platform.alchemy.web.descriptor.RocketMQConnectorDescriptor
 com.dfire.platform.alchemy.web.descriptor.RocketMQSinkDescriptor
+com.dfire.platform.alchemy.web.descriptor.MysqlConnectorDescriptor
+com.dfire.platform.alchemy.web.descriptor.PrintSinkDescriptor
+com.dfire.platform.alchemy.web.descriptor.CsvConnectorDescriptor
