@@ -18,6 +18,7 @@
     </properties>
 
     <modules>
+        <module>alchemy-connectors-common</module>
         <module>alchemy-connectors-elasticsearch</module>
         <module>alchemy-connectors-hbase</module>
         <module>alchemy-connectors-kafka</module>

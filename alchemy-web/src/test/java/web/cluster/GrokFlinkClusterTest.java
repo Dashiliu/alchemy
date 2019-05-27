@@ -1,6 +1,6 @@
 package web.cluster;
 
-import com.dfire.platform.alchemy.web.bind.BindPropertiesFactory;
+import com.dfire.platform.alchemy.web.util.BindPropertiesUtils;
 import com.dfire.platform.alchemy.web.cluster.ClusterInfo;
 import com.dfire.platform.alchemy.web.cluster.flink.FlinkCluster;
 import com.dfire.platform.alchemy.web.cluster.flink.SqlSubmitFlinkRequest;
@@ -130,8 +130,7 @@ public class GrokFlinkClusterTest {
 
     private SqlSubmitFlinkRequest createSqlRequest(String sql, String jobName) throws Exception {
         File file = ResourceUtils.getFile("classpath:ngx-config.yaml");
-        SqlSubmitFlinkRequest sqlSubmitFlinkRequest = new SqlSubmitFlinkRequest();
-        BindPropertiesFactory.bindProperties(sqlSubmitFlinkRequest, Constants.BIND_PREFIX, new FileInputStream(file));
+        SqlSubmitFlinkRequest sqlSubmitFlinkRequest = BindPropertiesUtils.bindProperties(file, SqlSubmitFlinkRequest.class);
         List<String> codes = new ArrayList<>();
         codes.add(createScalarUdfs());
         codes.add(createTableUdfs());

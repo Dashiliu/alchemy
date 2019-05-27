@@ -7,19 +7,18 @@ import java.net.URLClassLoader;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.dfire.platform.alchemy.connectors.common.utils.SideParser;
 import com.dfire.platform.alchemy.function.*;
 import com.dfire.platform.alchemy.web.cluster.ClusterInfo;
-import com.dfire.platform.alchemy.web.common.Alias;
+import com.dfire.platform.alchemy.api.common.Alias;
 import com.dfire.platform.alchemy.web.descriptor.SourceDescriptor;
-import com.dfire.platform.alchemy.web.side.SideParser;
-import com.dfire.platform.alchemy.web.side.SideStream;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.calcite.sql.SqlJoin;
 import org.apache.calcite.sql.SqlKind;
 import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.SqlSelect;
-import org.apache.calcite.sql.parser.SqlParseException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.JobSubmissionResult;
@@ -123,7 +122,7 @@ public class SubmitSqlHandler implements Handler<SqlSubmitFlinkRequest, SubmitFl
     private void registerSink(Table table, SqlSubmitFlinkRequest request, List<URL> urls) {
         request.getTable().getSinkDescriptors().forEach(sinkDescriptor -> {
             try {
-                replaceCodeValue(request, sinkDescriptor);
+//                replaceCodeValue(request, sinkDescriptor);
                 TableSink tableSink = sinkDescriptor.transform(ClusterType.FLINK);
                 table.writeToSink(tableSink);
                 addUrl(sinkDescriptor.getType(), urls);
@@ -136,51 +135,47 @@ public class SubmitSqlHandler implements Handler<SqlSubmitFlinkRequest, SubmitFl
     private Table registerSql(StreamTableEnvironment env, SqlSubmitFlinkRequest request, Map<String, TableSource> tableSources, Map<String, SourceDescriptor> sideSources ) throws Exception {
         if (sideSources.isEmpty()){
             return env.sqlQuery(request.getTable().getSql());
-        }else{
-            Deque<SqlNode> deque = SideParser.parse(request.getTable().getSql());
-            SqlNode last = deque.pollLast();
-            SqlSelect modifyNode = null;
-            SqlNode fullNode = deque.peekFirst();
-            while (true) {
-                if (last.getKind() == SqlKind.SELECT) {
-                    SqlSelect sqlSelect = (SqlSelect) last;
-                    SqlNode node = sqlSelect.getFrom();
-                    if (SqlKind.JOIN != node.getKind()){
-                        continue;
-                    }
-                    SqlJoin sqlJoin = (SqlJoin) node;
-                    Alias sideAlias = SideParser.getTableName(sqlJoin.getRight());
-                    Alias leftAlias = SideParser.getTableName(sqlJoin.getLeft());
-                    if (isSide(sideSources.keySet() , leftAlias.getTable())){
-                        throw new UnsupportedOperationException("side table must be right table");
-                    }
-                    if(!isSide(sideSources.keySet() , sideAlias.getTable())){
-                        continue;
-                    }
-                    DataStream<Row> dataStream = SideStream.buildStream( env, sqlSelect, leftAlias, sideAlias, sideSources.get(sideAlias.getTable()));
-                    Alias newTable = new Alias(leftAlias.getTable()+"_"+sideAlias.getTable(),leftAlias.getAlias()+"_"+sideAlias.getAlias());
-                    if (!env.isRegistered(newTable.getTable())){
-                        env.registerDataStream(newTable.getTable(), dataStream);
-                    }
-                    SqlSelect newSelect = SideParser.newSelect(sqlSelect , newTable.getTable() , newTable.getAlias(),false ,true);
-                    modifyNode = newSelect;
-                }
-                SqlNode node = deque.pollLast();
-                if (node == null){
-                    if (modifyNode != null){
-                        fullNode = modifyNode;
-                    }
-                    break;
-                }else{
-                    last = node;
-                    if (modifyNode != null){
-                        SideParser.rewrite(node,modifyNode);
-                        modifyNode = null;
-                    }
-                }
+        }
+        Deque<SqlNode> deque = SideParser.parse(request.getTable().getSql());
+        SqlNode last;
+        SqlSelect modifyNode = null;
+        SqlNode fullNode = deque.peekFirst();
+        while ((last = deque.pollLast()) != null) {
+            if (modifyNode != null){
+                SideParser.rewrite(last,modifyNode);
+                modifyNode = null;
             }
+            if (last.getKind() == SqlKind.SELECT) {
+                SqlSelect sqlSelect = (SqlSelect) last;
+                SqlNode selectFrom = sqlSelect.getFrom();
+                if (SqlKind.JOIN != selectFrom.getKind()){
+                    continue;
+                }
+                SqlJoin sqlJoin = (SqlJoin) selectFrom;
+                Alias sideAlias = SideParser.getTableName(sqlJoin.getRight());
+                Alias leftAlias = SideParser.getTableName(sqlJoin.getLeft());
+                if (isSide(sideSources.keySet() , leftAlias.getTable())){
+                    throw new UnsupportedOperationException("side table must be right table");
+                }
+                if(!isSide(sideSources.keySet() , sideAlias.getTable())){
+                    continue;
+                }
+                DataStream<Row> dataStream = SideStream.buildStream( env, sqlSelect, leftAlias, sideAlias, sideSources.get(sideAlias.getTable()));
+                Alias newTable = new Alias(leftAlias.getTable()+"_"+sideAlias.getTable(),leftAlias.getAlias()+"_"+sideAlias.getAlias());
+                if (!env.isRegistered(newTable.getTable())){
+                    env.registerDataStream(newTable.getTable(), dataStream);
+                }
+                SqlSelect newSelect = SideParser.newSelect(sqlSelect , newTable.getTable() , newTable.getAlias(),false ,true);
+                modifyNode = newSelect;
+            }
+        }
+        if (modifyNode != null) {
+            return env.sqlQuery(modifyNode.toString());
+        }else{
             return env.sqlQuery(fullNode.toString());
         }
+
+
     }
 
     private boolean isSide(Set<String> keySet, String table) {

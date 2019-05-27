@@ -5,14 +5,10 @@ import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.flink.runtime.jobmanager.HighAvailabilityMode;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.util.ResourceUtils;
 
-import com.dfire.platform.alchemy.web.bind.BindPropertiesFactory;
-import com.dfire.platform.alchemy.web.cluster.ClusterInfo;
-import com.dfire.platform.alchemy.web.cluster.flink.FlinkCluster;
+import com.dfire.platform.alchemy.web.util.BindPropertiesUtils;
 import com.dfire.platform.alchemy.web.cluster.flink.SqlSubmitFlinkRequest;
 import com.dfire.platform.alchemy.web.cluster.response.Response;
 import com.dfire.platform.alchemy.web.common.Constants;
@@ -66,8 +62,7 @@ public class FlinkClusterTest extends BaseCluster {
 
     private SqlSubmitFlinkRequest createSqlRequest(String sql, String jobName) throws Exception {
         File file = ResourceUtils.getFile("classpath:config.yaml");
-        SqlSubmitFlinkRequest sqlSubmitFlinkRequest = new SqlSubmitFlinkRequest();
-        BindPropertiesFactory.bindProperties(sqlSubmitFlinkRequest, Constants.BIND_PREFIX, new FileInputStream(file));
+        SqlSubmitFlinkRequest sqlSubmitFlinkRequest = BindPropertiesUtils.bindProperties(file, SqlSubmitFlinkRequest.class);
         List<String> codes = new ArrayList<>();
         codes.add(createScalarUdfs());
         codes.add(createTableUdfs());

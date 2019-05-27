@@ -1,6 +1,6 @@
 package web.parser;
 
-import com.dfire.platform.alchemy.web.common.Alias;
+import com.dfire.platform.alchemy.api.common.Alias;
 import org.apache.calcite.config.Lex;
 import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.parser.SqlParseException;

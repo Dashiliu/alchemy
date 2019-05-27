@@ -22,7 +22,7 @@ public final class Constants {
 
     public static final String GLOBAL_FILE_NAME = "global.jar";
 
-    public static final String BIND_PREFIX = "job";
+    public static final String BIND_PREFIX = "";
 
     public static final String DESCRIPTOR_TYPE_KEY = "type";
 
@@ -57,6 +57,8 @@ public final class Constants {
     public static final String SINK_TYPE_VALUE_HBASE = "hbase";
 
     public static final String SINK_TYPE_VALUE_KAFKA = "kafka";
+
+    public static final String SINK_TYPE_VALUE_MYSQL = "mysql";
 
     public static final String SINK_TYPE_VALUE_ROCKETMQ = "rocketMQ";
 

@@ -1,4 +1,4 @@
-job:
+
     name: test-nginx
     #cluster:
     parallelism: 1

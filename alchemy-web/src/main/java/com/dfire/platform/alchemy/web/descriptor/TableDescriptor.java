@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
-import com.dfire.platform.alchemy.web.bind.BindPropertiesFactory;
+import com.dfire.platform.alchemy.web.util.BindPropertiesUtils;
 import com.dfire.platform.alchemy.web.common.Constants;
 import com.dfire.platform.alchemy.web.util.PropertiesUtils;
 
@@ -24,7 +25,7 @@ public class TableDescriptor implements Descriptor {
     public volatile List<SinkDescriptor> sinkDescriptors;
     private String sql;
     private List<String> codes;
-    private Map<String, Object> sinks;
+    private List<Map<String, Object>> sinks;
 
     public List<UdfDescriptor> getUdfs() {
         return udfs;
@@ -42,11 +43,11 @@ public class TableDescriptor implements Descriptor {
         this.sources = sources;
     }
 
-    public Map<String, Object> getSinks() {
+    public List<Map<String, Object>> getSinks() {
         return sinks;
     }
 
-    public void setSinks(Map<String, Object> sinks) {
+    public void setSinks(List<Map<String, Object>> sinks) {
         this.sinks = sinks;
     }
 
@@ -57,26 +58,22 @@ public class TableDescriptor implements Descriptor {
                     return this.sinkDescriptors;
                 }
                 List<SinkDescriptor> sinkDescriptorList = new ArrayList<>(this.sinks.size());
-                for (Object object : sinks.values()) {
-                    if (object instanceof Map) {
-                        Map<String, Object> sink = (Map<String, Object>)object;
-                        Object type = sink.get(Constants.DESCRIPTOR_TYPE_KEY);
-                        if (type == null) {
-                            continue;
-                        }
-                        SinkDescriptor descriptor
-                            = DescriptorFactory.me.find(String.valueOf(type), SinkDescriptor.class);
-                        if (descriptor == null) {
-                            continue;
-                        }
-                        try {
-                            SinkDescriptor sinkDescriptor = descriptor.getClass().newInstance();
-                            BindPropertiesFactory.bindProperties(sinkDescriptor, "",
-                                PropertiesUtils.createProperties(sink));
-                            sinkDescriptorList.add(sinkDescriptor);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                for (Map<String, Object> sink : sinks) {
+                    Object type = sink.get(Constants.DESCRIPTOR_TYPE_KEY);
+                    if (type == null) {
+                        continue;
+                    }
+                    SinkDescriptor descriptor
+                        = DescriptorFactory.me.find(String.valueOf(type), SinkDescriptor.class);
+                    if (descriptor == null) {
+                        continue;
+                    }
+                    try {
+                        SinkDescriptor sinkDescriptor = descriptor.getClass().newInstance();
+                        BeanUtils.populate(sinkDescriptor, sink);
+                        sinkDescriptorList.add(sinkDescriptor);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
                 this.sinkDescriptors = sinkDescriptorList;

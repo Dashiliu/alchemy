@@ -3,13 +3,11 @@ package com.dfire.platform.alchemy.web.descriptor;
 import java.util.List;
 import java.util.Map;
 
-import com.dfire.platform.alchemy.web.common.Side;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.apache.flink.api.java.typeutils.RowTypeInfo;
-import org.apache.flink.table.typeutils.TypeStringUtils;
+import com.dfire.platform.alchemy.api.common.Side;
+import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.util.Assert;
 
-import com.dfire.platform.alchemy.web.bind.BindPropertiesFactory;
+import com.dfire.platform.alchemy.web.util.BindPropertiesUtils;
 import com.dfire.platform.alchemy.web.common.ClusterType;
 import com.dfire.platform.alchemy.web.common.Constants;
 import com.dfire.platform.alchemy.web.common.Field;
@@ -91,8 +89,7 @@ public class SourceDescriptor implements CoreDescriptor {
                 }
                 try {
                     this.connectorDescriptor = connectorDescriptor.getClass().newInstance();
-                    BindPropertiesFactory.bindProperties(this.connectorDescriptor, "",
-                        PropertiesUtils.createProperties(this.connector));
+                    BeanUtils.populate(this.connectorDescriptor, this.connector);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

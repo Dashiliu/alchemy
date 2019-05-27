@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import com.dfire.platform.alchemy.web.bind.BindPropertiesFactory;
+import com.dfire.platform.alchemy.web.util.BindPropertiesUtils;
 import com.dfire.platform.alchemy.web.cluster.flink.SqlSubmitFlinkRequest;
 import com.dfire.platform.alchemy.web.common.*;
 import com.dfire.platform.alchemy.web.config.Flame;
@@ -80,8 +80,7 @@ public class JobConfServiceImpl implements JobConfService {
         Content content = jobConfVM.getContent();
         if (ConfType.CONFIG.getType() == jobConfVM.getType()) {
             try {
-                SqlSubmitFlinkRequest sqlSubmitFlinkRequest = new SqlSubmitFlinkRequest();
-                BindPropertiesFactory.bindProperties(sqlSubmitFlinkRequest, Constants.BIND_PREFIX, content.getConfig());
+                SqlSubmitFlinkRequest sqlSubmitFlinkRequest = BindPropertiesUtils.bindProperties(content.getConfig(), SqlSubmitFlinkRequest.class);
                 sqlSubmitFlinkRequest.validate();
             } catch (Exception e) {
                 throw new RuntimeException(e);

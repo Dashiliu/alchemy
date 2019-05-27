@@ -22,7 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import com.dfire.platform.alchemy.web.bind.BindPropertiesFactory;
+import com.dfire.platform.alchemy.web.util.BindPropertiesUtils;
 import com.dfire.platform.alchemy.web.cluster.ClusterManager;
 import com.dfire.platform.alchemy.web.cluster.request.*;
 import com.dfire.platform.alchemy.web.cluster.response.JobStatusResponse;
@@ -31,7 +31,6 @@ import com.dfire.platform.alchemy.web.cluster.flink.SubmitFlinkResponse;
 import com.dfire.platform.alchemy.web.common.*;
 import com.dfire.platform.alchemy.web.config.Flame;
 import com.dfire.platform.alchemy.web.descriptor.JarInfoDescriptor;
-import com.dfire.platform.alchemy.web.descriptor.TableDescriptor;
 import com.dfire.platform.alchemy.web.domain.AcJob;
 import com.dfire.platform.alchemy.web.domain.AcJobConf;
 import com.dfire.platform.alchemy.web.domain.AcJobHistory;
@@ -281,16 +280,23 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
 
         private SqlSubmitFlinkRequest createSqlSubmitFlinkRequest(AcJob acJob, List<AcJobConf> jobConfs)
             throws Exception {
-            SqlSubmitFlinkRequest sqlSubmitFlinkRequest = new SqlSubmitFlinkRequest();
-            TableDescriptor tableDescriptor = new TableDescriptor();
-            sqlSubmitFlinkRequest.setTable(tableDescriptor);
+            SqlSubmitFlinkRequest sqlSubmitFlinkRequest = null;
+            for (AcJobConf acJobConf : jobConfs) {
+                switch (ConfType.fromType(acJobConf.getType())) {
+                    case CONFIG:
+                        sqlSubmitFlinkRequest = bindConfig(acJobConf);
+                        break;
+                    default:
+                        // nothing to do
+                }
+            }
+            if (sqlSubmitFlinkRequest == null){
+                throw new IllegalArgumentException("sql conf is null");
+            }
             for (AcJobConf acJobConf : jobConfs) {
                 switch (ConfType.fromType(acJobConf.getType())) {
                     case SQL:
                         bindSql(acJobConf, sqlSubmitFlinkRequest);
-                        break;
-                    case CONFIG:
-                        bindConfig(acJobConf, sqlSubmitFlinkRequest);
                         break;
                     default:
                         // nothing to do
@@ -301,10 +307,11 @@ public class ClusterJobServiceImpl implements ClusterJobService, InitializingBea
             return sqlSubmitFlinkRequest;
         }
 
-        private void bindConfig(AcJobConf acJobConf, SqlSubmitFlinkRequest submitFlinkRequest) throws Exception {
+        private SqlSubmitFlinkRequest bindConfig(AcJobConf acJobConf) throws Exception {
             Content content = JsonUtils.fromJson(acJobConf.getContent(), Content.class);
-            BindPropertiesFactory.bindProperties(submitFlinkRequest, Constants.BIND_PREFIX, content.getConfig());
+            SqlSubmitFlinkRequest submitFlinkRequest = BindPropertiesUtils.bindProperties(content.getConfig(), SqlSubmitFlinkRequest.class);
             submitFlinkRequest.getTable().setCodes(content.getCode());
+            return submitFlinkRequest;
         }
 
         private void bindSql(AcJobConf acJobConf, SqlSubmitFlinkRequest submitFlinkRequest) {

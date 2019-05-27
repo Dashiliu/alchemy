@@ -1,21 +1,23 @@
 package com.dfire.platform.alchemy.web.descriptor;
 
+import java.util.List;
+
+import com.dfire.platform.alchemy.connectors.common.side.SideTableInfo;
+import org.springframework.util.Assert;
+
 import com.dfire.platform.alchemy.web.common.ClusterType;
 import com.dfire.platform.alchemy.web.common.Constants;
 import com.dfire.platform.alchemy.web.common.Field;
-import com.dfire.platform.alchemy.web.common.Side;
-import com.dfire.platform.alchemy.web.side.MysqlAsyncReqRow;
-import com.dfire.platform.alchemy.web.side.MysqlProperties;
-import com.dfire.platform.alchemy.web.side.SideTableInfo;
-import org.springframework.util.Assert;
-
-import java.util.List;
+import com.dfire.platform.alchemy.api.common.Side;
+import com.dfire.platform.alchemy.connectors.mysql.side.MysqlAsyncSideFunction;
+import com.dfire.platform.alchemy.connectors.mysql.side.MysqlSideProperties;
+import com.dfire.platform.alchemy.connectors.mysql.side.MysqlSyncSideFunction;
 
 /**
  * @author congbai
  * @date 2019/5/24
  */
-public class MysqlConnectorDescriptor  implements ConnectorDescriptor {
+public class MysqlConnectorDescriptor implements ConnectorDescriptor {
 
     private String url;
 
@@ -31,29 +33,29 @@ public class MysqlConnectorDescriptor  implements ConnectorDescriptor {
     }
 
     @Override
-    public <T, R> T buildSource(ClusterType clusterType, List<Field> schema, FormatDescriptor format, R param) throws Exception {
+    public <T, R> T buildSource(ClusterType clusterType, List<Field> schema, FormatDescriptor format, R param)
+        throws Exception {
         if (!(param instanceof SideTableInfo)) {
             throw new IllegalArgumentException("MysqlConnectorDescriptor's param must be SideTableInfo");
         }
-        SideTableInfo sideTableInfo = (SideTableInfo) param;
+        SideTableInfo sideTableInfo = (SideTableInfo)param;
         if (sideTableInfo == null) {
-            //todo 正常的mysql表
-            return  null;
+            throw new UnsupportedOperationException("don't support read data from mysql");
         }
         Side side = sideTableInfo.getSide();
         if (side == null) {
             throw new IllegalArgumentException("MysqlConnectorDescriptor's side info is null");
         }
-        if (side.isAsync()){
-            return (T) new MysqlAsyncReqRow(sideTableInfo, createProperties());
-        }else{
-            //todo 同步的mysql维表
+        MysqlSideProperties properties = createProperties();
+        if (side.isAsync()) {
+            return (T)new MysqlAsyncSideFunction(sideTableInfo, properties);
+        } else {
+            return (T)new MysqlSyncSideFunction(sideTableInfo, properties);
         }
-        return null;
     }
 
-    private MysqlProperties createProperties(){
-        MysqlProperties properties = new MysqlProperties();
+    private MysqlSideProperties createProperties() {
+        MysqlSideProperties properties = new MysqlSideProperties();
         properties.setUrl(this.url);
         properties.setUsername(this.username);
         properties.setPassword(this.password);
