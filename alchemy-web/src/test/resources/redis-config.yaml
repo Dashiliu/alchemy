@@ -1,0 +1,50 @@
+job:
+    name: test-redis
+    #cluster:
+    parallelism: 1
+    timeCharacteristic: EventTime
+    #checkpointingInterval: 10000 #ms
+    avgs:
+        - com.dfire.platform:sunset-sql:0.0.1-SNAPSHOT
+    #jarPath: /Users/dongbinglin/Code/platform/alchemy/alchemy-connectors/target/alchemy-connectors-1.0-SNAPSHOT.jar
+    table:
+#        sql: select * from  TaxiRides
+        sources:
+          - name: redis_log
+            schema:
+              - name: syslog_host
+                type: VARCHAR
+              - name: syslog_tag
+                type: VARCHAR
+              - name: message
+                type: VARCHAR
+            connector:
+              property-version: 1
+              type: kafka
+              version: 0.10
+              topic: app-log
+            #  startup-mode: earliest-offset
+              properties:
+                 - key: zookeeper.connect
+                   value: zk1.2dfire-daily.com:2181/kafka1
+                 - key: bootstrap.servers
+                   value: 10.1.22.8:9092,10.1.22.7:9092
+                 - key: group.id
+                   value: testGroup
+            format:
+              property-version: 1
+              type: grok
+              regular: '%{DATA:syslog_host}%{SPACE}\[%{DATA:syslog_tag}\]%{SPACE}%{GREEDYDATA:message}'
+        udfs:
+            - name: DATEFORMAT
+              type: logstash
+              value: com.dfire.platform.alchemy.function.logstash.DateFormatFunction
+        sinks:
+            - name: esSink
+              index: redis
+              type: elasticsearch
+              address: 10.1.21.61:9300
+              clusterName: daily
+              bufferSize: 2  #1M
+#              filedIndex: index
+              dateFormat: yyyy.MM.dd

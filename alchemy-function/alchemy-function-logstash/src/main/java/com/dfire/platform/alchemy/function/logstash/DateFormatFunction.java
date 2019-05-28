@@ -59,16 +59,16 @@ public class DateFormatFunction extends ScalarFunction implements BaseFunction {
         return input;
     }
 
-    public String eval(String input) {
-        if (StringUtils.isBlank(input)) {
-            return input;
+    public String eval(Long input) {
+        if (input == null){
+            return "";
         }
         try {
-            return DATE_FORMA.get().format(new Date(Long.parseLong(input)));
+            return DATE_FORMA.get().format(new Date(input));
         } catch (Exception e) {
             logger.error("date format fail", e);
         }
-        return input;
+        return input.toString();
     }
 
     public String eval() {

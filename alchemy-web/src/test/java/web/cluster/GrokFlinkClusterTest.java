@@ -41,7 +41,7 @@ public class GrokFlinkClusterTest {
 
     @Test
     public void ngxTestSql() throws Exception {
-        SqlSubmitFlinkRequest sqlSubmitRequest = createSqlRequest(
+        SqlSubmitFlinkRequest sqlSubmitRequest = createNgxSqlRequest(
 
             "SELECT " +
                     "message_final as message" +
@@ -124,7 +124,7 @@ public class GrokFlinkClusterTest {
 
     @Test
     public void grayTestSql() throws Exception {
-        SqlSubmitFlinkRequest sqlSubmitRequest = createSqlRequest(
+        SqlSubmitFlinkRequest sqlSubmitRequest = createNgxSqlRequest(
 
             "SELECT " +
                 "message_final as message" +
@@ -192,8 +192,44 @@ public class GrokFlinkClusterTest {
         assert resp.isSuccess();
     }
 
-    private SqlSubmitFlinkRequest createSqlRequest(String sql, String jobName) throws Exception {
+    @Test
+    public void redisTestSql() throws Exception {
+        SqlSubmitFlinkRequest sqlSubmitRequest = createRedisSqlRequest(
+                "SELECT *,DATEFORMAT() as dateformat " +
+                "FROM redis_log log"
+            ,
+            "flinkClusterTest-TableSQL");
+        Response resp = this.cluster.send(sqlSubmitRequest);
+        assert resp.isSuccess();
+    }
+
+    @Test
+    public void loggerTestSql() throws Exception {
+        SqlSubmitFlinkRequest sqlSubmitRequest = createLoggerSqlRequest(
+            "select *,DATEFORMAT(sss) as dateformat from (SELECT message AS sss FROM logger_log) s"
+            ,
+            "flinkClusterTest-TableSQL");
+        Response resp = this.cluster.send(sqlSubmitRequest);
+        assert resp.isSuccess();
+    }
+
+
+    private SqlSubmitFlinkRequest createNgxSqlRequest(String sql, String jobName) throws Exception {
         File file = ResourceUtils.getFile("classpath:ngx-config.yaml");
+        return createSqlRequest(sql,jobName,file);
+    }
+
+    private SqlSubmitFlinkRequest createRedisSqlRequest(String sql, String jobName) throws Exception {
+        File file = ResourceUtils.getFile("classpath:redis-config.yaml");
+        return createSqlRequest(sql,jobName,file);
+    }
+
+    private SqlSubmitFlinkRequest createLoggerSqlRequest(String sql, String jobName) throws Exception {
+        File file = ResourceUtils.getFile("classpath:logger-config.yaml");
+        return createSqlRequest(sql,jobName,file);
+    }
+
+    private SqlSubmitFlinkRequest createSqlRequest(String sql, String jobName,File file) throws Exception {
         SqlSubmitFlinkRequest sqlSubmitFlinkRequest = new SqlSubmitFlinkRequest();
         BindPropertiesFactory.bindProperties(sqlSubmitFlinkRequest, Constants.BIND_PREFIX, new FileInputStream(file));
         List<String> codes = new ArrayList<>();
