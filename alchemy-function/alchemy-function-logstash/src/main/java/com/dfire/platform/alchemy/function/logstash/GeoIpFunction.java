@@ -2,6 +2,8 @@ package com.dfire.platform.alchemy.function.logstash;
 
 import com.dfire.platform.alchemy.function.BaseFunction;
 import com.dfire.platform.alchemy.function.logstash.util.geoip.GeoIpDatabase;
+import com.dfire.platform.alchemy.function.logstash.util.geoip.Geoip;
+import com.dfire.platform.alchemy.function.logstash.util.geoip.Location;
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.model.CityResponse;
 import com.maxmind.geoip2.record.City;

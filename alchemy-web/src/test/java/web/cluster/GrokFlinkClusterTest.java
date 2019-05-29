@@ -41,7 +41,7 @@ public class GrokFlinkClusterTest {
 
     @Test
     public void ngxTestSql() throws Exception {
-        SqlSubmitFlinkRequest sqlSubmitRequest = createSqlRequest(
+        SqlSubmitFlinkRequest sqlSubmitRequest = createNgxSqlRequest(
 
             "SELECT " +
                     "message_final as message" +
@@ -93,13 +93,6 @@ public class GrokFlinkClusterTest {
                             "FROM ( " +
                                 "SELECT log.*, ua.* " +
                                     ", KV(log.request_param, '&', 'param_') AS kvmap_param " +
-
-                                    ", CASE " +
-                                    "WHEN log.url IS NOT NULL " +
-                                    "AND log.url <> '-' THEN log.url " +
-                                    "ELSE '' " +
-                                    "END AS http_url " +
-
                                     ", CASE  " +
                                     "WHEN log.request IS NOT NULL " +
                                     "AND log.request <> '/' THEN log.request " +
@@ -128,9 +121,117 @@ public class GrokFlinkClusterTest {
         assert resp.isSuccess();
     }
 
-    private SqlSubmitFlinkRequest createSqlRequest(String sql, String jobName) throws Exception {
+
+    @Test
+    public void grayTestSql() throws Exception {
+        SqlSubmitFlinkRequest sqlSubmitRequest = createNgxSqlRequest(
+
+            "SELECT " +
+                "message_final as message" +
+                ",kvmap_geoip" +
+                ",requestd" +
+                ",kvmap_user_agent"+
+                ",http_url"+
+                ",request"+
+                ",user_agent"+
+                ",DATEFORMAT() as dateformat" +
+                ",syslog_host,syslog_tag,remote_addr,remote_user,time_local,http_method,request_param,http_version,status" +
+                ",body_bytes_sent,http_referer,host_name,http_x_forwarded_for,request_time,remote_port" +
+                ",upstream_response_time,http_x_readtime,uri,upstream_status,upstream_addr,nuid,request_id" +
+                ",http_x_forwarded_proto" +
+                " FROM (" +
+                "select *" +
+
+                ", GEOIP(client_ip) AS kvmap_geoip "+
+                ", CASE  " +
+                " WHEN message is not null AND CHAR_LENGTH(message)>2048 THEN SUBSTRING(message,1,2048)"+
+                " ELSE message " +
+
+                " END AS message_final " +
+
+                " FROM ( " +
+                "SELECT * " +
+                ", CASE  " +
+                "WHEN client_ip_gsub = http_x_forwarded_for THEN client_ip_gsub " +
+                "ELSE '' " +
+                "END AS client_ip " +
+                "FROM ( " +
+                "SELECT * " +
+                ", GSUB(GSUB(client_ip_http, '(^100|^172|^10|^192|^127)\\..?((, *)|$)|(unknown, *)', ''), '(,.*)|( *)', '') AS client_ip_gsub\n" +
+                ", SPLIT(request, '/') AS requestd " +
+                ", GROK(user_agent_grok, '%{DATA}NetType/%{DATA:ua_net_type} Language/%{GREEDYDATA:ua_language}') AS kvmap_user_agent\n" +
+                "FROM ( " +
+                "SELECT log.*, ua.* " +
+                ", KV(log.request_param, '&', 'param_') AS kvmap_param " +
+
+                ", CASE  " +
+                "WHEN log.request IS NOT NULL " +
+                "AND log.request <> '/' THEN log.request " +
+                "ELSE '' " +
+                "END AS request " +
+
+                ", CASE " +
+                "WHEN log.http_x_forwarded_for IS NOT NULL\n" +
+                "AND log.http_x_forwarded_for <> '-' THEN log.http_x_forwarded_for\n" +
+                "ELSE ''\n" +
+                "END AS client_ip_http\n" +
+
+                ", CASE \n" +
+                "WHEN log.user_agent LIKE 'NetType' THEN log.user_agent\n" +
+                "ELSE ''\n" +
+                "END AS user_agent_grok\n" +
+                "FROM ngx_log log\n" +
+                ",LATERAL TABLE(USERAGENT(log.user_agent)) as ua " +
+                ") ngx_log_tmp " +
+                ") ngx_log_tmp_one" +
+                ") ngx_log_tmp_two" +
+                ") sg_ngx_acc"
+            ,
+            "flinkClusterTest-TableSQL");
+        Response resp = this.cluster.send(sqlSubmitRequest);
+        assert resp.isSuccess();
+    }
+
+    @Test
+    public void redisTestSql() throws Exception {
+        SqlSubmitFlinkRequest sqlSubmitRequest = createRedisSqlRequest(
+                "SELECT *,DATEFORMAT() as dateformat " +
+                "FROM redis_log log"
+            ,
+            "flinkClusterTest-TableSQL");
+        Response resp = this.cluster.send(sqlSubmitRequest);
+        assert resp.isSuccess();
+    }
+
+    @Test
+    public void loggerTestSql() throws Exception {
+        SqlSubmitFlinkRequest sqlSubmitRequest = createLoggerSqlRequest(
+            "select *,DATEFORMAT(sss) as dateformat from (SELECT message AS sss FROM logger_log) s"
+            ,
+            "flinkClusterTest-TableSQL");
+        Response resp = this.cluster.send(sqlSubmitRequest);
+        assert resp.isSuccess();
+    }
+
+
+    private SqlSubmitFlinkRequest createNgxSqlRequest(String sql, String jobName) throws Exception {
         File file = ResourceUtils.getFile("classpath:ngx-config.yaml");
-        SqlSubmitFlinkRequest sqlSubmitFlinkRequest = BindPropertiesUtils.bindProperties(file, SqlSubmitFlinkRequest.class);
+        return createSqlRequest(sql,jobName,file);
+    }
+
+    private SqlSubmitFlinkRequest createRedisSqlRequest(String sql, String jobName) throws Exception {
+        File file = ResourceUtils.getFile("classpath:redis-config.yaml");
+        return createSqlRequest(sql,jobName,file);
+    }
+
+    private SqlSubmitFlinkRequest createLoggerSqlRequest(String sql, String jobName) throws Exception {
+        File file = ResourceUtils.getFile("classpath:logger-config.yaml");
+        return createSqlRequest(sql,jobName,file);
+    }
+
+    private SqlSubmitFlinkRequest createSqlRequest(String sql, String jobName,File file) throws Exception {
+        SqlSubmitFlinkRequest sqlSubmitFlinkRequest = new SqlSubmitFlinkRequest();
+        BindPropertiesFactory.bindProperties(sqlSubmitFlinkRequest, Constants.BIND_PREFIX, new FileInputStream(file));
         List<String> codes = new ArrayList<>();
         codes.add(createScalarUdfs());
         codes.add(createTableUdfs());

@@ -1,13 +1,16 @@
 package com.dfire.platform.alchemy.benchmarks.function;
 
 
+import com.dfire.platform.alchemy.function.logstash.util.geoip.GeoIpDatabase;
 import com.dfire.platform.alchemy.function.logstash.util.useragent.UserAgentUtil;
+import com.maxmind.geoip2.DatabaseReader;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import java.net.InetAddress;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -33,6 +36,13 @@ public class LogstashBenchmark {
     public void useragent() {
         String userAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/7.0.4(0x17000428) NetType/4G Language/zh_CN";
         UserAgentUtil.parse(userAgent);
+    }
+
+    @Benchmark
+    public void geoIp() throws Exception {
+        String ip = "117.136.8.65";
+        DatabaseReader reader = GeoIpDatabase.parse();
+        InetAddress ipAddress = InetAddress.getByName(ip);
     }
 
 }

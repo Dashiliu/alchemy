@@ -51,6 +51,13 @@ public class JsonRowStringSchema implements Serializable {
      */
     private final String[] fieldNames;
 
+    private static final ThreadLocal<SimpleDateFormat> DATE_FORMA = new ThreadLocal<SimpleDateFormat>() {
+        @Override
+        protected SimpleDateFormat initialValue() {
+            return new SimpleDateFormat(FORMAT);
+        }
+    };
+
     /**
      * Creates a JSON serialization schema for the given fields and types.
      *
@@ -98,7 +105,7 @@ public class JsonRowStringSchema implements Serializable {
                 }
             } else if (fieldNames[i].equals(DATEFORMAT)) {
                 try {
-                    Date date = new SimpleDateFormat(FORMAT).parse(row.getField(i).toString());
+                    Date date = DATE_FORMA.get().parse(row.getField(i).toString());
                     objectNode.set(TIMESTAMP, mapper.valueToTree(date));
                 } catch (ParseException e) {
                     logger.error("timestamp is fail",e);
