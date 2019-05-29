@@ -230,8 +230,7 @@ public class GrokFlinkClusterTest {
     }
 
     private SqlSubmitFlinkRequest createSqlRequest(String sql, String jobName,File file) throws Exception {
-        SqlSubmitFlinkRequest sqlSubmitFlinkRequest = new SqlSubmitFlinkRequest();
-        BindPropertiesFactory.bindProperties(sqlSubmitFlinkRequest, Constants.BIND_PREFIX, new FileInputStream(file));
+        SqlSubmitFlinkRequest sqlSubmitFlinkRequest = BindPropertiesUtils.bindProperties(file, SqlSubmitFlinkRequest.class);
         List<String> codes = new ArrayList<>();
         codes.add(createScalarUdfs());
         codes.add(createTableUdfs());
