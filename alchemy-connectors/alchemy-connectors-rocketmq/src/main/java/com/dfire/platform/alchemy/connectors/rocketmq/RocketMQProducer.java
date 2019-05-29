@@ -17,7 +17,6 @@ import com.alibaba.rocketmq.client.producer.DefaultMQProducer;
 import com.alibaba.rocketmq.client.producer.SendCallback;
 import com.alibaba.rocketmq.client.producer.SendResult;
 import com.alibaba.rocketmq.common.message.Message;
-import com.dfire.platform.alchemy.api.selector.TopicSelector;
 import com.dfire.platform.alchemy.connectors.rocketmq.serialization.KeyValueSerializationSchema;
 
 public class RocketMQProducer<IN> extends RichSinkFunction<IN> implements CheckpointedFunction {

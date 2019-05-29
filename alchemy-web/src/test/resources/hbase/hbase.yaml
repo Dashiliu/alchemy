@@ -22,20 +22,24 @@
               row-delim: '$'
               ignore-first-line: true
               ignore-comments: '%'
-        - name: side_simple  # tableName
-          schema:
-          - name: id
-            type: VARCHAR
-          - name: name
-            type: VARCHAR
-          side:
-#            async: true
-            cacheT-type: LRU
-          connector:
-              type: mysql
-              url: jdbc:mysql://common101.my.2dfire-daily.com:3306/flink_side?useUnicode=true&characterEncoding=utf8&useSSL=false
-              username: twodfire
-              password: 123456
         sinks:
-        - name: print_sink
-          type: print
+        - name: hbase_sink
+          type: hbase
+          row-keys:
+          - id
+          buffer-size: 1048576 # byte
+          family: s
+          family-columns:    #单个family 不需要配置这个参数，测试用
+            s1:
+            - first
+            - id
+            s2:
+            - last
+            - score
+          node: /hbase-unsecure
+          table-name: flink-test
+          zookeeper: 10.1.22.21:2181,10.1.22.22:2181,10.1.22.23:2181
+
+
+
+

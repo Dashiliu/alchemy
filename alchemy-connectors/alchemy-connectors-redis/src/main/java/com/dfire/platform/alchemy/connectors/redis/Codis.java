@@ -21,11 +21,6 @@ public class Codis implements Serializable {
      */
     private int zkSessionTimeoutMs = 30000;
 
-    /**
-     * codis管理员统一分配
-     */
-    private String passoword = null;
-
     public String getZkAddrs() {
         return zkAddrs;
     }
@@ -50,11 +45,4 @@ public class Codis implements Serializable {
         this.zkSessionTimeoutMs = zkSessionTimeoutMs;
     }
 
-    public String getPassoword() {
-        return passoword;
-    }
-
-    public void setPassoword(String passoword) {
-        this.passoword = passoword;
-    }
 }

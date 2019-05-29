@@ -6,7 +6,7 @@ package com.dfire.platform.alchemy.web.descriptor;
  */
 public interface Descriptor {
 
-    String getType();
+    String type();
 
     void validate() throws Exception;
 

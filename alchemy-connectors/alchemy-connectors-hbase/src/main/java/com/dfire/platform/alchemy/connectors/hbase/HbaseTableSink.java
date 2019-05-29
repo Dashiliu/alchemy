@@ -1,20 +1,16 @@
 package com.dfire.platform.alchemy.connectors.hbase;
 
-import org.apache.flink.api.common.serialization.SerializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
-import org.apache.flink.formats.json.JsonRowSerializationSchema;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.functions.sink.OutputFormatSinkFunction;
 import org.apache.flink.table.sinks.TableSink;
 import org.apache.flink.table.sinks.UpsertStreamTableSink;
 import org.apache.flink.types.Row;
 import org.apache.flink.util.Preconditions;
-
-import com.dfire.platform.alchemy.api.sink.HbaseInvoker;
 
 /**
  * @author congbai
@@ -24,19 +20,12 @@ public class HbaseTableSink implements UpsertStreamTableSink<Row> {
 
     private final HbaseProperties hbaseProperties;
 
-    private String code;
-
-    private HbaseInvoker hbaseInvoker;
-
-    private SerializationSchema<Row> serializationSchema;
-
     private String[] fieldNames;
 
     private TypeInformation[] fieldTypes;
 
-    public HbaseTableSink(HbaseProperties hbaseProperties, String code) {
+    public HbaseTableSink(HbaseProperties hbaseProperties) {
         this.hbaseProperties = hbaseProperties;
-        this.code = Preconditions.checkNotNull(code, "code can not be null ");
     }
 
     @Override
@@ -51,14 +40,11 @@ public class HbaseTableSink implements UpsertStreamTableSink<Row> {
 
     @Override
     public TableSink<Tuple2<Boolean, Row>> configure(String[] fieldNames, TypeInformation<?>[] fieldTypes) {
-        HbaseTableSink copy = new HbaseTableSink(this.hbaseProperties, this.code);
+        HbaseTableSink copy = new HbaseTableSink(this.hbaseProperties);
         copy.fieldNames = Preconditions.checkNotNull(fieldNames, "fieldNames");
         copy.fieldTypes = Preconditions.checkNotNull(fieldTypes, "fieldTypes");
         Preconditions.checkArgument(fieldNames.length == fieldTypes.length,
             "Number of provided field names and types does not match.");
-
-        RowTypeInfo rowSchema = new RowTypeInfo(fieldTypes, fieldNames);
-        copy.serializationSchema = new JsonRowSerializationSchema(rowSchema);
         return copy;
     }
 
@@ -90,7 +76,7 @@ public class HbaseTableSink implements UpsertStreamTableSink<Row> {
 
     private OutputFormatSinkFunction creatHbaseSink() {
         return new OutputFormatSinkFunction(
-            new HBaseOutputFormat(this.hbaseProperties, this.serializationSchema, this.code));
+            new HBaseOutputFormat(this.hbaseProperties, this.fieldNames, this.fieldTypes));
     }
 
 }

@@ -22,20 +22,22 @@
               row-delim: '$'
               ignore-first-line: true
               ignore-comments: '%'
-        - name: side_simple  # tableName
-          schema:
-          - name: id
-            type: VARCHAR
-          - name: name
-            type: VARCHAR
-          side:
-#            async: true
-            cacheT-type: LRU
-          connector:
-              type: mysql
-              url: jdbc:mysql://common101.my.2dfire-daily.com:3306/flink_side?useUnicode=true&characterEncoding=utf8&useSSL=false
-              username: twodfire
-              password: 123456
         sinks:
-        - name: print_sink
-          type: print
+        - name: redis_sink
+          type: redis
+          sentinel:
+              sentinels: common101.redis.2dfire-daily.com:26379
+              master: cache101
+          database: 2
+          keys:
+          - first
+          command: set
+          members:
+          - first
+          scores:
+          - score
+          ttl: 180
+
+
+
+

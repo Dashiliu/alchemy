@@ -4,7 +4,14 @@ import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -125,7 +132,7 @@ public class SubmitSqlHandler implements Handler<SqlSubmitFlinkRequest, SubmitFl
 //                replaceCodeValue(request, sinkDescriptor);
                 TableSink tableSink = sinkDescriptor.transform(ClusterType.FLINK);
                 table.writeToSink(tableSink);
-                addUrl(sinkDescriptor.getType(), urls);
+                addUrl(sinkDescriptor.type(), urls);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -191,7 +198,7 @@ public class SubmitSqlHandler implements Handler<SqlSubmitFlinkRequest, SubmitFl
         if (CollectionUtils.isNotEmpty(request.getTable().getUdfs())) {
             request.getTable().getUdfs().forEach(udfDescriptor -> {
                 try {
-                    addUrl(udfDescriptor.getType(), urls);
+                    addUrl(udfDescriptor.type(), urls);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -254,9 +261,9 @@ public class SubmitSqlHandler implements Handler<SqlSubmitFlinkRequest, SubmitFl
                     return;
                 }
                 TableSource tableSource = consumer.transform(ClusterType.FLINK);
-                addUrl(consumer.getConnectorDescriptor().getType(), urls);
+                addUrl(consumer.getConnectorDescriptor().type(), urls);
                 if (consumer.getFormat() != null){
-                    addUrl(consumer.getFormat().getType(), urls);
+                    addUrl(consumer.getFormat().type(), urls);
                 }
                 env.registerTableSource(consumer.getName(), tableSource);
                 tableSources.put(consumer.getName() , tableSource);

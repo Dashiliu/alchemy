@@ -11,6 +11,8 @@ import org.apache.flink.table.sinks.TableSink;
 import org.apache.flink.table.sinks.UpsertStreamTableSink;
 import org.apache.flink.types.Row;
 import org.apache.flink.util.Preconditions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author congbai
@@ -18,17 +20,16 @@ import org.apache.flink.util.Preconditions;
  */
 public class RedisTableSink implements UpsertStreamTableSink<Row> {
 
-    private final RedisProperties redisProperties;
+    protected static final Logger LOG = LoggerFactory.getLogger(RedisTableSink.class);
 
-    private final String code;
+    private final RedisProperties redisProperties;
 
     private String[] fieldNames;
 
     private TypeInformation[] fieldTypes;
 
-    public RedisTableSink(RedisProperties redisProperties, String code) {
+    public RedisTableSink(RedisProperties redisProperties) {
         this.redisProperties = redisProperties;
-        this.code = code;
     }
 
     @Override
@@ -43,7 +44,7 @@ public class RedisTableSink implements UpsertStreamTableSink<Row> {
 
     @Override
     public TableSink<Tuple2<Boolean, Row>> configure(String[] fieldNames, TypeInformation<?>[] fieldTypes) {
-        RedisTableSink copy = new RedisTableSink(redisProperties, this.code);
+        RedisTableSink copy = new RedisTableSink(redisProperties);
         copy.fieldNames = Preconditions.checkNotNull(fieldNames, "fieldNames");
         copy.fieldTypes = Preconditions.checkNotNull(fieldTypes, "fieldTypes");
         Preconditions.checkArgument(fieldNames.length == fieldTypes.length,
@@ -53,22 +54,22 @@ public class RedisTableSink implements UpsertStreamTableSink<Row> {
 
     @Override
     public void setKeyFields(String[] keys) {
-
+        LOG.info("redis keys:{}", keys);
     }
 
     @Override
     public void setIsAppendOnly(Boolean isAppendOnly) {
-
+        LOG.info("RedisTableSink is appendOnly:{}", isAppendOnly);
     }
 
     @Override
     public void emitDataStream(DataStream<Tuple2<Boolean, Row>> dataStream) {
-        RichSinkFunction richSinkFunction = creatRedisRich();
+        RichSinkFunction richSinkFunction = createRedisRich();
         dataStream.addSink(richSinkFunction);
     }
 
-    private RichSinkFunction creatRedisRich() {
-        return new RedisSinkFunction(this.redisProperties, this.code);
+    private RichSinkFunction createRedisRich() {
+        return RedisFactory.getInstance(this.fieldNames, this.fieldTypes, this.redisProperties);
     }
 
     @Override

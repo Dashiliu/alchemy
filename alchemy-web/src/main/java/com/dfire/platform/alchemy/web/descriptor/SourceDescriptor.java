@@ -88,8 +88,7 @@ public class SourceDescriptor implements CoreDescriptor {
                     return this.connectorDescriptor;
                 }
                 try {
-                    this.connectorDescriptor = connectorDescriptor.getClass().newInstance();
-                    BeanUtils.populate(this.connectorDescriptor, this.connector);
+                    this.connectorDescriptor = BindPropertiesUtils.bindProperties(this.connector, connectorDescriptor.getClass());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -111,7 +110,7 @@ public class SourceDescriptor implements CoreDescriptor {
     }
 
     @Override
-    public String getType() {
+    public String type() {
         return Constants.TYPE_VALUE_SOURCE;
     }
 

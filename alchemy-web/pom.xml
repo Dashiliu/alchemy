@@ -595,6 +595,10 @@
             <artifactId>lettuce-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.twodfire</groupId>
+            <artifactId>twodfire-redis</artifactId>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>

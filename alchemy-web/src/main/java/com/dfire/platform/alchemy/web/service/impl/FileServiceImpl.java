@@ -199,15 +199,6 @@ public class FileServiceImpl implements FileService {
         }
     }
 
-    static class AnyTrustStrategy implements TrustStrategy {
-
-        @Override
-        public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-            return true;
-        }
-
-    }
-
     static class HttpKeepAliveStrategy implements ConnectionKeepAliveStrategy {
         /**
          * 取不到服务器返回的keep-alive值,设置一个默认的keepAlive时间

@@ -51,7 +51,7 @@ public class JarInfoDescriptor implements Descriptor {
     }
 
     @Override
-    public String getType() {
+    public String type() {
         return Constants.TYPE_VALUE_JAR;
     }
 

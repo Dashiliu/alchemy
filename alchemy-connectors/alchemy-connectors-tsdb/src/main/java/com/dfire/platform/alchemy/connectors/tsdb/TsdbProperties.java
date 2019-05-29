@@ -1,18 +1,21 @@
 package com.dfire.platform.alchemy.connectors.tsdb;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author congbai
  * @date 2018/7/12
  */
-public class OpentsdbProperties implements Serializable{
+public class TsdbProperties implements Serializable{
 
     private static final long serialVersionUID = 1L;
 
-    private String opentsdbUrl;
+    private String url;
 
-    private String env;
+    private List<String> metrics;
+
+    private List<String> tags;
 
     private Integer ioThreadCount;
 
@@ -26,20 +29,28 @@ public class OpentsdbProperties implements Serializable{
 
     private Integer putRequestLimit;
 
-    public String getOpentsdbUrl() {
-        return opentsdbUrl;
+    public String getUrl() {
+        return url;
     }
 
-    public void setOpentsdbUrl(String opentsdbUrl) {
-        this.opentsdbUrl = opentsdbUrl;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
-    public String getEnv() {
-        return env;
+    public List<String> getMetrics() {
+        return metrics;
     }
 
-    public void setEnv(String env) {
-        this.env = env;
+    public void setMetrics(List<String> metrics) {
+        this.metrics = metrics;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 
     public Integer getIoThreadCount() {

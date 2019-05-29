@@ -1,6 +1,8 @@
 package com.dfire.platform.alchemy.connectors.hbase;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author congbai
@@ -16,7 +18,19 @@ public class HbaseProperties implements Serializable {
 
     private String tableName;
 
+    private List<String> rowKeys;
+
+    /**
+     * 一行只有单个family
+     */
     private String family;
+
+    /**
+     * 一行有多个family
+     */
+    private Map<String, List<String>> familyColumns;
+
+    private String dateFormat;
 
     private long bufferSize;
 
@@ -46,12 +60,36 @@ public class HbaseProperties implements Serializable {
         this.tableName = tableName;
     }
 
+    public List<String> getRowKeys() {
+        return rowKeys;
+    }
+
+    public void setRowKeys(List<String> rowKeys) {
+        this.rowKeys = rowKeys;
+    }
+
     public String getFamily() {
         return family;
     }
 
     public void setFamily(String family) {
         this.family = family;
+    }
+
+    public Map<String, List<String>> getFamilyColumns() {
+        return familyColumns;
+    }
+
+    public void setFamilyColumns(Map<String, List<String>> familyColumns) {
+        this.familyColumns = familyColumns;
+    }
+
+    public String getDateFormat() {
+        return dateFormat;
+    }
+
+    public void setDateFormat(String dateFormat) {
+        this.dateFormat = dateFormat;
     }
 
     public long getBufferSize() {

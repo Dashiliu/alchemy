@@ -13,7 +13,7 @@ import com.aliyun.hitsdb.client.callback.BatchPutCallback;
 import com.aliyun.hitsdb.client.value.Result;
 import com.aliyun.hitsdb.client.value.request.Point;
 import com.dfire.platform.alchemy.api.common.TsdbData;
-import com.dfire.platform.alchemy.connectors.tsdb.OpentsdbProperties;
+import com.dfire.platform.alchemy.connectors.tsdb.TsdbProperties;
 
 /**
  * @author congbai
@@ -25,10 +25,10 @@ public class HitsdbHandler implements TsdbHandler {
 
     private transient HiTSDB tsdb;
 
-    public HitsdbHandler(OpentsdbProperties opentsdbProperties) {
+    public HitsdbHandler(TsdbProperties opentsdbProperties) {
         HiTSDBConfig.Builder builder = HiTSDBConfig
             // 配置地址，第一个参数可以是域名，IP。
-            .address(opentsdbProperties.getOpentsdbUrl(), 8242)
+            .address(opentsdbProperties.getUrl(), 8242)
             // 异步写相关，异步批量 Put 回调接口。
             .listenBatchPut(new BatchPutCallback() {
                 @Override

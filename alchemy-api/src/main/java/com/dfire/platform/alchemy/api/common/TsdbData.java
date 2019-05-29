@@ -16,9 +16,14 @@ public class TsdbData {
 
     private Long timestamp;
 
-    public TsdbData(Map<String, Number> metricValues, Map<String, String> tags) {
+    public TsdbData(Map<String, Number> metricValues, Map<String, String> tags, Long timestamp) {
         this.metricValues = metricValues;
         this.tags = tags;
+        this.timestamp = timestamp;
+    }
+
+    public static Builder newBuilder(){
+        return new Builder();
     }
 
     public Map<String, Number> getMetricValues() {
@@ -86,7 +91,7 @@ public class TsdbData {
 
 
         public TsdbData build(){
-            return new TsdbData(this.metricValues,this.tags);
+            return new TsdbData(this.metricValues, this.tags, this.timestamp);
         }
 
     }

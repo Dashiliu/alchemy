@@ -22,13 +22,13 @@ public class DescriptorFactory {
         Iterator<Descriptor> iterator = serviceLoader.iterator();
         while (iterator.hasNext()) {
             Descriptor descriptor = iterator.next();
-            if (StringUtils.isEmpty(descriptor.getType())) {
+            if (StringUtils.isEmpty(descriptor.type())) {
                 continue;
             }
-            List<Descriptor> descriptorList = this.typeDescriptors.get(descriptor.getType());
+            List<Descriptor> descriptorList = this.typeDescriptors.get(descriptor.type());
             if (descriptorList == null) {
                 descriptorList = new ArrayList<>();
-                this.typeDescriptors.put(descriptor.getType(), descriptorList);
+                this.typeDescriptors.put(descriptor.type(), descriptorList);
             }
             if (!descriptorList.contains(descriptor)) {
                 descriptorList.add(descriptor);

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.dfire.platform.alchemy.api.selector;
+package com.dfire.platform.alchemy.connectors.rocketmq;
 
 import java.io.Serializable;
 

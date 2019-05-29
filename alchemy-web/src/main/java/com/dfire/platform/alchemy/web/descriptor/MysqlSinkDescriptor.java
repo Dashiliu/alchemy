@@ -138,7 +138,7 @@ public class MysqlSinkDescriptor extends SinkDescriptor {
     }
 
     @Override
-    public String getType() {
+    public String type() {
         return Constants.SINK_TYPE_VALUE_MYSQL;
     }
 }

@@ -34,8 +34,12 @@
         <maven.compiler.source>1.7</maven.compiler.source>
         <groovy.version>2.4.11</groovy.version>
         <redis.version>1.4.6</redis.version>
+        <jedis.version>2.9.0</jedis.version>
+        <codis.version>0.5.0</codis.version>
         <rocketmq.version>3.2.5</rocketmq.version>
         <hitsdb.version>0.0.5</hitsdb.version>
+        <httpclient.version>4.5.2</httpclient.version>
+        <httpcore.version>4.4.5</httpcore.version>
         <opentsdb.client.version>1.0.0</opentsdb.client.version>
         <lombok.version>1.16.18</lombok.version>
         <fastjson.versoiin>1.2.46</fastjson.versoiin>
@@ -84,6 +88,16 @@
                 <groupId>com.twodfire</groupId>
                 <artifactId>twodfire-redis</artifactId>
                 <version>${redis.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>redis.clients</groupId>
+                <artifactId>jedis</artifactId>
+                <version>${jedis.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.codis.jodis</groupId>
+                <artifactId>jodis</artifactId>
+                <version>${codis.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.flink</groupId>
@@ -169,6 +183,16 @@
                 <groupId>com.aliyun</groupId>
                 <artifactId>hitsdb-client</artifactId>
                 <version>${hitsdb.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${httpclient.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>${httpcore.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>

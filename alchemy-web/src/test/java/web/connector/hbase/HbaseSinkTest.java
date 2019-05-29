@@ -1,6 +1,7 @@
-package web.connector.mysql;
+package web.connector.hbase;
 
 import java.io.File;
+import java.util.Map;
 
 import org.junit.Test;
 import org.springframework.util.ResourceUtils;
@@ -13,32 +14,37 @@ import web.BaseCluster;
 
 /**
  * @author congbai
- * @date 2019/5/24
+ * @date 2019/5/28
  */
-public class MysqlSideTest extends BaseCluster {
+public class HbaseSinkTest extends BaseCluster {
 
     @Test
-    public void simple_mysql() throws Exception {
-        Response response = execute(
-            "select c.first, c.id, c.score ,c.last ,s.name  from csv_table_test as c join side_simple as s on c.id = s.id");
+    public void singleFaimly() throws Exception {
+        Response response = execute("select * from csv_table_test",true);
         assert response.isSuccess();
     }
 
+
     @Test
-    public void nest_mysql() throws Exception {
-        Response response = execute(
-            "select * from (select c.first, c.id, c.score ,c.last ,s.name  from csv_table_test as c join side_simple as s on c.id = s.id where c.score > 1 and s.name like 'z%') as d ");
+    public void multiFaimly() throws Exception {
+        Response response = execute("select * from csv_table_test",false);
         assert response.isSuccess();
     }
 
-    Response execute(String sql) throws Exception {
-        File file = ResourceUtils.getFile("classpath:mysql/side.yaml");
+
+    Response execute(String sql, boolean single) throws Exception {
+        File file = ResourceUtils.getFile("classpath:hbase/hbase.yaml");
         SqlSubmitFlinkRequest sqlSubmitFlinkRequest
             = BindPropertiesUtils.bindProperties(file, SqlSubmitFlinkRequest.class);
         sqlSubmitFlinkRequest.setTest(true);
         sqlSubmitFlinkRequest.getTable().setSql(sql);
         sqlSubmitFlinkRequest.setJobName("test_mysql_side");
+        Map<String,Object> redisSink = sqlSubmitFlinkRequest.getTable().getSinks().get(0);
+        if (single){
+            redisSink.put("familyColumns", null);
+        }else{
+            redisSink.put("tableName", "hbase-multi");
+        }
         return this.cluster.send(sqlSubmitFlinkRequest);
     }
-
 }

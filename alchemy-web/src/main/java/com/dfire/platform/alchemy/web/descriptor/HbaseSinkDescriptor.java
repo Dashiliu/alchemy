@@ -8,6 +8,9 @@ import com.dfire.platform.alchemy.connectors.hbase.HbaseTableSink;
 import com.dfire.platform.alchemy.web.common.ClusterType;
 import com.dfire.platform.alchemy.web.common.Constants;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author congbai
  * @date 03/06/2018
@@ -22,13 +25,23 @@ public class HbaseSinkDescriptor extends SinkDescriptor {
 
     private String tableName;
 
+    private List<String> rowKeys;
+
+    /**
+     * 一行只有单个family
+     */
     private String family;
+
+    /**
+     * 一行有多个family
+     */
+    private Map<String, List<String>> familyColumns;
+
+    private String dateFormat;
 
     private long bufferSize;
 
     private boolean skipWal;
-
-    private String value;
 
     @Override
     public String getName() {
@@ -63,12 +76,36 @@ public class HbaseSinkDescriptor extends SinkDescriptor {
         this.tableName = tableName;
     }
 
+    public List<String> getRowKeys() {
+        return rowKeys;
+    }
+
+    public void setRowKeys(List<String> rowKeys) {
+        this.rowKeys = rowKeys;
+    }
+
     public String getFamily() {
         return family;
     }
 
     public void setFamily(String family) {
         this.family = family;
+    }
+
+    public Map<String, List<String>> getFamilyColumns() {
+        return familyColumns;
+    }
+
+    public void setFamilyColumns(Map<String, List<String>> familyColumns) {
+        this.familyColumns = familyColumns;
+    }
+
+    public String getDateFormat() {
+        return dateFormat;
+    }
+
+    public void setDateFormat(String dateFormat) {
+        this.dateFormat = dateFormat;
     }
 
     public long getBufferSize() {
@@ -87,14 +124,6 @@ public class HbaseSinkDescriptor extends SinkDescriptor {
         this.skipWal = skipWal;
     }
 
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
     @Override
     public <T> T transform(ClusterType clusterType) throws Exception {
         if (ClusterType.FLINK.equals(clusterType)) {
@@ -103,10 +132,10 @@ public class HbaseSinkDescriptor extends SinkDescriptor {
         throw new UnsupportedOperationException("unknow clusterType:" + clusterType);
     }
 
-    private <T> T transformFlink() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+    private <T> T transformFlink(){
         HbaseProperties hbaseProperties = new HbaseProperties();
         BeanUtils.copyProperties(this, hbaseProperties);
-        return (T)new HbaseTableSink(hbaseProperties, this.value);
+        return (T)new HbaseTableSink(hbaseProperties);
     }
 
     @Override
@@ -114,12 +143,12 @@ public class HbaseSinkDescriptor extends SinkDescriptor {
         Assert.notNull(zookeeper, "hbase的zookeeper地址不能为空");
         Assert.notNull(node, "hbase在zookeeper的根目录不能为空");
         Assert.notNull(tableName, "hbase的表名不能为空");
-        Assert.notNull(family, "hbase的family不能为空");
-        Assert.notNull(value, "hbase的获取rowKey和column的逻辑不能为空");
+        Assert.notNull(rowKeys, "hbase的rowKeys不能为空");
+        Assert.isTrue(family != null || familyColumns != null, "hbase的family不能为空");
     }
 
     @Override
-    public String getType() {
+    public String type() {
         return Constants.SINK_TYPE_VALUE_HBASE;
     }
 }

@@ -13,19 +13,16 @@ import org.apache.flink.util.Preconditions;
  * @author congbai
  * @date 2018/7/10
  */
-public class OpentsdbTableSink implements AppendStreamTableSink<Row> {
+public class TsdbTableSink implements AppendStreamTableSink<Row> {
 
-    private final OpentsdbProperties opentsdbProperties;
-
-    private final String code;
+    private final TsdbProperties opentsdbProperties;
 
     private String[] fieldNames;
 
     private TypeInformation[] fieldTypes;
 
-    public OpentsdbTableSink(OpentsdbProperties opentsdbProperties, String code) {
+    public TsdbTableSink(TsdbProperties opentsdbProperties) {
         this.opentsdbProperties = Preconditions.checkNotNull(opentsdbProperties, "opentsdbProperties");;
-        this.code = code;
     }
 
     @Override
@@ -45,7 +42,7 @@ public class OpentsdbTableSink implements AppendStreamTableSink<Row> {
 
     @Override
     public TableSink<Row> configure(String[] fieldNames, TypeInformation<?>[] fieldTypes) {
-        OpentsdbTableSink copy = new OpentsdbTableSink(this.opentsdbProperties, this.code);
+        TsdbTableSink copy = new TsdbTableSink(this.opentsdbProperties);
         copy.fieldNames = Preconditions.checkNotNull(fieldNames, "fieldNames");
         copy.fieldTypes = Preconditions.checkNotNull(fieldTypes, "fieldTypes");
         Preconditions.checkArgument(fieldNames.length == fieldTypes.length,
@@ -60,6 +57,6 @@ public class OpentsdbTableSink implements AppendStreamTableSink<Row> {
     }
 
     private RichSinkFunction createTsdbRich() {
-        return new OpentsdbSinkFunction(this.opentsdbProperties, this.code);
+        return new TsdbSinkFunction(opentsdbProperties, fieldNames, fieldTypes);
     }
 }

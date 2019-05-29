@@ -5,28 +5,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.Properties;
-import java.util.regex.Pattern;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.Map;
 
-import com.dfire.platform.alchemy.web.cluster.flink.SqlSubmitFlinkRequest;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.core.JsonToken;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.core.io.IOContext;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.DeserializationFeature;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.dataformat.yaml.YAMLParser;
-import org.apache.flink.table.client.config.ConfigUtil;
-import org.springframework.beans.factory.config.YamlProcessor;
-import org.springframework.core.CollectionFactory;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.nodes.Tag;
-import org.yaml.snakeyaml.representer.Representer;
-import org.yaml.snakeyaml.resolver.Resolver;
 
 /**
  * @author congbai
@@ -37,19 +25,50 @@ public class BindPropertiesUtils {
     private static final ObjectMapper objectMapper = new LowerCaseYamlMapper();
 
     static {
-//        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.KEBAB_CASE);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
+    public static <T> T bindProperties(Map<String, Object> params, Class<T> beanClass)
+        throws IllegalAccessException, InstantiationException {
+        // BeanUtils.copyProperties(params, target);
+        // BeanWrapper wrapper = PropertyAccessorFactory.forBeanPropertyAccess(target);
+        // wrapper.setConversionService(new DefaultConversionService());
+        // wrapper.setAutoGrowNestedPaths(true);
+        // wrapper.setPropertyValues(new MutablePropertyValues(params), true, true);
+        if (params == null)
+            return null;
+
+        Object obj = beanClass.newInstance();
+
+        Field[] fields = obj.getClass().getDeclaredFields();
+        for (Field field : fields) {
+            int mod = field.getModifiers();
+            if (Modifier.isStatic(mod) || Modifier.isFinal(mod)) {
+                continue;
+            }
+            Object value = params.get(field.getName());
+            if (value == null) {
+                continue;
+            }
+            if (!field.getType().isAssignableFrom(value.getClass())) {
+                if (value instanceof Map) {
+                    value = bindProperties((Map<String, Object>)value, field.getType());
+                }
+            }
+            field.setAccessible(true);
+            field.set(obj, value);
+
+        }
+        return (T)obj;
+    }
 
     public static <T> T bindProperties(String value, Class<T> clazz) throws Exception {
-       return objectMapper.readValue(value, clazz);
+        return objectMapper.readValue(value, clazz);
     }
 
     public static <T> T bindProperties(File inputFile, Class<T> clazz) throws Exception {
         return objectMapper.readValue(inputFile.toURL(), clazz);
     }
-
 
     public static class LowerCaseYamlMapper extends ObjectMapper {
         public LowerCaseYamlMapper() {
@@ -58,7 +77,8 @@ public class BindPropertiesUtils {
                 protected YAMLParser _createParser(InputStream in, IOContext ctxt) throws IOException {
                     final Reader r = _createReader(in, null, ctxt);
                     // normalize all key to lower case keys
-                    return new YAMLParser(ctxt, _getBufferRecycler(), _parserFeatures, _yamlParserFeatures, _objectCodec, r) {
+                    return new YAMLParser(ctxt, _getBufferRecycler(), _parserFeatures, _yamlParserFeatures,
+                        _objectCodec, r) {
                         @Override
                         public String getCurrentName() throws IOException {
                             if (_currToken == JsonToken.FIELD_NAME) {
@@ -79,10 +99,11 @@ public class BindPropertiesUtils {
 
                 @Override
                 public YAMLParser createParser(String content) throws IOException {
-                    final Reader reader =new StringReader(content);
+                    final Reader reader = new StringReader(content);
                     IOContext ctxt = this._createContext(reader, true);
                     Reader r = this._decorate(reader, ctxt);
-                    return new YAMLParser(ctxt, _getBufferRecycler(), _parserFeatures, _yamlParserFeatures, _objectCodec, r) {
+                    return new YAMLParser(ctxt, _getBufferRecycler(), _parserFeatures, _yamlParserFeatures,
+                        _objectCodec, r) {
                         @Override
                         public String getCurrentName() throws IOException {
                             if (_currToken == JsonToken.FIELD_NAME) {
@@ -117,15 +138,15 @@ public class BindPropertiesUtils {
 
                 for (int i = 0; i < length; ++i) {
                     char ch = input.charAt(i);
-                    if (upperCount > 0){
+                    if (upperCount > 0) {
                         char uc = Character.toUpperCase(ch);
                         result.append(uc);
                         upperCount = 0;
                         continue;
                     }
-                    if (ch == '-'){
+                    if (ch == '-') {
                         ++upperCount;
-                    }else{
+                    } else {
                         result.append(Character.toLowerCase(ch));
                     }
                 }
@@ -133,12 +154,5 @@ public class BindPropertiesUtils {
                 return result.toString();
             }
         }
-    }
-
-    public static void main(String[] args) {
-        System.out.println(translate("min"));
-        System.out.println(translate("min-haha"));
-        System.out.println(translate("min-haha-fewfwf"));
-        System.out.println(translate("min-haha-fewfWf"));
     }
 }

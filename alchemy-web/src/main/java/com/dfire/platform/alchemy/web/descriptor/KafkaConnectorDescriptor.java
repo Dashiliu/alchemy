@@ -12,7 +12,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
-import org.apache.flink.streaming.connectors.kafka.Kafka010AvroTableSource;
 import org.apache.flink.streaming.connectors.kafka.Kafka010JsonTableSource;
 import org.apache.flink.streaming.connectors.kafka.internals.KafkaTopicPartition;
 import org.apache.flink.table.api.TableSchema;
@@ -91,7 +90,7 @@ public class KafkaConnectorDescriptor implements ConnectorDescriptor {
     }
 
     @Override
-    public String getType() {
+    public String type() {
         return Constants.CONNECTOR_TYPE_VALUE_KAFKA;
     }
 
@@ -104,7 +103,7 @@ public class KafkaConnectorDescriptor implements ConnectorDescriptor {
     }
 
     private <T> T buildKafkaFlinkSource(List<Field> schema, FormatDescriptor format) throws ClassNotFoundException {
-        String type = format.getType();
+        String type = format.type();
         if (StringUtils.isEmpty(type)) {
             type = Constants.TYPE_VALUE_FORMAT_JSON;
         }
@@ -135,7 +134,7 @@ public class KafkaConnectorDescriptor implements ConnectorDescriptor {
     private void createDeserialization(TypeInformation<Row> returnType, FormatDescriptor format,
         AlchemyKafkaTableSource.Builder tableSourceBuilder) throws ClassNotFoundException {
         DeserializationSchema<Row> deserializationSchema = null;
-        switch (format.getType()) {
+        switch (format.type()) {
             case Constants.TYPE_VALUE_FORMAT_HESSIAN:
                 deserializationSchema
                     = new HessianRowDeserializationSchema(returnType, Class.forName(format.getClassName()));

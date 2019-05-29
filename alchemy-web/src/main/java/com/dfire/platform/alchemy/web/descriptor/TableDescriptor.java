@@ -69,8 +69,7 @@ public class TableDescriptor implements Descriptor {
                         continue;
                     }
                     try {
-                        SinkDescriptor sinkDescriptor = descriptor.getClass().newInstance();
-                        BeanUtils.populate(sinkDescriptor, sink);
+                        SinkDescriptor sinkDescriptor = BindPropertiesUtils.bindProperties(sink, descriptor.getClass());
                         sinkDescriptorList.add(sinkDescriptor);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -103,7 +102,7 @@ public class TableDescriptor implements Descriptor {
     }
 
     @Override
-    public String getType() {
+    public String type() {
         return Constants.TYPE_VALUE_TABLE;
     }
 

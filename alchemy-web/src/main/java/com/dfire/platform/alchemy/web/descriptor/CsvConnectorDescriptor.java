@@ -53,7 +53,7 @@ public class CsvConnectorDescriptor implements ConnectorDescriptor{
     }
 
     @Override
-    public String getType() {
+    public String type() {
         return Constants.CONNECTOR_TYPE_VALUE_CSV;
     }
 

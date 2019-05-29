@@ -144,7 +144,7 @@ public class RocketMQConnectorDescriptor implements ConnectorDescriptor {
     }
 
     @Override
-    public String getType() {
+    public String type() {
         return Constants.CONNECTOR_TYPE_VALUE_ROCKETMQ;
     }
 
@@ -202,7 +202,7 @@ public class RocketMQConnectorDescriptor implements ConnectorDescriptor {
         }
         TypeInformation<Row> returnType = new RowTypeInfo(columnTypes, columnNames);
         DeserializationSchema<Row> deserializationSchema;
-        switch (format.getType()) {
+        switch (format.type()) {
             case Constants.TYPE_VALUE_FORMAT_HESSIAN:
                 deserializationSchema
                     = new HessianRowDeserializationSchema(returnType, Class.forName(format.getClassName()));
@@ -215,7 +215,7 @@ public class RocketMQConnectorDescriptor implements ConnectorDescriptor {
                 deserializationSchema = new JsonRowDeserializationSchema(returnType);
                 break;
             default:
-                throw new UnsupportedOperationException("unknow format type:" + format.getType());
+                throw new UnsupportedOperationException("unknow format type:" + format.type());
         }
         TableSchema tableSchema = new TableSchema(columnNames, columnTypes);
         RocketMQTableSource rocketMQTableSource

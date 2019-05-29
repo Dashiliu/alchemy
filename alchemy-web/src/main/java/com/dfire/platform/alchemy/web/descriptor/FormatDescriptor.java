@@ -41,7 +41,7 @@ public class FormatDescriptor implements Descriptor {
     }
 
     @Override
-    public String getType() {
+    public String type() {
         return this.type;
     }
 

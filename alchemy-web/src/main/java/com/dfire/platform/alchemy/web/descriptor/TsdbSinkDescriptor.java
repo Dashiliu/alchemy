@@ -3,10 +3,13 @@ package com.dfire.platform.alchemy.web.descriptor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.Assert;
 
-import com.dfire.platform.alchemy.connectors.tsdb.OpentsdbProperties;
-import com.dfire.platform.alchemy.connectors.tsdb.OpentsdbTableSink;
+import com.dfire.platform.alchemy.connectors.tsdb.TsdbProperties;
+import com.dfire.platform.alchemy.connectors.tsdb.TsdbTableSink;
 import com.dfire.platform.alchemy.web.common.ClusterType;
 import com.dfire.platform.alchemy.web.common.Constants;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author congbai
@@ -16,7 +19,11 @@ public class TsdbSinkDescriptor extends SinkDescriptor {
 
     private String name;
 
-    private String opentsdbUrl;
+    private String url;
+
+    private List<String> metrics;
+
+    private List<String> tags;
 
     private Integer ioThreadCount;
 
@@ -30,8 +37,6 @@ public class TsdbSinkDescriptor extends SinkDescriptor {
 
     private Integer putRequestLimit;
 
-    private String value;
-
     @Override
     public String getName() {
         return name;
@@ -41,33 +46,28 @@ public class TsdbSinkDescriptor extends SinkDescriptor {
         this.name = name;
     }
 
-    @Override
-    public <T> T transform(ClusterType clusterType) throws Exception {
-        if (ClusterType.FLINK.equals(clusterType)) {
-            return transformFlink();
-        }
-        throw new UnsupportedOperationException("unknow clusterType:" + clusterType);
-
+    public String getUrl() {
+        return url;
     }
 
-    private <T> T transformFlink() throws Exception {
-        OpentsdbProperties opentsdbProperties = new OpentsdbProperties();
-        BeanUtils.copyProperties(this, opentsdbProperties);
-        return (T)new OpentsdbTableSink(opentsdbProperties, this.value);
+    public void setUrl(String url) {
+        this.url = url;
     }
 
-    @Override
-    public void validate() throws Exception {
-        Assert.notNull(opentsdbUrl, "opentsdbUrl不能为空");
-        Assert.notNull(value, "写入opentsdb的逻辑不能为空");
+    public List<String> getMetrics() {
+        return metrics;
     }
 
-    public String getOpentsdbUrl() {
-        return opentsdbUrl;
+    public void setMetrics(List<String> metrics) {
+        this.metrics = metrics;
     }
 
-    public void setOpentsdbUrl(String opentsdbUrl) {
-        this.opentsdbUrl = opentsdbUrl;
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 
     public Integer getIoThreadCount() {
@@ -118,16 +118,30 @@ public class TsdbSinkDescriptor extends SinkDescriptor {
         this.putRequestLimit = putRequestLimit;
     }
 
-    public String getValue() {
-        return value;
+    @Override
+    public <T> T transform(ClusterType clusterType) throws Exception {
+        if (ClusterType.FLINK.equals(clusterType)) {
+            return transformFlink();
+        }
+        throw new UnsupportedOperationException("unknow clusterType:" + clusterType);
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    private <T> T transformFlink() throws Exception {
+        TsdbProperties tsdbProperties = new TsdbProperties();
+        BeanUtils.copyProperties(this, tsdbProperties);
+        return (T)new TsdbTableSink(tsdbProperties);
     }
 
     @Override
-    public String getType() {
+    public void validate() throws Exception {
+        Assert.notNull(url, "tsdb的Url不能为空");
+        Assert.notNull(metrics, "tsdb的metrics不能为空");
+        Assert.notNull(tags, "tsdb的tags不能为空");
+    }
+
+
+    @Override
+    public String type() {
         return Constants.SINK_TYPE_VALUE_OPENTSDB;
     }
 }
