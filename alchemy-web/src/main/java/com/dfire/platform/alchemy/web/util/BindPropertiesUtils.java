@@ -30,36 +30,34 @@ public class BindPropertiesUtils {
 
     public static <T> T bindProperties(Map<String, Object> params, Class<T> beanClass)
         throws IllegalAccessException, InstantiationException {
-        // BeanUtils.copyProperties(params, target);
-        // BeanWrapper wrapper = PropertyAccessorFactory.forBeanPropertyAccess(target);
-        // wrapper.setConversionService(new DefaultConversionService());
-        // wrapper.setAutoGrowNestedPaths(true);
-        // wrapper.setPropertyValues(new MutablePropertyValues(params), true, true);
-        if (params == null)
-            return null;
-
-        Object obj = beanClass.newInstance();
-
-        Field[] fields = obj.getClass().getDeclaredFields();
-        for (Field field : fields) {
-            int mod = field.getModifiers();
-            if (Modifier.isStatic(mod) || Modifier.isFinal(mod)) {
-                continue;
-            }
-            Object value = params.get(field.getName());
-            if (value == null) {
-                continue;
-            }
-            if (!field.getType().isAssignableFrom(value.getClass())) {
-                if (value instanceof Map) {
-                    value = bindProperties((Map<String, Object>)value, field.getType());
-                }
-            }
-            field.setAccessible(true);
-            field.set(obj, value);
-
-        }
-        return (T)obj;
+        return JsonUtils.fromJson(JsonUtils.toJson(params), beanClass);
+//        if (params == null){
+//            return null;
+//        }
+//        Object obj = beanClass.newInstance();
+//
+//        Field[] fields = obj.getClass().getDeclaredFields();
+//        for (Field field : fields) {
+//            int mod = field.getModifiers();
+//            if (Modifier.isStatic(mod) || Modifier.isFinal(mod)) {
+//                continue;
+//            }
+//            Object value = params.get(field.getName());
+//            if (value == null) {
+//                continue;
+//            }
+//            if (!field.getType().isAssignableFrom(value.getClass())) {
+//                if (value instanceof Map) {
+//                    value = bindProperties((Map<String, Object>)value, field.getType());
+//                }else if(value instanceof Integer){
+//
+//                }
+//            }
+//            field.setAccessible(true);
+//            field.set(obj, value);
+//
+//        }
+//        return (T)obj;
     }
 
     public static <T> T bindProperties(String value, Class<T> clazz) throws Exception {

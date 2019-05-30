@@ -29,18 +29,7 @@ public class PropertiesUtils {
     }
 
     public static Properties fromYamlMap(Map<String, Object> properties) {
-        Map<String, Object> prop = new HashedMap();
-        for (Object object : properties.values()) {
-            if (object instanceof Map) {
-                Map<String, Object> value = (Map<String, Object>)object;
-                Object key = value.get("key");
-                if (key == null) {
-                    continue;
-                }
-                prop.put(String.valueOf(value.get("key")), value.get("value"));
-            }
-        }
-        return createProperties(prop);
+        return createProperties(properties);
     }
 
     public static Properties getProperties(List<Pair<String, String>> prop) {

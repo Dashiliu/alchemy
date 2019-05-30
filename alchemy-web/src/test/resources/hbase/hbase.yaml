@@ -1,44 +1,43 @@
-
-    name: test
-    cluster:
-    parallelism: 1
-    table:
-        sources:
-        - name: csv_table_test
-          schema:
-          - name: first
-            type: VARCHAR
-          - name: id
-            type: INT
-          - name: score
-            type: DOUBLE
-          - name: last
-            type: VARCHAR
-          connector:
-              property-version: 1
-              type: csv
-              path: /Users/dongbinglin/Code/platform/alchemy/alchemy-web/src/test/resources/side.csv
-              field-delim: '#'
-              row-delim: '$'
-              ignore-first-line: true
-              ignore-comments: '%'
-        sinks:
-        - name: hbase_sink
-          type: hbase
-          row-keys:
-          - id
-          buffer-size: 1048576 # byte
-          family: s
-          family-columns:    #单个family 不需要配置这个参数，测试用
-            s1:
-            - first
-            - id
-            s2:
-            - last
-            - score
-          node: /hbase-unsecure
-          table-name: flink-test
-          zookeeper: 10.1.22.21:2181,10.1.22.22:2181,10.1.22.23:2181
+name: test
+cluster:
+parallelism: 1
+table:
+    sources:
+    - name: csv_table_test
+      schema:
+      - name: first
+        type: VARCHAR
+      - name: id
+        type: INT
+      - name: score
+        type: DOUBLE
+      - name: last
+        type: VARCHAR
+      connector:
+          property-version: 1
+          type: csv
+          path: /Users/dongbinglin/Code/platform/alchemy/alchemy-web/src/test/resources/source.csv
+          field-delim: '#'
+          row-delim: '$'
+          ignore-first-line: true
+          ignore-comments: '%'
+    sinks:
+    - name: hbase_sink
+      type: hbase
+      row-keys:
+      - id
+      buffer-size: 1048576 # byte
+      family: s
+      family-columns:    #单个family 不需要配置这个参数，测试用
+        s1:
+        - first
+        - id
+        s2:
+        - last
+        - score
+      node: /hbase-unsecure
+      table-name: flink-test
+      zookeeper: 10.1.22.21:2181,10.1.22.22:2181,10.1.22.23:2181
 
 
 

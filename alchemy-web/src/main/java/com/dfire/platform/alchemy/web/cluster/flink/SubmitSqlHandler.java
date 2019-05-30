@@ -195,6 +195,10 @@ public class SubmitSqlHandler implements Handler<SqlSubmitFlinkRequest, SubmitFl
     }
 
     private void registerFunction(StreamTableEnvironment env, SqlSubmitFlinkRequest request, List<URL> urls) {
+        //加载公共function
+        List<String> functionNames = Lists.newArrayList();
+        loadFunction(env, functionNames, ServiceLoader.load(BaseFunction.class));
+
         if (CollectionUtils.isNotEmpty(request.getTable().getUdfs())) {
             request.getTable().getUdfs().forEach(udfDescriptor -> {
                 try {
@@ -203,31 +207,33 @@ public class SubmitSqlHandler implements Handler<SqlSubmitFlinkRequest, SubmitFl
                     throw new RuntimeException(e);
                 }
             });
-            List<String> functionNames = Lists.newArrayList();
-            loadFunction(env, functionNames, ServiceLoader.load(BaseFunction.class));
-            URLClassLoader urlClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]) , Thread.currentThread().getContextClassLoader());
-            loadFunction(env, functionNames, ServiceLoader.load(BaseFunction.class , urlClassLoader));
-            request.getTable().getUdfs().forEach(udfDescriptor -> {
-                try {
-                    if (StringUtils.isEmpty(udfDescriptor.getValue()) || functionNames.contains(udfDescriptor.getName())){
-                        return;
-                    }
-                    if (udfDescriptor.getValue().matches(MATCH_CODE)){
-                        replaceCodeValue(request, udfDescriptor);
-                        BaseFunction udf = udfDescriptor.transform(ClusterType.FLINK);
-                        register(env, udf);
-                    }else{
-                        Class clazz = Class.forName(udfDescriptor.getValue() ,false , urlClassLoader);
-                        Object udf = clazz.newInstance();
-                        register(env , (BaseFunction) udf);
-                    }
-
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
+        }
+        //加载自定义函数
+        URLClassLoader urlClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]) , Thread.currentThread().getContextClassLoader());
+        loadFunction(env, functionNames, ServiceLoader.load(BaseFunction.class , urlClassLoader));
+        if(request.getTable().getUdfs() == null){
+            return;
+        }
+        request.getTable().getUdfs().forEach(udfDescriptor -> {
+            try {
+                if (StringUtils.isEmpty(udfDescriptor.getValue()) || functionNames.contains(udfDescriptor.getName())){
+                    return;
+                }
+                if (udfDescriptor.getValue().matches(MATCH_CODE)){
+                    replaceCodeValue(request, udfDescriptor);
+                    BaseFunction udf = udfDescriptor.transform(ClusterType.FLINK);
+                    register(env, udf);
+                }else{
+                    Class clazz = Class.forName(udfDescriptor.getValue() ,false , urlClassLoader);
+                    Object udf = clazz.newInstance();
+                    register(env , (BaseFunction) udf);
                 }
 
-            });
-        }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
+        });
     }
 
     private void loadFunction(StreamTableEnvironment env, List<String> functionNames, ServiceLoader<BaseFunction> serviceLoader) {
@@ -237,6 +243,7 @@ public class SubmitSqlHandler implements Handler<SqlSubmitFlinkRequest, SubmitFl
             if (StringUtils.isEmpty(function.getFunctionName()) || functionNames.contains(function.getFunctionName())) {
                 continue;
             }
+            functionNames.add(function.getFunctionName());
             register(env , function);
         }
     }

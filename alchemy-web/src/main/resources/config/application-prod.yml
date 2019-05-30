@@ -113,8 +113,6 @@ alchemy:
       storagePath: hdfs://hadoop1169.prod.2dfire.info:8020/user/alchemy/flink/ha-cpu
       address: flink-jobmanager-cpu
       port: 6123
-      avgs:
-         - org.apache.flink:flink-table_2.11:1.5.4
     - name: flink_5_4_1
       type: flink
       mode: zookeeper
@@ -123,17 +121,6 @@ alchemy:
       storagePath: hdfs://hadoop1169.prod.2dfire.info:8020/user/alchemy/flink/ha5-4-1-default-n
       address: flink-jobmanager-1-5-4-1-n
       port: 6123
-      avgs:
-        - org.apache.flink:flink-table_2.11:1.5.4
-#    - name: flink_5_4_8
-#      type: flink
-#      mode: zookeeper
-#      clusterId: flink5-4-8-default
-#      avg: com.dfire.platform:alchemy-connectors:0.0.7
-#      zookeeperQuorum: zk101.2dfire-inc.com:2181,zk102.2dfire-inc.com:2181,zk103.2dfire-inc.com:2181
-#      storagePath: hdfs://hadoop1169.prod.2dfire.info:8020/user/alchemy/flink/ha5-4-8-default
-#      address: flink-jobmanager-1-5-4-8
-#      port: 6123
     - name: flink_log
       type: flink
       mode: zookeeper
@@ -142,8 +129,6 @@ alchemy:
       storagePath: hdfs://hadoop1169.prod.2dfire.info:8020/user/alchemy/flink/ha-log
       address: log-jobmanager
       port: 6123
-      avgs:
-        - org.apache.flink:flink-table_2.11:1.5.4
     - name: flink-vm
       type: flink
       mode: zookeeper
@@ -152,8 +137,6 @@ alchemy:
       storagePath: hdfs://hadoop1169.prod.2dfire.info:8020/user/alchemy/flink/ha-vm
       address: 10.10.69.35
       port: 6123
-      avgs:
-        - org.apache.flink:flink-table_2.11:1.5.4
     - name: anomaly-detection
       type: flink
       mode: zookeeper
@@ -162,8 +145,6 @@ alchemy:
       storagePath: hdfs://hadoop1169.prod.2dfire.info:8020/user/alchemy/flink/ha-anomaly-detection
       address: anomaly-detection-jobmanager-jobmanager
       port: 6123
-      avgs:
-        - org.apache.flink:flink-table_2.11:1.5.4
   job:
     queueSize: 1000
     initialDelay: 1 #MINUTES

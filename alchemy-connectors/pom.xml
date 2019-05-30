@@ -26,6 +26,7 @@
         <module>alchemy-connectors-rocketmq</module>
         <module>alchemy-connectors-tsdb</module>
         <module>alchemy-connectors-mysql</module>
+        <module>alchemy-connectors-filesystem</module>
     </modules>
     <reporting>
         <plugins>

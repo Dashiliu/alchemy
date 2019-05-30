@@ -116,8 +116,6 @@ alchemy:
       storagePath: hdfs://sunset002.daily.2dfire.info:8020/flink/ha/real
       address: 10.1.21.95
       port: 6123
-      avgs:
-        - org.apache.flink:flink-table_2.11:1.5.4
     - name: flink_5_4_8
       type: flink
       mode: zookeeper
@@ -126,8 +124,6 @@ alchemy:
       storagePath: hdfs://sunset002.daily.2dfire.info:8020/flink/ha/default-8
       address: 10.1.21.95
       port: 6123
-      avgs:
-        - org.apache.flink:flink-table_2.11:1.5.4
   job:
     queueSize: 1000
     initialDelay: 1 #MINUTES

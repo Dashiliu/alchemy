@@ -1,6 +1,8 @@
 package com.dfire.platform.alchemy.api.util;
 
 import org.apache.flink.types.Row;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -10,6 +12,8 @@ import java.util.Map;
  * @date 2018/8/7
  */
 public class ConvertRowUtils {
+
+    private static final Logger logger = LoggerFactory.getLogger(ConvertRowUtils.class);
 
     public static void convertFromRow(Object object, String[] fieldNames, Row row) {
         Class clazz = object.getClass();
@@ -29,10 +33,8 @@ public class ConvertRowUtils {
                 Field field = clazz.getDeclaredField(name);
                 field.setAccessible(true);
                 field.set(object, row.getField(i));
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                logger.error("Occur Error when convert from Row",e);
             }
 
         }
@@ -51,10 +53,8 @@ public class ConvertRowUtils {
                 }
                 field.setAccessible(true);
                 row.setField(i, field.get(obj));
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                logger.error("Occur Error when convert to Row",e);
             }
         }
         return row;
@@ -73,7 +73,7 @@ public class ConvertRowUtils {
                 Object field = grokMap.get(name);
                 row.setField(i, field);
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Occur Error when grok convert to Row",e);
             }
         }
         return row;

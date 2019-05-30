@@ -16,7 +16,7 @@ table:
       connector:
           property-version: 1
           type: csv
-          path: /Users/dongbinglin/Code/platform/alchemy/alchemy-web/src/test/resources/mysql/side.csv
+          path: /Users/dongbinglin/Code/platform/alchemy/alchemy-web/src/test/resources/mysql/source.csv
           field-delim: '#'
           row-delim: '$'
           ignore-first-line: true

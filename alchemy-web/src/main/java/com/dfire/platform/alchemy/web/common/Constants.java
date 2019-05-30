@@ -66,6 +66,8 @@ public final class Constants {
 
     public static final String SINK_TYPE_VALUE_PRINT = "print";
 
+    public static final String SINK_TYPE_VALUE_FILESYSTEM = "file";
+
     // Regex for acceptable logins
     public static final String LOGIN_REGEX = "^[_.@A-Za-z0-9-]*$";
 

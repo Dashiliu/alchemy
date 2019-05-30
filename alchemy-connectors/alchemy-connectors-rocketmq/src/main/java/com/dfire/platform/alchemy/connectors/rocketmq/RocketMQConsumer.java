@@ -206,9 +206,8 @@ public class RocketMQConsumer<OUT> extends RichParallelSourceFunction<OUT>
                         throw new IllegalArgumentException("Unknown value for CONSUMER_OFFSET_RESET_TO.");
                 }
             }
-            offsetTable.put(mq, offset);
         }
-
+        offsetTable.put(mq, offset);
         return offsetTable.get(mq);
     }
 

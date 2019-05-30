@@ -15,3 +15,4 @@ com.dfire.platform.alchemy.web.descriptor.MysqlConnectorDescriptor
 com.dfire.platform.alchemy.web.descriptor.MysqlSinkDescriptor
 com.dfire.platform.alchemy.web.descriptor.PrintSinkDescriptor
 com.dfire.platform.alchemy.web.descriptor.CsvConnectorDescriptor
+com.dfire.platform.alchemy.web.descriptor.FileSystemSinkDescriptor

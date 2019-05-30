@@ -1,103 +1,103 @@
-    name: test
-    cluster:
-    parallelism: 1
-    time-characteristic: EventTime
-    checkpointing-interval: 60000 #ms
-    table:
-        #        sql: select * from  TaxiRides
-        sources:
-        - name: kafka_table_test
-          schema:
-          - name: id
-            type: VARCHAR
-          - name: rideId
-            type: BIGINT
-          - name: lon
-            type: FLOAT
-          - name: lat
-            type: FLOAT
-          - name: procTime
-            type: TIMESTAMP
-            proctime: true
-          - name: rideTime
-            type: TIMESTAMP
-            rowtime:
-                timestamps:
-                    type: "from-field"
-                    from: "rideTime"
-                watermarks:
-                    type: "periodic-bounded"
-                    delay: "1000"
-          connector:
-              property-version: 1
-              type: kafka
-              version: 0.11
-              topic: TaxiRides
-              startup-mode: earliest-offset
-              properties:
-               zookeeper.connect: localhost:2181
-               bootstrap.servers:  localhost:9092
-               group.id: testGroup
-          format:
-              property-version: 1
-              type: json
-              schema: "ROW(rideId LONG, lon FLOAT, lat FLOAT, rideTime TIMESTAMP)"
-        - name: rocketmq_table_test
-          schema:
-          - name: goodId
-            type: VARCHAR
-          - name: entityId
-            type: VARCHAR
-          - name: rideTime
-            type: TIMESTAMP
-            rowtime:
-                timestamps:
-                    type: "from-field"
-                    from: "rideTime"
-                watermarks:
-                    type: "periodic-bounded"
-                    delay: "1000"
-          connector:
-              type: rocketMQ
-              name-servers: mq101.2dfire-daily.com:9876;mq102.2dfire-daily.com:9876
-              name: hot_goods
-              topic: hot_goods
-#              tag: *
-              consumer-group: c_alchemy_hot_goods
-          format:
-              property-version: 1
-              type: json
-              schema: "ROW(entityId VARCHAR,goodId VARCHAR, rideTime TIMESTAMP)"
-        udfs:
-        - name: scalarF
-          value: ${0}
-        - name: tableF
-          value: ${1}
-        - name: aggreF
-          value: ${2}
-        sinks:
-        - name: esSink
-          type: elasticsearch
-          cluster-name: daily
-          address: 10.1.21.61:9300,10.1.21.62:9300,10.1.21.63:9300
-          index: flink-test
-          buffer-size: 2  #M
-        - name: hbaseSink
-          type: hbase
-          buffer-size: 1048576 # byte
-          family: s
-          node: /hbase-unsecure
-          table-name: flink-test
-          zookeeper: 10.1.22.21:2181,10.1.22.22:2181,10.1.22.23:2181
-          value: ${3}
-        - name: kafkaSink
+name: test
+cluster:
+parallelism: 1
+time-characteristic: EventTime
+checkpointing-interval: 60000 #ms
+table:
+    #        sql: select * from  TaxiRides
+    sources:
+    - name: kafka_table_test
+      schema:
+      - name: id
+        type: VARCHAR
+      - name: rideId
+        type: BIGINT
+      - name: lon
+        type: FLOAT
+      - name: lat
+        type: FLOAT
+      - name: procTime
+        type: TIMESTAMP
+        proctime: true
+      - name: rideTime
+        type: TIMESTAMP
+        rowtime:
+            timestamps:
+                type: "from-field"
+                from: "rideTime"
+            watermarks:
+                type: "periodic-bounded"
+                delay: "1000"
+      connector:
+          property-version: 1
           type: kafka
-          topic: stream_dest
+          version: 0.11
+          topic: TaxiRides
+          startup-mode: earliest-offset
           properties:
-            bootstrap.servers: kafka1001.2dfire-daily.com:9092,kafka1002.2dfire-daily.com:9092
-        - name: hot_notify
+           zookeeper.connect: localhost:2181
+           bootstrap.servers:  localhost:9092
+           group.id: testGroup
+      format:
+          property-version: 1
+          type: json
+          schema: "ROW(rideId LONG, lon FLOAT, lat FLOAT, rideTime TIMESTAMP)"
+    - name: rocketmq_table_test
+      schema:
+      - name: goodId
+        type: VARCHAR
+      - name: entityId
+        type: VARCHAR
+      - name: rideTime
+        type: TIMESTAMP
+        rowtime:
+            timestamps:
+                type: "from-field"
+                from: "rideTime"
+            watermarks:
+                type: "periodic-bounded"
+                delay: "1000"
+      connector:
           type: rocketMQ
-          topic: alchemy
-          tag: hot_goods
           name-servers: mq101.2dfire-daily.com:9876;mq102.2dfire-daily.com:9876
-          producer-group: c_alchemy_producer
+          name: hot_goods
+          topic: hot_goods
+#              tag: *
+          consumer-group: c_alchemy_hot_goods
+      format:
+          property-version: 1
+          type: json
+          schema: "ROW(entityId VARCHAR,goodId VARCHAR, rideTime TIMESTAMP)"
+    udfs:
+    - name: scalarF
+      value: ${0}
+    - name: tableF
+      value: ${1}
+    - name: aggreF
+      value: ${2}
+    sinks:
+    - name: esSink
+      type: elasticsearch
+      cluster-name: daily
+      address: 10.1.21.61:9300,10.1.21.62:9300,10.1.21.63:9300
+      index: flink-test
+      buffer-size: 2  #M
+    - name: hbaseSink
+      type: hbase
+      buffer-size: 1048576 # byte
+      family: s
+      node: /hbase-unsecure
+      table-name: flink-test
+      zookeeper: 10.1.22.21:2181,10.1.22.22:2181,10.1.22.23:2181
+      value: ${3}
+    - name: kafkaSink
+      type: kafka
+      topic: stream_dest
+      properties:
+        bootstrap.servers: kafka1001.2dfire-daily.com:9092,kafka1002.2dfire-daily.com:9092
+    - name: hot_notify
+      type: rocketMQ
+      topic: alchemy
+      tag: hot_goods
+      name-servers: mq101.2dfire-daily.com:9876;mq102.2dfire-daily.com:9876
+      producer-group: c_alchemy_producer
