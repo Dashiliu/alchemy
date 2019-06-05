@@ -1,6 +1,6 @@
 package com.dfire.platform.alchemy.formats.grok;
 
-import com.dfire.platform.alchemy.api.util.ConvertRowUtils;
+import com.dfire.platform.alchemy.api.util.ConvertRowUtil;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
@@ -26,7 +26,7 @@ public class GrokRowDeserializationSchema implements DeserializationSchema<Row> 
     @Override
     public Row deserialize(byte[] bytes) throws IOException {
         String message = new String(bytes,"utf-8");
-        return ConvertRowUtils.grokConvertToRow(message, ((RowTypeInfo)typeInfo).getFieldNames(),regular);
+        return ConvertRowUtil.grokConvertToRow(message, ((RowTypeInfo)typeInfo).getFieldNames(),regular);
     }
 
     @Override

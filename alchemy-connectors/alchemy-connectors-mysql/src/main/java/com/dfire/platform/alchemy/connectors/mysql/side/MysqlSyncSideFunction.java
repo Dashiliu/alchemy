@@ -2,7 +2,7 @@ package com.dfire.platform.alchemy.connectors.mysql.side;
 
 import java.util.List;
 
-import com.dfire.platform.alchemy.connectors.common.side.SideTableInfo;
+import com.dfire.platform.alchemy.connectors.common.side.SideTable;
 import com.dfire.platform.alchemy.connectors.common.side.SyncSideFunction;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.types.Row;
@@ -24,7 +24,7 @@ public class MysqlSyncSideFunction extends SyncSideFunction<List<JsonObject>> {
 
     private transient MysqlSideFunction mysqlSideFunction;
 
-    public MysqlSyncSideFunction(SideTableInfo sideTable, MysqlSideProperties mysqlProperties) {
+    public MysqlSyncSideFunction(SideTable sideTable, MysqlSideProperties mysqlProperties) {
         super(sideTable);
         this.mysqlProperties = mysqlProperties;
     }

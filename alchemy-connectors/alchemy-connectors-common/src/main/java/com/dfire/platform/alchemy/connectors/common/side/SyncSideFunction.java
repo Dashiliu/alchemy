@@ -12,9 +12,9 @@ import static org.apache.flink.util.Preconditions.checkArgument;
  */
 public abstract class SyncSideFunction<T>  extends RichFlatMapFunction<Row, Row> implements ISideFunction<T> {
 
-    protected final SideTableInfo sideTable;
+    protected final SideTable sideTable;
 
-    protected SyncSideFunction(SideTableInfo sideTable) {
+    protected SyncSideFunction(SideTable sideTable) {
         checkArgument(sideTable != null && sideTable.getSide() != null , "side can't be null");
         this.sideTable = sideTable;
     }

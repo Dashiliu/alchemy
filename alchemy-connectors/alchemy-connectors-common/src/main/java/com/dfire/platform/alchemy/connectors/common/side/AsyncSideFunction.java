@@ -12,10 +12,10 @@ import static org.apache.flink.util.Preconditions.checkArgument;
  */
 public abstract class AsyncSideFunction<T>  extends RichAsyncFunction<Row, Row> implements ISideFunction<T> {
 
-    protected final SideTableInfo sideTable;
+    protected final SideTable sideTable;
 
 
-    protected AsyncSideFunction(SideTableInfo sideTable) {
+    protected AsyncSideFunction(SideTable sideTable) {
         checkArgument(sideTable != null && sideTable.getSide() != null , "side can't be null");
         this.sideTable = sideTable;
     }

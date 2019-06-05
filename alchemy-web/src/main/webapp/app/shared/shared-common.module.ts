@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 
-import { AlchemySharedLibsModule, JhiAlertComponent, JhiAlertErrorComponent } from './';
+import { AlchemySharedLibsModule, FindLanguageFromKeyPipe, JhiAlertComponent, JhiAlertErrorComponent } from './';
 
 @NgModule({
-    imports: [AlchemySharedLibsModule],
-    declarations: [JhiAlertComponent, JhiAlertErrorComponent],
-    exports: [AlchemySharedLibsModule, JhiAlertComponent, JhiAlertErrorComponent]
+  imports: [AlchemySharedLibsModule],
+  declarations: [FindLanguageFromKeyPipe, JhiAlertComponent, JhiAlertErrorComponent],
+  exports: [AlchemySharedLibsModule, FindLanguageFromKeyPipe, JhiAlertComponent, JhiAlertErrorComponent]
 })
 export class AlchemySharedCommonModule {}

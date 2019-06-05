@@ -9,7 +9,7 @@ import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.types.Row;
 
 import com.caucho.hessian.io.HessianInput;
-import com.dfire.platform.alchemy.api.util.ConvertRowUtils;
+import com.dfire.platform.alchemy.api.util.ConvertRowUtil;
 
 /**
  * @author congbai
@@ -34,7 +34,7 @@ public class HessianRowDeserializationSchema implements DeserializationSchema<Ro
         if (object.getClass() != clazz) {
             throw new ClassCastException("expected class is:" + clazz + " but is :" + object.getClass());
         }
-        return ConvertRowUtils.convertToRow(object, ((RowTypeInfo)typeInfo).getFieldNames());
+        return ConvertRowUtil.convertToRow(object, ((RowTypeInfo)typeInfo).getFieldNames());
     }
 
     @Override

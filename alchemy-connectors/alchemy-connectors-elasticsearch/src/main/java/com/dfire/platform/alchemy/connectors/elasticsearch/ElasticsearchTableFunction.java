@@ -22,14 +22,14 @@ public class ElasticsearchTableFunction implements ElasticsearchSinkFunction<Row
 
     private final String index;
 
-    private final String filedIndex;
+    private final String fieldIndex;
 
     private final JsonRowStringSchema jsonRowSchema;
 
-    public ElasticsearchTableFunction(String index, JsonRowStringSchema jsonRowSchema, String filedIndex, String formatDate) {
+    public ElasticsearchTableFunction(String index, String fieldIndex, String formatDate, JsonRowStringSchema jsonRowSchema) {
         this.index = index;
         this.jsonRowSchema = jsonRowSchema;
-        this.filedIndex = filedIndex;
+        this.fieldIndex = fieldIndex;
         if (StringUtils.isNotBlank(formatDate)){
             this.dateFormat = new SimpleDateFormat(formatDate);
         }else {
@@ -61,14 +61,14 @@ public class ElasticsearchTableFunction implements ElasticsearchSinkFunction<Row
      * @return
      */
     private String getIndex(Row row) {
-        if (StringUtils.isBlank(filedIndex)) {
+        if (StringUtils.isBlank(fieldIndex)) {
             return this.index;
         }
 
         int arrayIndex = 0;
         boolean result = false;
         for (int i = 0; i < this.jsonRowSchema.getFieldNames().length; i++) {
-            if (filedIndex.equals(this.jsonRowSchema.getFieldNames()[i])) {
+            if (fieldIndex.equals(this.jsonRowSchema.getFieldNames()[i])) {
                 arrayIndex = i;
                 result = true;
                 break;

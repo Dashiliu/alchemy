@@ -5,7 +5,7 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.types.Row;
 
-import com.dfire.platform.alchemy.api.util.ConvertRowUtils;
+import com.dfire.platform.alchemy.api.util.ConvertRowUtil;
 
 import io.protostuff.LinkedBuffer;
 import io.protostuff.ProtostuffIOUtil;
@@ -38,7 +38,7 @@ public class ProtostuffRowSerializationSchema implements SerializationSchema<Row
         LinkedBuffer buf = bufThreadLocal.get();
         try {
             Object object = schema.newMessage();
-            ConvertRowUtils.convertFromRow(object, ((RowTypeInfo)typeInfo).getFieldNames(), row);
+            ConvertRowUtil.convertFromRow(object, ((RowTypeInfo)typeInfo).getFieldNames(), row);
             return ProtostuffIOUtil.toByteArray(object, schema, buf);
         } catch (Throwable t) {
             throw new RuntimeException(

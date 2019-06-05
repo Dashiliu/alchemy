@@ -5,7 +5,7 @@
     <parent>
         <artifactId>alchemy-connectors</artifactId>
         <groupId>com.dfire.platform</groupId>
-        <version>0.0.11-SNAPSHOT</version>
+        <version>0.1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,6 +15,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <HikariCP.versoin>2.6.0</HikariCP.versoin>
+        <vertx.version>3.7.0</vertx.version>
     </properties>
 
     <dependencies>
@@ -67,14 +69,18 @@
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
+            <version>${HikariCP.versoin}</version>
         </dependency>
+        <!--vertx -->
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-jdbc-client</artifactId>
+            <version>${vertx.version}</version>
         </dependency>
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-sql-common</artifactId>
+            <version>${vertx.version}</version>
         </dependency>
     </dependencies>
 

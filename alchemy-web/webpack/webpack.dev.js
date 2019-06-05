@@ -2,44 +2,49 @@ const webpack = require('webpack');
 const writeFilePlugin = require('write-file-webpack-plugin');
 const webpackMerge = require('webpack-merge');
 const BrowserSyncPlugin = require('browser-sync-webpack-plugin');
-const WebpackNotifierPlugin = require('webpack-notifier');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
+const SimpleProgressWebpackPlugin = require('simple-progress-webpack-plugin');
+const WebpackNotifierPlugin = require('webpack-notifier');
 const path = require('path');
+const sass = require('sass');
 
 const utils = require('./utils.js');
 const commonConfig = require('./webpack.common.js');
 
 const ENV = 'development';
 
-module.exports = webpackMerge(commonConfig({ env: ENV }), {
+module.exports = (options) => webpackMerge(commonConfig({ env: ENV }), {
     devtool: 'eval-source-map',
     devServer: {
-        contentBase: './src/main/resources/static',
+        contentBase: './target/classes/static/',
         proxy: [{
             context: [
-                /* jhipster-needle-add-entity-to-webpack - JHipster will add entity api paths here */
-                '/api',
-                '/management',
-                '/swagger-resources',
-                '/v2/api-docs',
-                '/h2-console',
-                '/auth'
+                '/'
             ],
-            target: 'http://127.0.0.1:8080',
+            target: `http${options.tls ? 's' : ''}://localhost:8080`,
             secure: false,
-            headers: { host: 'localhost:9000' }
+            changeOrigin: options.tls
+        },{
+            context: [
+                '/websocket'
+            ],
+            target: 'ws://127.0.0.1:8080',
+            ws: true
         }],
+        stats: options.stats,
         watchOptions: {
             ignored: /node_modules/
-        }
+        },
+        https: options.tls
     },
     entry: {
         polyfills: './src/main/webapp/app/polyfills',
-        global: './src/main/webapp/content/css/global.css',
+        global: './src/main/webapp/content/scss/global.scss',
         main: './src/main/webapp/app/app.main'
     },
     output: {
-        path: utils.root('src/main/resources/static'),
+        path: utils.root('target/classes/static/'),
         filename: 'app/[name].bundle.js',
         chunkFilename: 'app/[id].chunk.js'
     },
@@ -47,18 +52,25 @@ module.exports = webpackMerge(commonConfig({ env: ENV }), {
         rules: [{
             test: /\.ts$/,
             enforce: 'pre',
-            loaders: 'tslint-loader',
-            exclude: ['node_modules', new RegExp('reflect-metadata\\' + path.sep + 'Reflect\\.ts')]
+            loader: 'tslint-loader',
+            exclude: [/(node_modules)/, new RegExp('reflect-metadata\\' + path.sep + 'Reflect\\.ts')]
         },
         {
             test: /\.ts$/,
             use: [
-                { loader: 'angular2-template-loader' },
-                { loader: 'cache-loader' },
+                'angular2-template-loader',
+                {
+                    loader: 'cache-loader',
+                    options: {
+                      cacheDirectory: path.resolve('target/cache-loader')
+                    }
+                },
                 {
                     loader: 'thread-loader',
                     options: {
-                        // there should be 1 cpu for the fork-ts-checker-webpack-plugin
+                        // There should be 1 cpu for the fork-ts-checker-webpack-plugin.
+                        // The value may need to be adjusted (e.g. to 1) in some CI environments,
+                        // as cpus() may report more cores than what are available to the build.
                         workers: require('os').cpus().length - 1
                     }
                 },
@@ -69,34 +81,57 @@ module.exports = webpackMerge(commonConfig({ env: ENV }), {
                         happyPackMode: true
                     }
                 },
-                { loader: 'angular-router-loader' }
+                'angular-router-loader'
             ],
-            exclude: ['node_modules']
+            exclude: /(node_modules)/
         },
         {
-            test: /\.css$/,
-            loaders: ['to-string-loader', 'css-loader'],
-            exclude: /(vendor\.css|global\.css)/
+            test: /\.scss$/,
+            use: ['to-string-loader', 'css-loader', {
+                loader: 'sass-loader',
+                options: { implementation: sass }
+            }],
+            exclude: /(vendor\.scss|global\.scss)/
         },
         {
-            test: /(vendor\.css|global\.css)/,
-            loaders: ['style-loader', 'css-loader']
+            test: /(vendor\.scss|global\.scss)/,
+            use: ['style-loader', 'css-loader', 'postcss-loader', {
+                loader: 'sass-loader',
+                options: { implementation: sass }
+            }]
         }]
     },
+    stats: process.env.JHI_DISABLE_WEBPACK_LOGS ? 'none' : options.stats,
     plugins: [
+        process.env.JHI_DISABLE_WEBPACK_LOGS
+            ? null
+            : new SimpleProgressWebpackPlugin({
+                format: options.stats === 'minimal' ? 'compact' : 'expanded'
+              }),
+        new FriendlyErrorsWebpackPlugin(),
         new ForkTsCheckerWebpackPlugin(),
         new BrowserSyncPlugin({
+            https: options.tls,
             host: 'localhost',
             port: 9000,
             proxy: {
-                target: 'http://localhost:9060'
+                target: `http${options.tls ? 's' : ''}://localhost:9060`,
+                ws: true,
+                proxyOptions: {
+                    changeOrigin: false  //pass the Host header to the backend unchanged  https://github.com/Browsersync/browser-sync/issues/430
+                }
+            },
+            socket: {
+                clients: {
+                    heartbeatTimeout: 60000
+                }
             }
         }, {
             reload: false
         }),
         new webpack.ContextReplacementPlugin(
             /angular(\\|\/)core(\\|\/)/,
-            path.resolve(__dirname, './src/main/webapp')
+            path.resolve(__dirname, './src/main/webapp/')
         ),
         new writeFilePlugin(),
         new webpack.WatchIgnorePlugin([
@@ -106,6 +141,6 @@ module.exports = webpackMerge(commonConfig({ env: ENV }), {
             title: 'JHipster',
             contentImage: path.join(__dirname, 'logo-jhipster.png')
         })
-    ],
+    ].filter(Boolean),
     mode: 'development'
 });

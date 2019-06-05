@@ -11,9 +11,9 @@ import java.util.concurrent.ExecutionException;
 import com.dfire.platform.alchemy.connectors.common.Cache;
 import com.dfire.platform.alchemy.connectors.common.Future;
 import com.dfire.platform.alchemy.connectors.common.side.ISideFunction;
-import com.dfire.platform.alchemy.connectors.common.side.SideTableInfo;
-import com.dfire.platform.alchemy.connectors.common.utils.SideParser;
-import com.dfire.platform.alchemy.connectors.common.utils.TransformUtils;
+import com.dfire.platform.alchemy.connectors.common.side.SideTable;
+import com.dfire.platform.alchemy.api.util.SideParser;
+import com.dfire.platform.alchemy.api.util.ConvertObjectUtil;
 import org.apache.calcite.config.Lex;
 import org.apache.calcite.sql.SqlBasicCall;
 import org.apache.calcite.sql.SqlBinaryOperator;
@@ -65,7 +65,7 @@ public class MysqlSideFunction implements ISideFunction<List<JsonObject>> {
 
     public final static String KEY_SEP = "_";
 
-    private final SideTableInfo sideTableInfo;
+    private final SideTable sideTableInfo;
 
     private final String sql;
 
@@ -75,7 +75,7 @@ public class MysqlSideFunction implements ISideFunction<List<JsonObject>> {
 
     private final Cache<List<JsonObject>> cache;
 
-    public MysqlSideFunction(SideTableInfo sideTableInfo, MysqlSideProperties mysqlProperties) throws SqlParseException {
+    public MysqlSideFunction(SideTable sideTableInfo, MysqlSideProperties mysqlProperties) throws SqlParseException {
         this.sideTableInfo = sideTableInfo;
         this.sql = modifySql(sideTableInfo);
         this.vertx = createVertx();
@@ -83,7 +83,7 @@ public class MysqlSideFunction implements ISideFunction<List<JsonObject>> {
         this.cache = create(this.sideTableInfo.getSide());
     }
 
-    private String modifySql(SideTableInfo sideTable) throws SqlParseException {
+    private String modifySql(SideTable sideTable) throws SqlParseException {
         SqlParser.Config config = SqlParser.configBuilder().setLex(Lex.MYSQL).build();
         SqlParser sqlParser = SqlParser.create(sideTable.getSql(), config);
         SqlNode sqlNode = sqlParser.parseStmt();
@@ -276,7 +276,7 @@ public class MysqlSideFunction implements ISideFunction<List<JsonObject>> {
         Map<Integer, String> indexFields = getIndexFields(sideType);
         for (int i = 0; i < sideSize; i++) {
             Object result = value.getValue(indexFields.get(i));
-            row.setField(i + inputSize, TransformUtils.transform(result, sideType.getTypeAt(i)));
+            row.setField(i + inputSize, ConvertObjectUtil.transform(result, sideType.getTypeAt(i)));
         }
         return row;
     }

@@ -1,0 +1,15 @@
+{
+  "alchemyApp": {
+    "SinkType": {
+      "null": "",
+      "REDIS": "REDIS",
+      "KAFKA": "KAFKA",
+      "MYSQL": "MYSQL",
+      "HBASE": "HBASE",
+      "TSDB": "TSDB",
+      "FILE": "FILE",
+      "ELASTICSEARCH": "ELASTICSEARCH",
+      "PRINT": "PRINT"
+    }
+  }
+}

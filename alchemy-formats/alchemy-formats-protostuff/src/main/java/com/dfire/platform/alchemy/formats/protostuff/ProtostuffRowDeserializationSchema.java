@@ -7,7 +7,7 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.types.Row;
 
-import com.dfire.platform.alchemy.api.util.ConvertRowUtils;
+import com.dfire.platform.alchemy.api.util.ConvertRowUtil;
 
 import io.protostuff.ProtostuffIOUtil;
 import io.protostuff.Schema;
@@ -34,7 +34,7 @@ public class ProtostuffRowDeserializationSchema implements DeserializationSchema
             Object obj = schema.newMessage();
             ProtostuffIOUtil.mergeFrom(bytes, obj, schema);
             // convert to row
-            return ConvertRowUtils.convertToRow(obj, ((RowTypeInfo)typeInfo).getFieldNames());
+            return ConvertRowUtil.convertToRow(obj, ((RowTypeInfo)typeInfo).getFieldNames());
         } catch (Exception e) {
             return null;
         }

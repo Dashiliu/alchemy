@@ -3,7 +3,7 @@ package com.dfire.platform.alchemy.connectors.mysql.side;
 import java.util.List;
 
 import com.dfire.platform.alchemy.connectors.common.side.AsyncSideFunction;
-import com.dfire.platform.alchemy.connectors.common.side.SideTableInfo;
+import com.dfire.platform.alchemy.connectors.common.side.SideTable;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.async.ResultFuture;
 import org.apache.flink.types.Row;
@@ -24,7 +24,7 @@ public class MysqlAsyncSideFunction extends AsyncSideFunction<List<JsonObject>> 
 
     private transient MysqlSideFunction mysqlSideFunction;
 
-    public MysqlAsyncSideFunction(SideTableInfo sideTable, MysqlSideProperties mysqlProperties) {
+    public MysqlAsyncSideFunction(SideTable sideTable, MysqlSideProperties mysqlProperties) {
         super(sideTable);
         this.mysqlProperties = mysqlProperties;
     }

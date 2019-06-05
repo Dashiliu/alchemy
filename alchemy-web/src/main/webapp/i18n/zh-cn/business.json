@@ -1,0 +1,29 @@
+{
+  "alchemyApp": {
+    "business": {
+      "home": {
+        "title": "Businesses",
+        "createLabel": "创建新 Business",
+        "createOrEditLabel": "创建或编辑 Business"
+      },
+      "created": "Business {{ param }} 创建成功",
+      "updated": "Business {{ param }} 更新成功",
+      "deleted": "Business {{ param }} 删除成功",
+      "delete": {
+        "question": "你确定要删除 Business {{ id }} 吗？"
+      },
+      "detail": {
+        "title": "Business"
+      },
+      "name": "Name",
+      "remark": "Remark",
+      "createdBy": "Created By",
+      "createdDate": "Created Date",
+      "job": "Job",
+      "cluster": "Cluster",
+      "source": "Source",
+      "sink": "Sink",
+      "udf": "Udf"
+    }
+  }
+}

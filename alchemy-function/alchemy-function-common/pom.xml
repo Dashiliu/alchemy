@@ -5,7 +5,7 @@
     <parent>
         <artifactId>alchemy-function</artifactId>
         <groupId>com.dfire.platform</groupId>
-        <version>0.0.11-SNAPSHOT</version>
+        <version>0.1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,6 +15,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <httpmime-version>4.2</httpmime-version>
+        <groovy.version>2.4.11</groovy.version>
     </properties>
 
 
@@ -38,6 +39,11 @@
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>${groovy.version}</version>
         </dependency>
     </dependencies>
     <build>

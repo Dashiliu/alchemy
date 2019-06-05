@@ -1,0 +1,9 @@
+{
+  "alchemyApp": {
+    "ClusterType": {
+      "null": "",
+      "REST": "REST",
+      "YARN": "YARN"
+    }
+  }
+}

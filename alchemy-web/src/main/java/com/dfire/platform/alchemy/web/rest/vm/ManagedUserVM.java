@@ -1,8 +1,7 @@
 package com.dfire.platform.alchemy.web.rest.vm;
 
+import com.dfire.platform.alchemy.service.dto.UserDTO;
 import javax.validation.constraints.Size;
-
-import com.dfire.platform.alchemy.web.service.dto.UserDTO;
 
 /**
  * View Model extending the UserDTO, which is meant to be used in the user management UI.
@@ -30,6 +29,7 @@ public class ManagedUserVM extends UserDTO {
 
     @Override
     public String toString() {
-        return "ManagedUserVM{" + "} " + super.toString();
+        return "ManagedUserVM{" +
+            "} " + super.toString();
     }
 }

@@ -12,7 +12,7 @@
   },
   "defaultProject": "alchemy",
   "cli": {
-    "packageManager": "yarn"
+    "packageManager": "npm"
   },
   "schematics": {
     "@schematics/angular:component": {
@@ -20,7 +20,7 @@
       "inlineTemplate": false,
       "spec": false,
       "prefix": "jhi",
-      "styleExt": "css"
+      "styleExt": "scss"
     },
     "@schematics/angular:directive": {
       "spec": false,

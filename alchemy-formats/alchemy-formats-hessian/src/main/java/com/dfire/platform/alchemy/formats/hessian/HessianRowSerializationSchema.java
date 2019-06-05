@@ -8,7 +8,7 @@ import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.types.Row;
 
 import com.caucho.hessian.io.HessianOutput;
-import com.dfire.platform.alchemy.api.util.ConvertRowUtils;
+import com.dfire.platform.alchemy.api.util.ConvertRowUtil;
 
 /**
  * @author congbai
@@ -30,7 +30,7 @@ public class HessianRowSerializationSchema implements SerializationSchema<Row> {
         outputStream.reset();
         try {
             Object object = clazz.newInstance();
-            ConvertRowUtils.convertFromRow(object, ((RowTypeInfo)typeInfo).getFieldNames(), row);
+            ConvertRowUtil.convertFromRow(object, ((RowTypeInfo)typeInfo).getFieldNames(), row);
             HessianOutput ho = new HessianOutput(outputStream);
             ho.writeObject(outputStream);
             return outputStream.toByteArray();

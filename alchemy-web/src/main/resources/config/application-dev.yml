@@ -12,147 +12,66 @@
 # Full reference is available at:
 # http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
 # ===================================================================
-spring:
-    profiles:
-        active: dev
-        include: swagger
-    devtools:
-        restart:
-            enabled: true
-        livereload:
-            enabled: false # we use Webpack dev server + BrowserSync for livereload
-    servlet:
-      multipart:
-        max-file-size: 200Mb
-        max-request-size: 200Mb
-    jackson:
-        serialization.indent_output: true
-    application:
-        name: alchemy
-    redis:
-        sentinel:
-                  nodes:
-                    - common101.redis.2dfire-daily.com:26379
-                  master: cache101
-        database: 2
-        jedis:
-          pool:
-            max-active: 20
-            max-idle: 20
-            min-idle: 20
 
-    dubbo:
-            application:
-                name: alchemy
-                owner: congbai
-            registry:
-                address: zookeeper://zk1.2dfire-daily.com:2181?backup=zk2.2dfire-daily.com:2181,zk3.2dfire-daily.com:2181
-            protocol:
-                name: dubbo
-                port: -1
-                accesslog: /opt/logs/spring-boot/access.log
-            provider:
-                retries: 0
-                delay: -1
-                loadbalance: leastactive
-                version: 1.0.0
-            consumer:
-                timeout: 20000
-                check: false
-                version: 1.0.0
-            service:
-                shutdown:
-                      wait:  30000
-            scan: com.dfire.platform.alchemy.web
-    datasource:
-        type: com.zaxxer.hikari.HikariDataSource
-        url: jdbc:mysql://common101.my.2dfire-daily.com:3306/alchemy?useUnicode=true&characterEncoding=utf8&useSSL=false
-        username: twodfire
-        password: 123456
-        hikari:
-            data-source-properties:
-                cachePrepStmts: true
-                prepStmtCacheSize: 250
-                prepStmtCacheSqlLimit: 2048
-                useServerPrepStmts: true
-    jpa:
-        database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
-        database: MYSQL
-        show-sql: true
-        properties:
-            hibernate.id.new_generator_mappings: true
-            hibernate.cache.use_second_level_cache: false
-            hibernate.cache.use_query_cache: false
-            hibernate.generate_statistics: true
-    liquibase:
-        contexts: dev
-    mail:
-        host: localhost
-        port: 25
-        username:
-        password:
-    messages:
-        cache-duration: PT1S # 1 second, see the ISO 8601 standard
-    thymeleaf:
-        cache: false
 logging:
-  config: classpath:alchemy-logback.xml
-  path: /opt/logs/spring-boot
   level:
-    root: info
+    ROOT: DEBUG
     io.github.jhipster: DEBUG
     com.dfire.platform.alchemy: DEBUG
 
-alchemy:
-#  file:
-#    upload-url: http://upload.2dfire-daily.com/upbigfile
-#    download-url: https://assets.2dfire.com/
-  clusters:
-    - name: flink_default
-      type: flink
-      mode: zookeeper
-      clusterId: daily-real
-      zookeeperQuorum: 10.1.22.21:2181,10.1.22.22:2181,10.1.22.23:2181
-      storagePath: hdfs://sunset002.daily.2dfire.info:8020/flink/ha/real
-      address: 10.1.21.95
-      port: 6123
-    - name: flink_5_4_8
-      type: flink
-      mode: zookeeper
-      clusterId: daily-default-8
-      zookeeperQuorum: 10.1.22.21:2181,10.1.22.22:2181,10.1.22.23:2181
-      storagePath: hdfs://sunset002.daily.2dfire.info:8020/flink/ha/default-8
-      address: 10.1.21.95
-      port: 6123
-  job:
-    queueSize: 1000
-    initialDelay: 1 #MINUTES
-    period:   5 #MINUTES
-  flame:
-    maxTotal: 4096
-    maxWaitMillis: 500
-    minEvictableIdleTimeMillis: 10000
+spring:
+  profiles:
+    active: dev
+    include:
+      - swagger
+      # Uncomment to activate TLS for the dev profile
+      #- tls
+  devtools:
+    restart:
+      enabled: true
+      additional-exclude: .h2.server.properties
+    livereload:
+      enabled: false # we use Webpack dev server + BrowserSync for livereload
+  jackson:
+    serialization:
+      indent-output: true
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:h2:file:./alchemy-web/target/h2db/db/alchemy;DB_CLOSE_DELAY=-1
+    username: alchemy
+    password:
+    hikari:
+      poolName: Hikari
+      auto-commit: false
+  h2:
+    console:
+      enabled: false
+  jpa:
+    database-platform: io.github.jhipster.domain.util.FixedH2Dialect
+    database: H2
+    show-sql: true
+    properties:
+      hibernate.id.new_generator_mappings: true
+      hibernate.connection.provider_disables_autocommit: true
+      hibernate.cache.use_second_level_cache: false
+      hibernate.cache.use_query_cache: false
+      hibernate.generate_statistics: false
+  liquibase:
+    # Remove 'faker' if you do not want the sample data to be loaded automatically
+    contexts: dev, faker
+  mail:
+    host: localhost
+    port: 25
+    username:
+    password:
+  messages:
+    cache-duration: PT1S # 1 second, see the ISO 8601 standard
+  thymeleaf:
+    cache: false
 
-# ===================================================================
-# To enable SSL, generate a certificate using:
-# keytool -genkey -alias alchemy -storetype PKCS12 -keyalg RSA -keysize 2048 -keystore keystore.p12 -validity 3650
-#
-# You can also use Let's Encrypt:
-# https://maximilian-boehm.com/hp2121/Create-a-Java-Keystore-JKS-from-Let-s-Encrypt-Certificates.htm
-#
-# Then, modify the server.ssl properties so your "server" configuration looks like:
-#
-# server:
-#    port: 8443
-#    ssl:
-#        key-store: keystore.p12
-#        key-store-password: <your-password>
-#        key-store-type: PKCS12
-#        key-alias: alchemy
-# ===================================================================
 server:
-    port: 8080
-#    context-path: /alchemy
+  port: 8080
+
 # ===================================================================
 # JHipster specific properties
 #
@@ -160,43 +79,40 @@ server:
 # ===================================================================
 
 jhipster:
-    http:
-        version: V_1_1 # To use HTTP/2 you will need SSL support (see above the "server.ssl" configuration)
-    cache: # Cache configuration
-        ehcache: # Ehcache configuration
-            time-to-live-seconds: 3600 # By default objects stay 1 hour in the cache
-            max-entries: 100 # Number of objects in each cache entry
-    # CORS is only enabled by default with the "dev" profile, so BrowserSync can access the API
-    cors:
-        allowed-origins: "*"
-        allowed-methods: "*"
-        allowed-headers: "*"
-        exposed-headers: "Authorization,Link,X-Total-Count"
-        allow-credentials: true
-        max-age: 1800
-    security:
-        authentication:
-            jwt:
-                secret: my-secret-token-to-change-in-production
-                # Token is valid 24 hours
-                token-validity-in-seconds: 86400
-                token-validity-in-seconds-for-remember-me: 2592000
-    mail: # specific JHipster mail property, for standard properties see MailProperties
-        from: alchemy@localhost
-        base-url: http://127.0.0.1:8080
-    metrics: # DropWizard Metrics configuration, used by MetricsConfiguration
-        jmx:
-            enabled: true
-        logs: # Reports Dropwizard metrics in the logs
-            enabled: false
-            report-frequency: 60 # in seconds
-    logging:
-        logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
-            enabled: false
-            host: localhost
-            port: 5000
-            queue-size: 512
-
+  cache: # Cache configuration
+    ehcache: # Ehcache configuration
+      time-to-live-seconds: 3600 # By default objects stay 1 hour in the cache
+      max-entries: 100 # Number of objects in each cache entry
+  # CORS is only enabled by default with the "dev" profile, so BrowserSync can access the API
+  cors:
+    allowed-origins: '*'
+    allowed-methods: '*'
+    allowed-headers: '*'
+    exposed-headers: 'Authorization,Link,X-Total-Count'
+    allow-credentials: true
+    max-age: 1800
+  security:
+    authentication:
+      jwt:
+        # This token must be encoded using Base64 and be at least 256 bits long (you can type `openssl rand -base64 64` on your command line to generate a 512 bits one)
+        base64-secret: NjhiMjdiYmU1OWU2NzdkZmVmMjg5YmE4MDkwNDI2ZTBkZmQ4OTdjNDMwZTkxYzQ2Zjk4YTg1MDM3NWE4MWJhMmQ5MDcyZWQ4NjM5NjBhMzBkMmY0MzczMzNjYjkxOTY1YTJlMDcwYTZjYjc1NzQ0NjhjNDM5OTc2MDI0NzA2YzE=
+        # Token is valid 24 hours
+        token-validity-in-seconds: 86400
+        token-validity-in-seconds-for-remember-me: 2592000
+  mail: # specific JHipster mail property, for standard properties see MailProperties
+    from: alchemy@localhost
+    base-url: http://127.0.0.1:8080
+  metrics:
+    logs: # Reports metrics in the logs
+      enabled: false
+      report-frequency: 60 # in seconds
+  logging:
+    use-json-format: false # By default, logs are not in Json format
+    logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
+      enabled: false
+      host: localhost
+      port: 5000
+      queue-size: 512
 # ===================================================================
 # Application specific properties
 # Add your own application properties here, see the ApplicationProperties class

@@ -5,7 +5,7 @@
     <parent>
         <artifactId>alchemy-connectors</artifactId>
         <groupId>com.dfire.platform</groupId>
-        <version>0.0.11-SNAPSHOT</version>
+        <version>0.1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,12 +15,14 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <rocketmq.version>3.2.5</rocketmq.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.alibaba.rocketmq</groupId>
             <artifactId>rocketmq-client</artifactId>
+            <version>${rocketmq.version}</version>
         </dependency>
         <dependency>
             <groupId>com.dfire.platform</groupId>

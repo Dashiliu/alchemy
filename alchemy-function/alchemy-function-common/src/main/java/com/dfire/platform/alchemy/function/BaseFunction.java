@@ -1,12 +1,6 @@
 package com.dfire.platform.alchemy.function;
 
-/**
- * Created with IntelliJ IDEA.
- * User: yuntun
- * Date: 2019/3/25
- * Time: 20:29
- * Description:
- */
+
 public interface BaseFunction extends Function{
 
     String getFunctionName();

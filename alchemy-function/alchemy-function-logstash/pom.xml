@@ -5,13 +5,17 @@
     <parent>
         <artifactId>alchemy-function</artifactId>
         <groupId>com.dfire.platform</groupId>
-        <version>0.0.11-SNAPSHOT</version>
+        <version>0.1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>alchemy-function-logstash</artifactId>
     <packaging>jar</packaging>
 
+    <properties>
+        <geoip2.version>2.12.0</geoip2.version>
+        <snakeyaml.version>1.18</snakeyaml.version>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -37,10 +41,12 @@
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
+            <version>${snakeyaml.version}</version>
         </dependency>
         <dependency>
             <groupId>com.maxmind.geoip2</groupId>
             <artifactId>geoip2</artifactId>
+            <version>${geoip2.version}</version>
         </dependency>
     </dependencies>
 
