@@ -22,6 +22,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Base64Utils;
 import org.springframework.validation.Validator;
 
 import javax.persistence.EntityManager;
@@ -331,45 +332,6 @@ public class SinkResourceIT {
 
     @Test
     @Transactional
-    public void getAllSinksByConfigIsEqualToSomething() throws Exception {
-        // Initialize the database
-        sinkRepository.saveAndFlush(sink);
-
-        // Get all the sinkList where config equals to DEFAULT_CONFIG
-        defaultSinkShouldBeFound("config.equals=" + DEFAULT_CONFIG);
-
-        // Get all the sinkList where config equals to UPDATED_CONFIG
-        defaultSinkShouldNotBeFound("config.equals=" + UPDATED_CONFIG);
-    }
-
-    @Test
-    @Transactional
-    public void getAllSinksByConfigIsInShouldWork() throws Exception {
-        // Initialize the database
-        sinkRepository.saveAndFlush(sink);
-
-        // Get all the sinkList where config in DEFAULT_CONFIG or UPDATED_CONFIG
-        defaultSinkShouldBeFound("config.in=" + DEFAULT_CONFIG + "," + UPDATED_CONFIG);
-
-        // Get all the sinkList where config equals to UPDATED_CONFIG
-        defaultSinkShouldNotBeFound("config.in=" + UPDATED_CONFIG);
-    }
-
-    @Test
-    @Transactional
-    public void getAllSinksByConfigIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        sinkRepository.saveAndFlush(sink);
-
-        // Get all the sinkList where config is not null
-        defaultSinkShouldBeFound("config.specified=true");
-
-        // Get all the sinkList where config is null
-        defaultSinkShouldNotBeFound("config.specified=false");
-    }
-
-    @Test
-    @Transactional
     public void getAllSinksByCreatedByIsEqualToSomething() throws Exception {
         // Initialize the database
         sinkRepository.saveAndFlush(sink);
@@ -552,7 +514,7 @@ public class SinkResourceIT {
             .andExpect(jsonPath("$.[*].id").value(hasItem(sink.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())))
-            .andExpect(jsonPath("$.[*].config").value(hasItem(DEFAULT_CONFIG)))
+            .andExpect(jsonPath("$.[*].config").value(hasItem(DEFAULT_CONFIG.toString())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY)))
             .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY)))

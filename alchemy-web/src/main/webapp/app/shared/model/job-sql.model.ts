@@ -2,7 +2,7 @@ import { Moment } from 'moment';
 
 export interface IJobSql {
   id?: number;
-  sql?: string;
+  sql?: any;
   createdBy?: string;
   createdDate?: Moment;
   lastModifiedBy?: string;
@@ -13,7 +13,7 @@ export interface IJobSql {
 export class JobSql implements IJobSql {
   constructor(
     public id?: number,
-    public sql?: string,
+    public sql?: any,
     public createdBy?: string,
     public createdDate?: Moment,
     public lastModifiedBy?: string,

@@ -3,6 +3,7 @@ import java.time.Instant;
 import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.util.Objects;
+import javax.persistence.Lob;
 import com.dfire.platform.alchemy.domain.enumeration.SinkType;
 
 /**
@@ -17,6 +18,7 @@ public class SinkDTO implements Serializable {
     @NotNull
     private SinkType type;
 
+    @Lob
     private String config;
 
     private String createdBy;
@@ -27,7 +29,7 @@ public class SinkDTO implements Serializable {
 
     private Instant lastModifiedDate;
 
-
+    @NotNull
     private Long businessId;
 
     public Long getId() {

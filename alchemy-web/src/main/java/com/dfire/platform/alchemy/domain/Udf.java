@@ -25,7 +25,8 @@ public class Udf implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name")
+    @NotNull
+    @Column(name = "name", nullable = false)
     private String name;
 
     @NotNull
@@ -33,8 +34,13 @@ public class Udf implements Serializable {
     @Column(name = "jhi_type", nullable = false)
     private UdfType type;
 
-    @Column(name = "config")
-    private String config;
+    
+    @Lob
+    @Column(name = "jhi_value", nullable = false)
+    private String value;
+
+    @Column(name = "avg")
+    private String avg;
 
     @Column(name = "created_by")
     private String createdBy;
@@ -87,17 +93,30 @@ public class Udf implements Serializable {
         this.type = type;
     }
 
-    public String getConfig() {
-        return config;
+    public String getValue() {
+        return value;
     }
 
-    public Udf config(String config) {
-        this.config = config;
+    public Udf value(String value) {
+        this.value = value;
         return this;
     }
 
-    public void setConfig(String config) {
-        this.config = config;
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public String getAvg() {
+        return avg;
+    }
+
+    public Udf avg(String avg) {
+        this.avg = avg;
+        return this;
+    }
+
+    public void setAvg(String avg) {
+        this.avg = avg;
     }
 
     public String getCreatedBy() {
@@ -188,7 +207,8 @@ public class Udf implements Serializable {
             "id=" + getId() +
             ", name='" + getName() + "'" +
             ", type='" + getType() + "'" +
-            ", config='" + getConfig() + "'" +
+            ", value='" + getValue() + "'" +
+            ", avg='" + getAvg() + "'" +
             ", createdBy='" + getCreatedBy() + "'" +
             ", createdDate='" + getCreatedDate() + "'" +
             ", lastModifiedBy='" + getLastModifiedBy() + "'" +

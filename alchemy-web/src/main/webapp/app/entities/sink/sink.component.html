@@ -16,13 +16,12 @@
             <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="transition.bind(this)">
             <th jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="name"><span jhiTranslate="alchemyApp.sink.name">Name</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+            <th jhiSortBy="businessId"><span jhiTranslate="alchemyApp.sink.business">Business</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="type"><span jhiTranslate="alchemyApp.sink.type">Type</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-            <th jhiSortBy="config"><span jhiTranslate="alchemyApp.sink.config">Config</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="createdBy"><span jhiTranslate="alchemyApp.sink.createdBy">Created By</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="createdDate"><span jhiTranslate="alchemyApp.sink.createdDate">Created Date</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="lastModifiedBy"><span jhiTranslate="alchemyApp.sink.lastModifiedBy">Last Modified By</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="lastModifiedDate"><span jhiTranslate="alchemyApp.sink.lastModifiedDate">Last Modified Date</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-            <th jhiSortBy="businessId"><span jhiTranslate="alchemyApp.sink.business">Business</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th></th>
             </tr>
             </thead>
@@ -30,17 +29,16 @@
             <tr *ngFor="let sink of sinks ;trackBy: trackId">
                 <td><a [routerLink]="['/sink', sink.id, 'view' ]">{{sink.id}}</a></td>
                 <td>{{sink.name}}</td>
-                <td jhiTranslate="{{'alchemyApp.SinkType.' + sink.type}}">{{sink.type}}</td>
-                <td>{{sink.config}}</td>
-                <td>{{sink.createdBy}}</td>
-                <td>{{sink.createdDate | date:'medium'}}</td>
-                <td>{{sink.lastModifiedBy}}</td>
-                <td>{{sink.lastModifiedDate | date:'medium'}}</td>
                 <td>
                     <div *ngIf="sink.businessId">
                         <a [routerLink]="['../business', sink.businessId , 'view' ]" >{{sink.businessId}}</a>
                     </div>
                 </td>
+                <td jhiTranslate="{{'alchemyApp.SinkType.' + sink.type}}">{{sink.type}}</td>
+                <td>{{sink.createdBy}}</td>
+                <td>{{sink.createdDate | date:'medium'}}</td>
+                <td>{{sink.lastModifiedBy}}</td>
+                <td>{{sink.lastModifiedDate | date:'medium'}}</td>
                 <td class="text-right">
                     <div class="btn-group">
                         <button type="submit"

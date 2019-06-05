@@ -3,7 +3,10 @@
     "fields": [
         {
             "fieldName": "name",
-            "fieldType": "String"
+            "fieldType": "String",
+            "fieldValidateRules": [
+              "required"
+            ]
         },
         {
             "fieldName": "type",
@@ -14,8 +17,16 @@
             ]
         },
         {
-            "fieldName": "config",
-            "fieldType": "String"
+            "fieldName": "value",
+            "fieldType": "byte[]",
+            "fieldTypeBlobContent": "text",
+            "fieldValidateRules": [
+              "required"
+            ]
+        },
+        {
+          "fieldName": "avg",
+          "fieldType": "String"
         },
         {
             "fieldName": "createdBy",

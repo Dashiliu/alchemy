@@ -13,6 +13,7 @@ import { IBusiness } from 'app/shared/model/business.model';
 import { BusinessService } from 'app/entities/business';
 import { ICluster } from 'app/shared/model/cluster.model';
 import { ClusterService } from 'app/entities/cluster';
+import 'codemirror/mode/yaml/yaml';
 
 @Component({
   selector: 'jhi-job-update',

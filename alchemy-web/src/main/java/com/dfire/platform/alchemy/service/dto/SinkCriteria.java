@@ -50,8 +50,6 @@ public class SinkCriteria implements Serializable, Criteria {
 
     private SinkTypeFilter type;
 
-    private StringFilter config;
-
     private StringFilter createdBy;
 
     private InstantFilter createdDate;
@@ -69,7 +67,6 @@ public class SinkCriteria implements Serializable, Criteria {
         this.id = other.id == null ? null : other.id.copy();
         this.name = other.name == null ? null : other.name.copy();
         this.type = other.type == null ? null : other.type.copy();
-        this.config = other.config == null ? null : other.config.copy();
         this.createdBy = other.createdBy == null ? null : other.createdBy.copy();
         this.createdDate = other.createdDate == null ? null : other.createdDate.copy();
         this.lastModifiedBy = other.lastModifiedBy == null ? null : other.lastModifiedBy.copy();
@@ -104,14 +101,6 @@ public class SinkCriteria implements Serializable, Criteria {
 
     public void setType(SinkTypeFilter type) {
         this.type = type;
-    }
-
-    public StringFilter getConfig() {
-        return config;
-    }
-
-    public void setConfig(StringFilter config) {
-        this.config = config;
     }
 
     public StringFilter getCreatedBy() {
@@ -168,7 +157,6 @@ public class SinkCriteria implements Serializable, Criteria {
             Objects.equals(id, that.id) &&
             Objects.equals(name, that.name) &&
             Objects.equals(type, that.type) &&
-            Objects.equals(config, that.config) &&
             Objects.equals(createdBy, that.createdBy) &&
             Objects.equals(createdDate, that.createdDate) &&
             Objects.equals(lastModifiedBy, that.lastModifiedBy) &&
@@ -182,7 +170,6 @@ public class SinkCriteria implements Serializable, Criteria {
         id,
         name,
         type,
-        config,
         createdBy,
         createdDate,
         lastModifiedBy,
@@ -197,7 +184,6 @@ public class SinkCriteria implements Serializable, Criteria {
                 (id != null ? "id=" + id + ", " : "") +
                 (name != null ? "name=" + name + ", " : "") +
                 (type != null ? "type=" + type + ", " : "") +
-                (config != null ? "config=" + config + ", " : "") +
                 (createdBy != null ? "createdBy=" + createdBy + ", " : "") +
                 (createdDate != null ? "createdDate=" + createdDate + ", " : "") +
                 (lastModifiedBy != null ? "lastModifiedBy=" + lastModifiedBy + ", " : "") +

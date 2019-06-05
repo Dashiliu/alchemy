@@ -1,5 +1,6 @@
 package com.dfire.platform.alchemy.web.rest;
 
+import com.dfire.platform.alchemy.security.SecurityUtils;
 import com.dfire.platform.alchemy.service.SourceService;
 import com.dfire.platform.alchemy.web.rest.errors.BadRequestAlertException;
 import com.dfire.platform.alchemy.service.dto.SourceDTO;
@@ -25,6 +26,7 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,6 +66,14 @@ public class SourceResource {
         if (sourceDTO.getId() != null) {
             throw new BadRequestAlertException("A new source cannot already have an ID", ENTITY_NAME, "idexists");
         }
+        Optional<String> loginUser = SecurityUtils.getCurrentUserLogin();
+        if(!loginUser.isPresent()){
+            throw new BadRequestAlertException("No user was found for this cluster", ENTITY_NAME, "usernotlogin");
+        }
+        sourceDTO.setCreatedBy(loginUser.get());
+        sourceDTO.setCreatedDate(Instant.now());
+        sourceDTO.setLastModifiedBy(loginUser.get());
+        sourceDTO.setLastModifiedDate(Instant.now());
         SourceDTO result = sourceService.save(sourceDTO);
         return ResponseEntity.created(new URI("/api/sources/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -85,6 +95,12 @@ public class SourceResource {
         if (sourceDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
+        Optional<String> loginUser = SecurityUtils.getCurrentUserLogin();
+        if(!loginUser.isPresent()){
+            throw new BadRequestAlertException("No user was found for this cluster", ENTITY_NAME, "usernotlogin");
+        }
+        sourceDTO.setLastModifiedBy(loginUser.get());
+        sourceDTO.setLastModifiedDate(Instant.now());
         SourceDTO result = sourceService.save(sourceDTO);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, sourceDTO.getId().toString()))

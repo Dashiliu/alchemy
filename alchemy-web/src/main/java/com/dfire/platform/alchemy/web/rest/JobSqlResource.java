@@ -1,25 +1,35 @@
 package com.dfire.platform.alchemy.web.rest;
 
-import com.dfire.platform.alchemy.service.JobSqlService;
-import com.dfire.platform.alchemy.web.rest.errors.BadRequestAlertException;
-import com.dfire.platform.alchemy.service.dto.JobSqlDTO;
-import com.dfire.platform.alchemy.service.dto.JobSqlCriteria;
-import com.dfire.platform.alchemy.service.JobSqlQueryService;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
 
-import io.github.jhipster.web.util.HeaderUtil;
-import io.github.jhipster.web.util.ResponseUtil;
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
-import java.net.URI;
-import java.net.URISyntaxException;
+import com.dfire.platform.alchemy.security.SecurityUtils;
+import com.dfire.platform.alchemy.service.JobSqlQueryService;
+import com.dfire.platform.alchemy.service.JobSqlService;
+import com.dfire.platform.alchemy.service.dto.JobSqlCriteria;
+import com.dfire.platform.alchemy.service.dto.JobSqlDTO;
+import com.dfire.platform.alchemy.web.rest.errors.BadRequestAlertException;
 
-import java.util.List;
-import java.util.Optional;
+import io.github.jhipster.web.util.HeaderUtil;
+import io.github.jhipster.web.util.ResponseUtil;
 
 /**
  * REST controller for managing {@link com.dfire.platform.alchemy.domain.JobSql}.
@@ -48,7 +58,8 @@ public class JobSqlResource {
      * {@code POST  /job-sqls} : Create a new jobSql.
      *
      * @param jobSqlDTO the jobSqlDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new jobSqlDTO, or with status {@code 400 (Bad Request)} if the jobSql has already an ID.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new jobSqlDTO, or with
+     *         status {@code 400 (Bad Request)} if the jobSql has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/job-sqls")
@@ -57,9 +68,18 @@ public class JobSqlResource {
         if (jobSqlDTO.getId() != null) {
             throw new BadRequestAlertException("A new jobSql cannot already have an ID", ENTITY_NAME, "idexists");
         }
+        Optional<String> loginUser = SecurityUtils.getCurrentUserLogin();
+        if (!loginUser.isPresent()) {
+            throw new BadRequestAlertException("No user was found for this cluster", ENTITY_NAME, "usernotlogin");
+        }
+        jobSqlDTO.setCreatedBy(loginUser.get());
+        jobSqlDTO.setCreatedDate(Instant.now());
+        jobSqlDTO.setLastModifiedBy(loginUser.get());
+        jobSqlDTO.setLastModifiedDate(Instant.now());
         JobSqlDTO result = jobSqlService.save(jobSqlDTO);
         return ResponseEntity.created(new URI("/api/job-sqls/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+            .headers(
+                HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
 
@@ -67,9 +87,9 @@ public class JobSqlResource {
      * {@code PUT  /job-sqls} : Updates an existing jobSql.
      *
      * @param jobSqlDTO the jobSqlDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated jobSqlDTO,
-     * or with status {@code 400 (Bad Request)} if the jobSqlDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the jobSqlDTO couldn't be updated.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated jobSqlDTO, or with
+     *         status {@code 400 (Bad Request)} if the jobSqlDTO is not valid, or with status
+     *         {@code 500 (Internal Server Error)} if the jobSqlDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/job-sqls")
@@ -78,9 +98,16 @@ public class JobSqlResource {
         if (jobSqlDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
+        Optional<String> loginUser = SecurityUtils.getCurrentUserLogin();
+        if (!loginUser.isPresent()) {
+            throw new BadRequestAlertException("No user was found for this cluster", ENTITY_NAME, "usernotlogin");
+        }
+        jobSqlDTO.setLastModifiedBy(loginUser.get());
+        jobSqlDTO.setLastModifiedDate(Instant.now());
         JobSqlDTO result = jobSqlService.save(jobSqlDTO);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, jobSqlDTO.getId().toString()))
+            .headers(
+                HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, jobSqlDTO.getId().toString()))
             .body(result);
     }
 
@@ -98,11 +125,11 @@ public class JobSqlResource {
     }
 
     /**
-    * {@code GET  /job-sqls/count} : count all the jobSqls.
-    *
-    * @param criteria the criteria which the requested entities should match.
-    * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
-    */
+     * {@code GET  /job-sqls/count} : count all the jobSqls.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
     @GetMapping("/job-sqls/count")
     public ResponseEntity<Long> countJobSqls(JobSqlCriteria criteria) {
         log.debug("REST request to count JobSqls by criteria: {}", criteria);
@@ -113,7 +140,8 @@ public class JobSqlResource {
      * {@code GET  /job-sqls/:id} : get the "id" jobSql.
      *
      * @param id the id of the jobSqlDTO to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the jobSqlDTO, or with status {@code 404 (Not Found)}.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the jobSqlDTO, or with status
+     *         {@code 404 (Not Found)}.
      */
     @GetMapping("/job-sqls/{id}")
     public ResponseEntity<JobSqlDTO> getJobSql(@PathVariable Long id) {
@@ -132,6 +160,7 @@ public class JobSqlResource {
     public ResponseEntity<Void> deleteJobSql(@PathVariable Long id) {
         log.debug("REST request to delete JobSql : {}", id);
         jobSqlService.delete(id);
-        return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
+        return ResponseEntity.noContent()
+            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
     }
 }

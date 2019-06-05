@@ -41,7 +41,8 @@ public class Source implements Serializable {
     @Column(name = "source_type", nullable = false)
     private SourceType sourceType;
 
-    @NotNull
+    
+    @Lob
     @Column(name = "config", nullable = false)
     private String config;
 

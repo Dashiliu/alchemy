@@ -50,8 +50,6 @@ public class ClusterCriteria implements Serializable, Criteria {
 
     private ClusterTypeFilter type;
 
-    private StringFilter config;
-
     private StringFilter remark;
 
     private StringFilter createdBy;
@@ -73,7 +71,6 @@ public class ClusterCriteria implements Serializable, Criteria {
         this.id = other.id == null ? null : other.id.copy();
         this.name = other.name == null ? null : other.name.copy();
         this.type = other.type == null ? null : other.type.copy();
-        this.config = other.config == null ? null : other.config.copy();
         this.remark = other.remark == null ? null : other.remark.copy();
         this.createdBy = other.createdBy == null ? null : other.createdBy.copy();
         this.createdDate = other.createdDate == null ? null : other.createdDate.copy();
@@ -110,14 +107,6 @@ public class ClusterCriteria implements Serializable, Criteria {
 
     public void setType(ClusterTypeFilter type) {
         this.type = type;
-    }
-
-    public StringFilter getConfig() {
-        return config;
-    }
-
-    public void setConfig(StringFilter config) {
-        this.config = config;
     }
 
     public StringFilter getRemark() {
@@ -190,7 +179,6 @@ public class ClusterCriteria implements Serializable, Criteria {
             Objects.equals(id, that.id) &&
             Objects.equals(name, that.name) &&
             Objects.equals(type, that.type) &&
-            Objects.equals(config, that.config) &&
             Objects.equals(remark, that.remark) &&
             Objects.equals(createdBy, that.createdBy) &&
             Objects.equals(createdDate, that.createdDate) &&
@@ -206,7 +194,6 @@ public class ClusterCriteria implements Serializable, Criteria {
         id,
         name,
         type,
-        config,
         remark,
         createdBy,
         createdDate,
@@ -223,7 +210,6 @@ public class ClusterCriteria implements Serializable, Criteria {
                 (id != null ? "id=" + id + ", " : "") +
                 (name != null ? "name=" + name + ", " : "") +
                 (type != null ? "type=" + type + ", " : "") +
-                (config != null ? "config=" + config + ", " : "") +
                 (remark != null ? "remark=" + remark + ", " : "") +
                 (createdBy != null ? "createdBy=" + createdBy + ", " : "") +
                 (createdDate != null ? "createdDate=" + createdDate + ", " : "") +

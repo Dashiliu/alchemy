@@ -3,6 +3,7 @@ import java.time.Instant;
 import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.util.Objects;
+import javax.persistence.Lob;
 import com.dfire.platform.alchemy.domain.enumeration.ClusterType;
 
 /**
@@ -18,7 +19,8 @@ public class ClusterDTO implements Serializable {
     @NotNull
     private ClusterType type;
 
-    @NotNull
+    
+    @Lob
     private String config;
 
     @NotNull
@@ -32,7 +34,7 @@ public class ClusterDTO implements Serializable {
 
     private Instant lastModifiedDate;
 
-
+    @NotNull
     private Long businessId;
 
     public Long getId() {

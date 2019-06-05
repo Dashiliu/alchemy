@@ -22,6 +22,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Base64Utils;
 import org.springframework.validation.Validator;
 
 import javax.persistence.EntityManager;
@@ -258,25 +259,6 @@ public class SourceResourceIT {
 
     @Test
     @Transactional
-    public void checkConfigIsRequired() throws Exception {
-        int databaseSizeBeforeTest = sourceRepository.findAll().size();
-        // set the field null
-        source.setConfig(null);
-
-        // Create the Source, which fails.
-        SourceDTO sourceDTO = sourceMapper.toDto(source);
-
-        restSourceMockMvc.perform(post("/api/sources")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(sourceDTO)))
-            .andExpect(status().isBadRequest());
-
-        List<Source> sourceList = sourceRepository.findAll();
-        assertThat(sourceList).hasSize(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
     public void getAllSources() throws Exception {
         // Initialize the database
         sourceRepository.saveAndFlush(source);
@@ -432,45 +414,6 @@ public class SourceResourceIT {
 
         // Get all the sourceList where sourceType is null
         defaultSourceShouldNotBeFound("sourceType.specified=false");
-    }
-
-    @Test
-    @Transactional
-    public void getAllSourcesByConfigIsEqualToSomething() throws Exception {
-        // Initialize the database
-        sourceRepository.saveAndFlush(source);
-
-        // Get all the sourceList where config equals to DEFAULT_CONFIG
-        defaultSourceShouldBeFound("config.equals=" + DEFAULT_CONFIG);
-
-        // Get all the sourceList where config equals to UPDATED_CONFIG
-        defaultSourceShouldNotBeFound("config.equals=" + UPDATED_CONFIG);
-    }
-
-    @Test
-    @Transactional
-    public void getAllSourcesByConfigIsInShouldWork() throws Exception {
-        // Initialize the database
-        sourceRepository.saveAndFlush(source);
-
-        // Get all the sourceList where config in DEFAULT_CONFIG or UPDATED_CONFIG
-        defaultSourceShouldBeFound("config.in=" + DEFAULT_CONFIG + "," + UPDATED_CONFIG);
-
-        // Get all the sourceList where config equals to UPDATED_CONFIG
-        defaultSourceShouldNotBeFound("config.in=" + UPDATED_CONFIG);
-    }
-
-    @Test
-    @Transactional
-    public void getAllSourcesByConfigIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        sourceRepository.saveAndFlush(source);
-
-        // Get all the sourceList where config is not null
-        defaultSourceShouldBeFound("config.specified=true");
-
-        // Get all the sourceList where config is null
-        defaultSourceShouldNotBeFound("config.specified=false");
     }
 
     @Test
@@ -658,7 +601,7 @@ public class SourceResourceIT {
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].tableType").value(hasItem(DEFAULT_TABLE_TYPE.toString())))
             .andExpect(jsonPath("$.[*].sourceType").value(hasItem(DEFAULT_SOURCE_TYPE.toString())))
-            .andExpect(jsonPath("$.[*].config").value(hasItem(DEFAULT_CONFIG)))
+            .andExpect(jsonPath("$.[*].config").value(hasItem(DEFAULT_CONFIG.toString())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY)))
             .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY)))

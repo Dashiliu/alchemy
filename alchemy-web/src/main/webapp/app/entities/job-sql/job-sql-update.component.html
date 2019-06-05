@@ -10,45 +10,24 @@
                         readonly />
                 </div>
                 <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="alchemyApp.jobSql.job" for="field_job">Job</label>
+                    <select class="form-control" id="field_job" name="job" formControlName="jobId">
+                        <option [ngValue]="null"></option>
+                        <option [ngValue]="jobOption.id" *ngFor="let jobOption of jobs; trackBy: trackJobById">{{jobOption.name}}</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label class="form-control-label" jhiTranslate="alchemyApp.jobSql.sql" for="field_sql">Sql</label>
-                    <input type="text" class="form-control" name="sql" id="field_sql"
-                           formControlName="sql"/>
+                    <div>
+                        <codemirror  formControlName="sql" [config]="sqlConfig"  id="field_sql"></codemirror>
+                    </div>
+
                     <div *ngIf="editForm.get('sql').invalid && (editForm.get('sql').dirty || editForm.get('sql').touched)">
                         <small class="form-text text-danger"
                                *ngIf="editForm.get('sql').errors.required" jhiTranslate="entity.validation.required">
                         This field is required.
                         </small>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-control-label" jhiTranslate="alchemyApp.jobSql.createdBy" for="field_createdBy">Created By</label>
-                    <input type="text" class="form-control" name="createdBy" id="field_createdBy"
-                           formControlName="createdBy"/>
-                </div>
-                <div class="form-group">
-                    <label class="form-control-label" jhiTranslate="alchemyApp.jobSql.createdDate" for="field_createdDate">Created Date</label>
-                    <div class="d-flex">
-                        <input id="field_createdDate" type="datetime-local" class="form-control" name="createdDate" formControlName="createdDate" placeholder="YYYY-MM-DD HH:mm"/>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-control-label" jhiTranslate="alchemyApp.jobSql.lastModifiedBy" for="field_lastModifiedBy">Last Modified By</label>
-                    <input type="text" class="form-control" name="lastModifiedBy" id="field_lastModifiedBy"
-                           formControlName="lastModifiedBy"/>
-                </div>
-                <div class="form-group">
-                    <label class="form-control-label" jhiTranslate="alchemyApp.jobSql.lastModifiedDate" for="field_lastModifiedDate">Last Modified Date</label>
-                    <div class="d-flex">
-                        <input id="field_lastModifiedDate" type="datetime-local" class="form-control" name="lastModifiedDate" formControlName="lastModifiedDate" placeholder="YYYY-MM-DD HH:mm"/>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-control-label" jhiTranslate="alchemyApp.jobSql.job" for="field_job">Job</label>
-                    <select class="form-control" id="field_job" name="job" formControlName="jobId">
-                        <option [ngValue]="null"></option>
-                        <option [ngValue]="jobOption.id" *ngFor="let jobOption of jobs; trackBy: trackJobById">{{jobOption.id}}</option>
-                    </select>
                 </div>
             </div>
             <div>

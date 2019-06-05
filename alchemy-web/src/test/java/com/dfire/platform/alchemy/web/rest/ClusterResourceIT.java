@@ -23,6 +23,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Base64Utils;
 import org.springframework.validation.Validator;
 
 import javax.persistence.EntityManager;
@@ -239,25 +240,6 @@ public class ClusterResourceIT {
 
     @Test
     @Transactional
-    public void checkConfigIsRequired() throws Exception {
-        int databaseSizeBeforeTest = clusterRepository.findAll().size();
-        // set the field null
-        cluster.setConfig(null);
-
-        // Create the Cluster, which fails.
-        ClusterDTO clusterDTO = clusterMapper.toDto(cluster);
-
-        restClusterMockMvc.perform(post("/api/clusters")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(clusterDTO)))
-            .andExpect(status().isBadRequest());
-
-        List<Cluster> clusterList = clusterRepository.findAll();
-        assertThat(clusterList).hasSize(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
     public void checkRemarkIsRequired() throws Exception {
         int databaseSizeBeforeTest = clusterRepository.findAll().size();
         // set the field null
@@ -393,45 +375,6 @@ public class ClusterResourceIT {
 
         // Get all the clusterList where type is null
         defaultClusterShouldNotBeFound("type.specified=false");
-    }
-
-    @Test
-    @Transactional
-    public void getAllClustersByConfigIsEqualToSomething() throws Exception {
-        // Initialize the database
-        clusterRepository.saveAndFlush(cluster);
-
-        // Get all the clusterList where config equals to DEFAULT_CONFIG
-        defaultClusterShouldBeFound("config.equals=" + DEFAULT_CONFIG);
-
-        // Get all the clusterList where config equals to UPDATED_CONFIG
-        defaultClusterShouldNotBeFound("config.equals=" + UPDATED_CONFIG);
-    }
-
-    @Test
-    @Transactional
-    public void getAllClustersByConfigIsInShouldWork() throws Exception {
-        // Initialize the database
-        clusterRepository.saveAndFlush(cluster);
-
-        // Get all the clusterList where config in DEFAULT_CONFIG or UPDATED_CONFIG
-        defaultClusterShouldBeFound("config.in=" + DEFAULT_CONFIG + "," + UPDATED_CONFIG);
-
-        // Get all the clusterList where config equals to UPDATED_CONFIG
-        defaultClusterShouldNotBeFound("config.in=" + UPDATED_CONFIG);
-    }
-
-    @Test
-    @Transactional
-    public void getAllClustersByConfigIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        clusterRepository.saveAndFlush(cluster);
-
-        // Get all the clusterList where config is not null
-        defaultClusterShouldBeFound("config.specified=true");
-
-        // Get all the clusterList where config is null
-        defaultClusterShouldNotBeFound("config.specified=false");
     }
 
     @Test
@@ -676,7 +619,7 @@ public class ClusterResourceIT {
             .andExpect(jsonPath("$.[*].id").value(hasItem(cluster.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())))
-            .andExpect(jsonPath("$.[*].config").value(hasItem(DEFAULT_CONFIG)))
+            .andExpect(jsonPath("$.[*].config").value(hasItem(DEFAULT_CONFIG.toString())))
             .andExpect(jsonPath("$.[*].remark").value(hasItem(DEFAULT_REMARK)))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY)))
             .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))

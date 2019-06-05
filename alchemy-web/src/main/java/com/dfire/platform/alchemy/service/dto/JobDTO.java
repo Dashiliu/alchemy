@@ -3,6 +3,7 @@ import java.time.Instant;
 import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.util.Objects;
+import javax.persistence.Lob;
 import com.dfire.platform.alchemy.domain.enumeration.JobType;
 import com.dfire.platform.alchemy.domain.enumeration.JobStatus;
 
@@ -19,7 +20,8 @@ public class JobDTO implements Serializable {
     @NotNull
     private JobType type;
 
-    @NotNull
+    
+    @Lob
     private String config;
 
     @NotNull
@@ -37,9 +39,10 @@ public class JobDTO implements Serializable {
 
     private Instant lastModifiedDate;
 
-
+    @NotNull
     private Long businessId;
 
+    @NotNull
     private Long clusterId;
 
     public Long getId() {

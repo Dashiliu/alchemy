@@ -1,6 +1,8 @@
 package com.dfire.platform.alchemy.web.rest;
 
+import com.dfire.platform.alchemy.domain.enumeration.JobStatus;
 import com.dfire.platform.alchemy.handle.response.Response;
+import com.dfire.platform.alchemy.security.SecurityUtils;
 import com.dfire.platform.alchemy.service.JobService;
 import com.dfire.platform.alchemy.web.rest.errors.BadRequestAlertException;
 import com.dfire.platform.alchemy.service.dto.JobDTO;
@@ -25,6 +27,7 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,6 +67,15 @@ public class JobResource {
         if (jobDTO.getId() != null) {
             throw new BadRequestAlertException("A new job cannot already have an ID", ENTITY_NAME, "idexists");
         }
+        Optional<String> loginUser = SecurityUtils.getCurrentUserLogin();
+        if(!loginUser.isPresent()){
+            throw new BadRequestAlertException("No user was found for this cluster", ENTITY_NAME, "usernotlogin");
+        }
+        jobDTO.setStatus(JobStatus.CREATE);
+        jobDTO.setCreatedBy(loginUser.get());
+        jobDTO.setCreatedDate(Instant.now());
+        jobDTO.setLastModifiedBy(loginUser.get());
+        jobDTO.setLastModifiedDate(Instant.now());
         JobDTO result = jobService.save(jobDTO);
         return ResponseEntity.created(new URI("/api/jobs/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -85,6 +97,13 @@ public class JobResource {
         if (jobDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
+        Optional<String> loginUser = SecurityUtils.getCurrentUserLogin();
+        if(!loginUser.isPresent()){
+            throw new BadRequestAlertException("No user was found for this cluster", ENTITY_NAME, "usernotlogin");
+        }
+        jobDTO.setStatus(JobStatus.UPDATE);
+        jobDTO.setLastModifiedBy(loginUser.get());
+        jobDTO.setLastModifiedDate(Instant.now());
         JobDTO result = jobService.save(jobDTO);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, jobDTO.getId().toString()))

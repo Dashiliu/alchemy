@@ -16,14 +16,13 @@
             <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="transition.bind(this)">
             <th jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="name"><span jhiTranslate="alchemyApp.source.name">Name</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+            <th jhiSortBy="businessId"><span jhiTranslate="alchemyApp.source.business">Business</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="tableType"><span jhiTranslate="alchemyApp.source.tableType">Table Type</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="sourceType"><span jhiTranslate="alchemyApp.source.sourceType">Source Type</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-            <th jhiSortBy="config"><span jhiTranslate="alchemyApp.source.config">Config</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="createdBy"><span jhiTranslate="alchemyApp.source.createdBy">Created By</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="createdDate"><span jhiTranslate="alchemyApp.source.createdDate">Created Date</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="lastModifiedBy"><span jhiTranslate="alchemyApp.source.lastModifiedBy">Last Modified By</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="lastModifiedDate"><span jhiTranslate="alchemyApp.source.lastModifiedDate">Last Modified Date</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-            <th jhiSortBy="businessId"><span jhiTranslate="alchemyApp.source.business">Business</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th></th>
             </tr>
             </thead>
@@ -31,18 +30,17 @@
             <tr *ngFor="let source of sources ;trackBy: trackId">
                 <td><a [routerLink]="['/source', source.id, 'view' ]">{{source.id}}</a></td>
                 <td>{{source.name}}</td>
-                <td jhiTranslate="{{'alchemyApp.TableType.' + source.tableType}}">{{source.tableType}}</td>
-                <td jhiTranslate="{{'alchemyApp.SourceType.' + source.sourceType}}">{{source.sourceType}}</td>
-                <td>{{source.config}}</td>
-                <td>{{source.createdBy}}</td>
-                <td>{{source.createdDate | date:'medium'}}</td>
-                <td>{{source.lastModifiedBy}}</td>
-                <td>{{source.lastModifiedDate | date:'medium'}}</td>
                 <td>
                     <div *ngIf="source.businessId">
                         <a [routerLink]="['../business', source.businessId , 'view' ]" >{{source.businessId}}</a>
                     </div>
                 </td>
+                <td jhiTranslate="{{'alchemyApp.TableType.' + source.tableType}}">{{source.tableType}}</td>
+                <td jhiTranslate="{{'alchemyApp.SourceType.' + source.sourceType}}">{{source.sourceType}}</td>
+                <td>{{source.createdBy}}</td>
+                <td>{{source.createdDate | date:'medium'}}</td>
+                <td>{{source.lastModifiedBy}}</td>
+                <td>{{source.lastModifiedDate | date:'medium'}}</td>
                 <td class="text-right">
                     <div class="btn-group">
                         <button type="submit"

@@ -8,6 +8,7 @@ export const enum JobType {
 
 export const enum JobStatus {
   CREATE = 'CREATE',
+  UPDATE = 'UPDATE',
   SUBMIT = 'SUBMIT',
   RUNNING = 'RUNNING',
   FAILED = 'FAILED',
@@ -19,7 +20,7 @@ export interface IJob {
   id?: number;
   name?: string;
   type?: JobType;
-  config?: string;
+  config?: any;
   remark?: string;
   clusterJobId?: string;
   status?: JobStatus;
@@ -37,7 +38,7 @@ export class Job implements IJob {
     public id?: number,
     public name?: string,
     public type?: JobType,
-    public config?: string,
+    public config?: any,
     public remark?: string,
     public clusterJobId?: string,
     public status?: JobStatus,

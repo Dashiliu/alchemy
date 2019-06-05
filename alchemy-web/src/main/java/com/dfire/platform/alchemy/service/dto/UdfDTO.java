@@ -3,6 +3,7 @@ import java.time.Instant;
 import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.util.Objects;
+import javax.persistence.Lob;
 import com.dfire.platform.alchemy.domain.enumeration.UdfType;
 
 /**
@@ -12,12 +13,17 @@ public class UdfDTO implements Serializable {
 
     private Long id;
 
+    @NotNull
     private String name;
 
     @NotNull
     private UdfType type;
 
-    private String config;
+    
+    @Lob
+    private String value;
+
+    private String avg;
 
     private String createdBy;
 
@@ -54,12 +60,20 @@ public class UdfDTO implements Serializable {
         this.type = type;
     }
 
-    public String getConfig() {
-        return config;
+    public String getValue() {
+        return value;
     }
 
-    public void setConfig(String config) {
-        this.config = config;
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public String getAvg() {
+        return avg;
+    }
+
+    public void setAvg(String avg) {
+        this.avg = avg;
     }
 
     public String getCreatedBy() {
@@ -129,7 +143,8 @@ public class UdfDTO implements Serializable {
             "id=" + getId() +
             ", name='" + getName() + "'" +
             ", type='" + getType() + "'" +
-            ", config='" + getConfig() + "'" +
+            ", value='" + getValue() + "'" +
+            ", avg='" + getAvg() + "'" +
             ", createdBy='" + getCreatedBy() + "'" +
             ", createdDate='" + getCreatedDate() + "'" +
             ", lastModifiedBy='" + getLastModifiedBy() + "'" +

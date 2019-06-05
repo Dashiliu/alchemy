@@ -15,7 +15,7 @@ export interface ISink {
   id?: number;
   name?: string;
   type?: SinkType;
-  config?: string;
+  config?: any;
   createdBy?: string;
   createdDate?: Moment;
   lastModifiedBy?: string;
@@ -28,7 +28,7 @@ export class Sink implements ISink {
     public id?: number,
     public name?: string,
     public type?: SinkType,
-    public config?: string,
+    public config?: any,
     public createdBy?: string,
     public createdDate?: Moment,
     public lastModifiedBy?: string,

@@ -22,6 +22,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Base64Utils;
 import org.springframework.validation.Validator;
 
 import javax.persistence.EntityManager;
@@ -48,8 +49,11 @@ public class UdfResourceIT {
     private static final UdfType DEFAULT_TYPE = UdfType.AVG;
     private static final UdfType UPDATED_TYPE = UdfType.CODE;
 
-    private static final String DEFAULT_CONFIG = "AAAAAAAAAA";
-    private static final String UPDATED_CONFIG = "BBBBBBBBBB";
+    private static final String DEFAULT_VALUE = "AAAAAAAAAA";
+    private static final String UPDATED_VALUE = "BBBBBBBBBB";
+
+    private static final String DEFAULT_AVG = "AAAAAAAAAA";
+    private static final String UPDATED_AVG = "BBBBBBBBBB";
 
     private static final String DEFAULT_CREATED_BY = "AAAAAAAAAA";
     private static final String UPDATED_CREATED_BY = "BBBBBBBBBB";
@@ -116,7 +120,8 @@ public class UdfResourceIT {
         Udf udf = new Udf()
             .name(DEFAULT_NAME)
             .type(DEFAULT_TYPE)
-            .config(DEFAULT_CONFIG)
+            .value(DEFAULT_VALUE)
+            .avg(DEFAULT_AVG)
             .createdBy(DEFAULT_CREATED_BY)
             .createdDate(DEFAULT_CREATED_DATE)
             .lastModifiedBy(DEFAULT_LAST_MODIFIED_BY)
@@ -133,7 +138,8 @@ public class UdfResourceIT {
         Udf udf = new Udf()
             .name(UPDATED_NAME)
             .type(UPDATED_TYPE)
-            .config(UPDATED_CONFIG)
+            .value(UPDATED_VALUE)
+            .avg(UPDATED_AVG)
             .createdBy(UPDATED_CREATED_BY)
             .createdDate(UPDATED_CREATED_DATE)
             .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
@@ -164,7 +170,8 @@ public class UdfResourceIT {
         Udf testUdf = udfList.get(udfList.size() - 1);
         assertThat(testUdf.getName()).isEqualTo(DEFAULT_NAME);
         assertThat(testUdf.getType()).isEqualTo(DEFAULT_TYPE);
-        assertThat(testUdf.getConfig()).isEqualTo(DEFAULT_CONFIG);
+        assertThat(testUdf.getValue()).isEqualTo(DEFAULT_VALUE);
+        assertThat(testUdf.getAvg()).isEqualTo(DEFAULT_AVG);
         assertThat(testUdf.getCreatedBy()).isEqualTo(DEFAULT_CREATED_BY);
         assertThat(testUdf.getCreatedDate()).isEqualTo(DEFAULT_CREATED_DATE);
         assertThat(testUdf.getLastModifiedBy()).isEqualTo(DEFAULT_LAST_MODIFIED_BY);
@@ -191,6 +198,25 @@ public class UdfResourceIT {
         assertThat(udfList).hasSize(databaseSizeBeforeCreate);
     }
 
+
+    @Test
+    @Transactional
+    public void checkNameIsRequired() throws Exception {
+        int databaseSizeBeforeTest = udfRepository.findAll().size();
+        // set the field null
+        udf.setName(null);
+
+        // Create the Udf, which fails.
+        UdfDTO udfDTO = udfMapper.toDto(udf);
+
+        restUdfMockMvc.perform(post("/api/udfs")
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .content(TestUtil.convertObjectToJsonBytes(udfDTO)))
+            .andExpect(status().isBadRequest());
+
+        List<Udf> udfList = udfRepository.findAll();
+        assertThat(udfList).hasSize(databaseSizeBeforeTest);
+    }
 
     @Test
     @Transactional
@@ -224,7 +250,8 @@ public class UdfResourceIT {
             .andExpect(jsonPath("$.[*].id").value(hasItem(udf.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
             .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())))
-            .andExpect(jsonPath("$.[*].config").value(hasItem(DEFAULT_CONFIG.toString())))
+            .andExpect(jsonPath("$.[*].value").value(hasItem(DEFAULT_VALUE.toString())))
+            .andExpect(jsonPath("$.[*].avg").value(hasItem(DEFAULT_AVG.toString())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.toString())))
             .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY.toString())))
@@ -244,7 +271,8 @@ public class UdfResourceIT {
             .andExpect(jsonPath("$.id").value(udf.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
             .andExpect(jsonPath("$.type").value(DEFAULT_TYPE.toString()))
-            .andExpect(jsonPath("$.config").value(DEFAULT_CONFIG.toString()))
+            .andExpect(jsonPath("$.value").value(DEFAULT_VALUE.toString()))
+            .andExpect(jsonPath("$.avg").value(DEFAULT_AVG.toString()))
             .andExpect(jsonPath("$.createdBy").value(DEFAULT_CREATED_BY.toString()))
             .andExpect(jsonPath("$.createdDate").value(DEFAULT_CREATED_DATE.toString()))
             .andExpect(jsonPath("$.lastModifiedBy").value(DEFAULT_LAST_MODIFIED_BY.toString()))
@@ -331,41 +359,41 @@ public class UdfResourceIT {
 
     @Test
     @Transactional
-    public void getAllUdfsByConfigIsEqualToSomething() throws Exception {
+    public void getAllUdfsByAvgIsEqualToSomething() throws Exception {
         // Initialize the database
         udfRepository.saveAndFlush(udf);
 
-        // Get all the udfList where config equals to DEFAULT_CONFIG
-        defaultUdfShouldBeFound("config.equals=" + DEFAULT_CONFIG);
+        // Get all the udfList where avg equals to DEFAULT_AVG
+        defaultUdfShouldBeFound("avg.equals=" + DEFAULT_AVG);
 
-        // Get all the udfList where config equals to UPDATED_CONFIG
-        defaultUdfShouldNotBeFound("config.equals=" + UPDATED_CONFIG);
+        // Get all the udfList where avg equals to UPDATED_AVG
+        defaultUdfShouldNotBeFound("avg.equals=" + UPDATED_AVG);
     }
 
     @Test
     @Transactional
-    public void getAllUdfsByConfigIsInShouldWork() throws Exception {
+    public void getAllUdfsByAvgIsInShouldWork() throws Exception {
         // Initialize the database
         udfRepository.saveAndFlush(udf);
 
-        // Get all the udfList where config in DEFAULT_CONFIG or UPDATED_CONFIG
-        defaultUdfShouldBeFound("config.in=" + DEFAULT_CONFIG + "," + UPDATED_CONFIG);
+        // Get all the udfList where avg in DEFAULT_AVG or UPDATED_AVG
+        defaultUdfShouldBeFound("avg.in=" + DEFAULT_AVG + "," + UPDATED_AVG);
 
-        // Get all the udfList where config equals to UPDATED_CONFIG
-        defaultUdfShouldNotBeFound("config.in=" + UPDATED_CONFIG);
+        // Get all the udfList where avg equals to UPDATED_AVG
+        defaultUdfShouldNotBeFound("avg.in=" + UPDATED_AVG);
     }
 
     @Test
     @Transactional
-    public void getAllUdfsByConfigIsNullOrNotNull() throws Exception {
+    public void getAllUdfsByAvgIsNullOrNotNull() throws Exception {
         // Initialize the database
         udfRepository.saveAndFlush(udf);
 
-        // Get all the udfList where config is not null
-        defaultUdfShouldBeFound("config.specified=true");
+        // Get all the udfList where avg is not null
+        defaultUdfShouldBeFound("avg.specified=true");
 
-        // Get all the udfList where config is null
-        defaultUdfShouldNotBeFound("config.specified=false");
+        // Get all the udfList where avg is null
+        defaultUdfShouldNotBeFound("avg.specified=false");
     }
 
     @Test
@@ -552,7 +580,8 @@ public class UdfResourceIT {
             .andExpect(jsonPath("$.[*].id").value(hasItem(udf.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())))
-            .andExpect(jsonPath("$.[*].config").value(hasItem(DEFAULT_CONFIG)))
+            .andExpect(jsonPath("$.[*].value").value(hasItem(DEFAULT_VALUE.toString())))
+            .andExpect(jsonPath("$.[*].avg").value(hasItem(DEFAULT_AVG)))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY)))
             .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY)))
@@ -606,7 +635,8 @@ public class UdfResourceIT {
         updatedUdf
             .name(UPDATED_NAME)
             .type(UPDATED_TYPE)
-            .config(UPDATED_CONFIG)
+            .value(UPDATED_VALUE)
+            .avg(UPDATED_AVG)
             .createdBy(UPDATED_CREATED_BY)
             .createdDate(UPDATED_CREATED_DATE)
             .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
@@ -624,7 +654,8 @@ public class UdfResourceIT {
         Udf testUdf = udfList.get(udfList.size() - 1);
         assertThat(testUdf.getName()).isEqualTo(UPDATED_NAME);
         assertThat(testUdf.getType()).isEqualTo(UPDATED_TYPE);
-        assertThat(testUdf.getConfig()).isEqualTo(UPDATED_CONFIG);
+        assertThat(testUdf.getValue()).isEqualTo(UPDATED_VALUE);
+        assertThat(testUdf.getAvg()).isEqualTo(UPDATED_AVG);
         assertThat(testUdf.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
         assertThat(testUdf.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
         assertThat(testUdf.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY);

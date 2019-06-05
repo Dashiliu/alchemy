@@ -3,6 +3,7 @@
     "JobStatus": {
       "null": "",
       "CREATE": "CREATE",
+      "UPDATE": "UPDATE",
       "SUBMIT": "SUBMIT",
       "RUNNING": "RUNNING",
       "FAILED": "FAILED",

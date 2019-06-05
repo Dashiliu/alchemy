@@ -95,9 +95,6 @@ public class SinkQueryService extends QueryService<Sink> {
             if (criteria.getType() != null) {
                 specification = specification.and(buildSpecification(criteria.getType(), Sink_.type));
             }
-            if (criteria.getConfig() != null) {
-                specification = specification.and(buildStringSpecification(criteria.getConfig(), Sink_.config));
-            }
             if (criteria.getCreatedBy() != null) {
                 specification = specification.and(buildStringSpecification(criteria.getCreatedBy(), Sink_.createdBy));
             }

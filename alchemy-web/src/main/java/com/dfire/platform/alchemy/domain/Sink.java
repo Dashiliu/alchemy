@@ -33,6 +33,7 @@ public class Sink implements Serializable {
     @Column(name = "jhi_type", nullable = false)
     private SinkType type;
 
+    @Lob
     @Column(name = "config")
     private String config;
 

@@ -2,6 +2,7 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { JhiLanguageService } from 'ng-jhipster';
 import { JhiLanguageHelper } from 'app/core';
+import { CodemirrorModule } from 'ng2-codemirror';
 
 import { AlchemySharedModule } from 'app/shared';
 import {
@@ -17,7 +18,7 @@ import {
 const ENTITY_STATES = [...jobSqlRoute, ...jobSqlPopupRoute];
 
 @NgModule({
-  imports: [AlchemySharedModule, RouterModule.forChild(ENTITY_STATES)],
+  imports: [AlchemySharedModule,CodemirrorModule, RouterModule.forChild(ENTITY_STATES)],
   declarations: [JobSqlComponent, JobSqlDetailComponent, JobSqlUpdateComponent, JobSqlDeleteDialogComponent, JobSqlDeletePopupComponent],
   entryComponents: [JobSqlComponent, JobSqlUpdateComponent, JobSqlDeleteDialogComponent, JobSqlDeletePopupComponent],
   providers: [{ provide: JhiLanguageService, useClass: JhiLanguageService }],

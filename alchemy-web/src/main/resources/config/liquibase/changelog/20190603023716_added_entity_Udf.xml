@@ -17,14 +17,18 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="name" type="varchar(255)">
-                <constraints nullable="true" />
+                <constraints nullable="false" />
             </column>
 
             <column name="jhi_type" type="varchar(255)">
                 <constraints nullable="false" />
             </column>
 
-            <column name="config" type="varchar(255)">
+            <column name="jhi_value" type="clob">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="avg" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
 
@@ -72,7 +76,8 @@
             <column name="id" type="numeric"/>
             <column name="name" type="string"/>
             <column name="jhi_type" type="string"/>
-            <column name="config" type="string"/>
+            <column name="jhi_value" type="string"/>
+            <column name="avg" type="string"/>
             <column name="created_by" type="string"/>
             <column name="created_date" type="date"/>
             <column name="last_modified_by" type="string"/>

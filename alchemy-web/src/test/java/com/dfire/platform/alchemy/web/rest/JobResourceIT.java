@@ -24,6 +24,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Base64Utils;
 import org.springframework.validation.Validator;
 
 import javax.persistence.EntityManager;
@@ -253,25 +254,6 @@ public class JobResourceIT {
 
     @Test
     @Transactional
-    public void checkConfigIsRequired() throws Exception {
-        int databaseSizeBeforeTest = jobRepository.findAll().size();
-        // set the field null
-        job.setConfig(null);
-
-        // Create the Job, which fails.
-        JobDTO jobDTO = jobMapper.toDto(job);
-
-        restJobMockMvc.perform(post("/api/jobs")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(jobDTO)))
-            .andExpect(status().isBadRequest());
-
-        List<Job> jobList = jobRepository.findAll();
-        assertThat(jobList).hasSize(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
     public void checkRemarkIsRequired() throws Exception {
         int databaseSizeBeforeTest = jobRepository.findAll().size();
         // set the field null
@@ -411,45 +393,6 @@ public class JobResourceIT {
 
         // Get all the jobList where type is null
         defaultJobShouldNotBeFound("type.specified=false");
-    }
-
-    @Test
-    @Transactional
-    public void getAllJobsByConfigIsEqualToSomething() throws Exception {
-        // Initialize the database
-        jobRepository.saveAndFlush(job);
-
-        // Get all the jobList where config equals to DEFAULT_CONFIG
-        defaultJobShouldBeFound("config.equals=" + DEFAULT_CONFIG);
-
-        // Get all the jobList where config equals to UPDATED_CONFIG
-        defaultJobShouldNotBeFound("config.equals=" + UPDATED_CONFIG);
-    }
-
-    @Test
-    @Transactional
-    public void getAllJobsByConfigIsInShouldWork() throws Exception {
-        // Initialize the database
-        jobRepository.saveAndFlush(job);
-
-        // Get all the jobList where config in DEFAULT_CONFIG or UPDATED_CONFIG
-        defaultJobShouldBeFound("config.in=" + DEFAULT_CONFIG + "," + UPDATED_CONFIG);
-
-        // Get all the jobList where config equals to UPDATED_CONFIG
-        defaultJobShouldNotBeFound("config.in=" + UPDATED_CONFIG);
-    }
-
-    @Test
-    @Transactional
-    public void getAllJobsByConfigIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        jobRepository.saveAndFlush(job);
-
-        // Get all the jobList where config is not null
-        defaultJobShouldBeFound("config.specified=true");
-
-        // Get all the jobList where config is null
-        defaultJobShouldNotBeFound("config.specified=false");
     }
 
     @Test
@@ -791,7 +734,7 @@ public class JobResourceIT {
             .andExpect(jsonPath("$.[*].id").value(hasItem(job.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())))
-            .andExpect(jsonPath("$.[*].config").value(hasItem(DEFAULT_CONFIG)))
+            .andExpect(jsonPath("$.[*].config").value(hasItem(DEFAULT_CONFIG.toString())))
             .andExpect(jsonPath("$.[*].remark").value(hasItem(DEFAULT_REMARK)))
             .andExpect(jsonPath("$.[*].clusterJobId").value(hasItem(DEFAULT_CLUSTER_JOB_ID)))
             .andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS.toString())))

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { JhiDataUtils } from 'ng-jhipster';
 
 import { IJobSql } from 'app/shared/model/job-sql.model';
 
@@ -10,7 +11,7 @@ import { IJobSql } from 'app/shared/model/job-sql.model';
 export class JobSqlDetailComponent implements OnInit {
   jobSql: IJobSql;
 
-  constructor(protected activatedRoute: ActivatedRoute) {}
+  constructor(protected dataUtils: JhiDataUtils, protected activatedRoute: ActivatedRoute) {}
 
   ngOnInit() {
     this.activatedRoute.data.subscribe(({ jobSql }) => {
@@ -18,6 +19,13 @@ export class JobSqlDetailComponent implements OnInit {
     });
   }
 
+  byteSize(field) {
+    return this.dataUtils.byteSize(field);
+  }
+
+  openFile(contentType, field) {
+    return this.dataUtils.openFile(contentType, field);
+  }
   previousState() {
     window.history.back();
   }

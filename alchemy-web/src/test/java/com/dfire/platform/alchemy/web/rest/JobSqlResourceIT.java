@@ -22,6 +22,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Base64Utils;
 import org.springframework.validation.Validator;
 
 import javax.persistence.EntityManager;
@@ -181,25 +182,6 @@ public class JobSqlResourceIT {
 
     @Test
     @Transactional
-    public void checkSqlIsRequired() throws Exception {
-        int databaseSizeBeforeTest = jobSqlRepository.findAll().size();
-        // set the field null
-        jobSql.setSql(null);
-
-        // Create the JobSql, which fails.
-        JobSqlDTO jobSqlDTO = jobSqlMapper.toDto(jobSql);
-
-        restJobSqlMockMvc.perform(post("/api/job-sqls")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(jobSqlDTO)))
-            .andExpect(status().isBadRequest());
-
-        List<JobSql> jobSqlList = jobSqlRepository.findAll();
-        assertThat(jobSqlList).hasSize(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
     public void getAllJobSqls() throws Exception {
         // Initialize the database
         jobSqlRepository.saveAndFlush(jobSql);
@@ -232,45 +214,6 @@ public class JobSqlResourceIT {
             .andExpect(jsonPath("$.createdDate").value(DEFAULT_CREATED_DATE.toString()))
             .andExpect(jsonPath("$.lastModifiedBy").value(DEFAULT_LAST_MODIFIED_BY.toString()))
             .andExpect(jsonPath("$.lastModifiedDate").value(DEFAULT_LAST_MODIFIED_DATE.toString()));
-    }
-
-    @Test
-    @Transactional
-    public void getAllJobSqlsBySqlIsEqualToSomething() throws Exception {
-        // Initialize the database
-        jobSqlRepository.saveAndFlush(jobSql);
-
-        // Get all the jobSqlList where sql equals to DEFAULT_SQL
-        defaultJobSqlShouldBeFound("sql.equals=" + DEFAULT_SQL);
-
-        // Get all the jobSqlList where sql equals to UPDATED_SQL
-        defaultJobSqlShouldNotBeFound("sql.equals=" + UPDATED_SQL);
-    }
-
-    @Test
-    @Transactional
-    public void getAllJobSqlsBySqlIsInShouldWork() throws Exception {
-        // Initialize the database
-        jobSqlRepository.saveAndFlush(jobSql);
-
-        // Get all the jobSqlList where sql in DEFAULT_SQL or UPDATED_SQL
-        defaultJobSqlShouldBeFound("sql.in=" + DEFAULT_SQL + "," + UPDATED_SQL);
-
-        // Get all the jobSqlList where sql equals to UPDATED_SQL
-        defaultJobSqlShouldNotBeFound("sql.in=" + UPDATED_SQL);
-    }
-
-    @Test
-    @Transactional
-    public void getAllJobSqlsBySqlIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        jobSqlRepository.saveAndFlush(jobSql);
-
-        // Get all the jobSqlList where sql is not null
-        defaultJobSqlShouldBeFound("sql.specified=true");
-
-        // Get all the jobSqlList where sql is null
-        defaultJobSqlShouldNotBeFound("sql.specified=false");
     }
 
     @Test
@@ -455,7 +398,7 @@ public class JobSqlResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(jobSql.getId().intValue())))
-            .andExpect(jsonPath("$.[*].sql").value(hasItem(DEFAULT_SQL)))
+            .andExpect(jsonPath("$.[*].sql").value(hasItem(DEFAULT_SQL.toString())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY)))
             .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY)))

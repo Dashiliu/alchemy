@@ -89,9 +89,6 @@ public class JobSqlQueryService extends QueryService<JobSql> {
             if (criteria.getId() != null) {
                 specification = specification.and(buildSpecification(criteria.getId(), JobSql_.id));
             }
-            if (criteria.getSql() != null) {
-                specification = specification.and(buildStringSpecification(criteria.getSql(), JobSql_.sql));
-            }
             if (criteria.getCreatedBy() != null) {
                 specification = specification.and(buildStringSpecification(criteria.getCreatedBy(), JobSql_.createdBy));
             }

@@ -27,8 +27,6 @@ public class JobSqlCriteria implements Serializable, Criteria {
 
     private LongFilter id;
 
-    private StringFilter sql;
-
     private StringFilter createdBy;
 
     private InstantFilter createdDate;
@@ -44,7 +42,6 @@ public class JobSqlCriteria implements Serializable, Criteria {
 
     public JobSqlCriteria(JobSqlCriteria other){
         this.id = other.id == null ? null : other.id.copy();
-        this.sql = other.sql == null ? null : other.sql.copy();
         this.createdBy = other.createdBy == null ? null : other.createdBy.copy();
         this.createdDate = other.createdDate == null ? null : other.createdDate.copy();
         this.lastModifiedBy = other.lastModifiedBy == null ? null : other.lastModifiedBy.copy();
@@ -63,14 +60,6 @@ public class JobSqlCriteria implements Serializable, Criteria {
 
     public void setId(LongFilter id) {
         this.id = id;
-    }
-
-    public StringFilter getSql() {
-        return sql;
-    }
-
-    public void setSql(StringFilter sql) {
-        this.sql = sql;
     }
 
     public StringFilter getCreatedBy() {
@@ -125,7 +114,6 @@ public class JobSqlCriteria implements Serializable, Criteria {
         final JobSqlCriteria that = (JobSqlCriteria) o;
         return
             Objects.equals(id, that.id) &&
-            Objects.equals(sql, that.sql) &&
             Objects.equals(createdBy, that.createdBy) &&
             Objects.equals(createdDate, that.createdDate) &&
             Objects.equals(lastModifiedBy, that.lastModifiedBy) &&
@@ -137,7 +125,6 @@ public class JobSqlCriteria implements Serializable, Criteria {
     public int hashCode() {
         return Objects.hash(
         id,
-        sql,
         createdBy,
         createdDate,
         lastModifiedBy,
@@ -150,7 +137,6 @@ public class JobSqlCriteria implements Serializable, Criteria {
     public String toString() {
         return "JobSqlCriteria{" +
                 (id != null ? "id=" + id + ", " : "") +
-                (sql != null ? "sql=" + sql + ", " : "") +
                 (createdBy != null ? "createdBy=" + createdBy + ", " : "") +
                 (createdDate != null ? "createdDate=" + createdDate + ", " : "") +
                 (lastModifiedBy != null ? "lastModifiedBy=" + lastModifiedBy + ", " : "") +

@@ -3,6 +3,7 @@ import java.time.Instant;
 import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.util.Objects;
+import javax.persistence.Lob;
 import com.dfire.platform.alchemy.domain.enumeration.TableType;
 import com.dfire.platform.alchemy.domain.enumeration.SourceType;
 
@@ -22,7 +23,8 @@ public class SourceDTO implements Serializable {
     @NotNull
     private SourceType sourceType;
 
-    @NotNull
+    
+    @Lob
     private String config;
 
     private String createdBy;
@@ -33,7 +35,7 @@ public class SourceDTO implements Serializable {
 
     private Instant lastModifiedDate;
 
-
+    @NotNull
     private Long businessId;
 
     public Long getId() {

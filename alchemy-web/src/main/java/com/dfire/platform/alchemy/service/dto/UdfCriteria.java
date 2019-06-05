@@ -50,7 +50,7 @@ public class UdfCriteria implements Serializable, Criteria {
 
     private UdfTypeFilter type;
 
-    private StringFilter config;
+    private StringFilter avg;
 
     private StringFilter createdBy;
 
@@ -69,7 +69,7 @@ public class UdfCriteria implements Serializable, Criteria {
         this.id = other.id == null ? null : other.id.copy();
         this.name = other.name == null ? null : other.name.copy();
         this.type = other.type == null ? null : other.type.copy();
-        this.config = other.config == null ? null : other.config.copy();
+        this.avg = other.avg == null ? null : other.avg.copy();
         this.createdBy = other.createdBy == null ? null : other.createdBy.copy();
         this.createdDate = other.createdDate == null ? null : other.createdDate.copy();
         this.lastModifiedBy = other.lastModifiedBy == null ? null : other.lastModifiedBy.copy();
@@ -106,12 +106,12 @@ public class UdfCriteria implements Serializable, Criteria {
         this.type = type;
     }
 
-    public StringFilter getConfig() {
-        return config;
+    public StringFilter getAvg() {
+        return avg;
     }
 
-    public void setConfig(StringFilter config) {
-        this.config = config;
+    public void setAvg(StringFilter avg) {
+        this.avg = avg;
     }
 
     public StringFilter getCreatedBy() {
@@ -168,7 +168,7 @@ public class UdfCriteria implements Serializable, Criteria {
             Objects.equals(id, that.id) &&
             Objects.equals(name, that.name) &&
             Objects.equals(type, that.type) &&
-            Objects.equals(config, that.config) &&
+            Objects.equals(avg, that.avg) &&
             Objects.equals(createdBy, that.createdBy) &&
             Objects.equals(createdDate, that.createdDate) &&
             Objects.equals(lastModifiedBy, that.lastModifiedBy) &&
@@ -182,7 +182,7 @@ public class UdfCriteria implements Serializable, Criteria {
         id,
         name,
         type,
-        config,
+        avg,
         createdBy,
         createdDate,
         lastModifiedBy,
@@ -197,7 +197,7 @@ public class UdfCriteria implements Serializable, Criteria {
                 (id != null ? "id=" + id + ", " : "") +
                 (name != null ? "name=" + name + ", " : "") +
                 (type != null ? "type=" + type + ", " : "") +
-                (config != null ? "config=" + config + ", " : "") +
+                (avg != null ? "avg=" + avg + ", " : "") +
                 (createdBy != null ? "createdBy=" + createdBy + ", " : "") +
                 (createdDate != null ? "createdDate=" + createdDate + ", " : "") +
                 (lastModifiedBy != null ? "lastModifiedBy=" + lastModifiedBy + ", " : "") +

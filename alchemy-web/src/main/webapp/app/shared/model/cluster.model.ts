@@ -10,7 +10,7 @@ export interface ICluster {
   id?: number;
   name?: string;
   type?: ClusterType;
-  config?: string;
+  config?: any;
   remark?: string;
   createdBy?: string;
   createdDate?: Moment;
@@ -25,7 +25,7 @@ export class Cluster implements ICluster {
     public id?: number,
     public name?: string,
     public type?: ClusterType,
-    public config?: string,
+    public config?: any,
     public remark?: string,
     public createdBy?: string,
     public createdDate?: Moment,

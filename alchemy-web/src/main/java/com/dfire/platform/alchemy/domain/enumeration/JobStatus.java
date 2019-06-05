@@ -4,5 +4,5 @@ package com.dfire.platform.alchemy.domain.enumeration;
  * The JobStatus enumeration.
  */
 public enum JobStatus {
-    CREATE, SUBMIT, RUNNING, FAILED, CANCELED, FINISHED
+    CREATE, UPDATE,  SUBMIT, RUNNING, FAILED, CANCELED, FINISHED
 }

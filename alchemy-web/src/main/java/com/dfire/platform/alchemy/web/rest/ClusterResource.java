@@ -70,6 +70,10 @@ public class ClusterResource {
         if(!loginUser.isPresent()){
             throw new BadRequestAlertException("No user was found for this cluster", ENTITY_NAME, "usernotlogin");
         }
+        clusterDTO.setCreatedBy(loginUser.get());
+        clusterDTO.setLastModifiedBy(loginUser.get());
+        clusterDTO.setCreatedDate(Instant.now());
+        clusterDTO.setLastModifiedDate(Instant.now());
         ClusterDTO result = clusterService.save(clusterDTO);
         return ResponseEntity.created(new URI("/api/clusters/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -95,6 +99,8 @@ public class ClusterResource {
         if(!loginUser.isPresent()){
             throw new BadRequestAlertException("No user was found for this cluster", ENTITY_NAME, "usernotlogin");
         }
+        clusterDTO.setCreatedDate(Instant.now());
+        clusterDTO.setLastModifiedDate(Instant.now());
         ClusterDTO result = clusterService.save(clusterDTO);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, clusterDTO.getId().toString()))

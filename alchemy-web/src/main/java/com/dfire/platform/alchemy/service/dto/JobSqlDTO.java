@@ -3,6 +3,7 @@ import java.time.Instant;
 import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.util.Objects;
+import javax.persistence.Lob;
 
 /**
  * A DTO for the {@link com.dfire.platform.alchemy.domain.JobSql} entity.
@@ -11,7 +12,8 @@ public class JobSqlDTO implements Serializable {
 
     private Long id;
 
-    @NotNull
+    
+    @Lob
     private String sql;
 
     private String createdBy;

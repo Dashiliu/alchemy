@@ -32,6 +32,10 @@ import { RouterModule } from '@angular/router';
         path: 'sink',
         loadChildren: './sink/sink.module#AlchemySinkModule'
       },
+      {
+        path: 'udf',
+        loadChildren: './udf/udf.module#AlchemyUdfModule'
+      }
       /* jhipster-needle-add-entity-route - JHipster will add entity modules routes here */
     ])
   ],

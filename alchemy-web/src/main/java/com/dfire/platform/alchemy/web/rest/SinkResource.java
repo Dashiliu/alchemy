@@ -1,5 +1,6 @@
 package com.dfire.platform.alchemy.web.rest;
 
+import com.dfire.platform.alchemy.security.SecurityUtils;
 import com.dfire.platform.alchemy.service.SinkService;
 import com.dfire.platform.alchemy.web.rest.errors.BadRequestAlertException;
 import com.dfire.platform.alchemy.service.dto.SinkDTO;
@@ -25,6 +26,7 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,6 +66,14 @@ public class SinkResource {
         if (sinkDTO.getId() != null) {
             throw new BadRequestAlertException("A new sink cannot already have an ID", ENTITY_NAME, "idexists");
         }
+        Optional<String> loginUser = SecurityUtils.getCurrentUserLogin();
+        if(!loginUser.isPresent()){
+            throw new BadRequestAlertException("No user was found for this cluster", ENTITY_NAME, "usernotlogin");
+        }
+        sinkDTO.setCreatedBy(loginUser.get());
+        sinkDTO.setCreatedDate(Instant.now());
+        sinkDTO.setLastModifiedBy(loginUser.get());
+        sinkDTO.setLastModifiedDate(Instant.now());
         SinkDTO result = sinkService.save(sinkDTO);
         return ResponseEntity.created(new URI("/api/sinks/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -85,6 +95,12 @@ public class SinkResource {
         if (sinkDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
+        Optional<String> loginUser = SecurityUtils.getCurrentUserLogin();
+        if(!loginUser.isPresent()){
+            throw new BadRequestAlertException("No user was found for this cluster", ENTITY_NAME, "usernotlogin");
+        }
+        sinkDTO.setLastModifiedBy(loginUser.get());
+        sinkDTO.setLastModifiedDate(Instant.now());
         SinkDTO result = sinkService.save(sinkDTO);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, sinkDTO.getId().toString()))

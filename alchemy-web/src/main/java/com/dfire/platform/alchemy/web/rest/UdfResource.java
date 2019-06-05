@@ -1,5 +1,6 @@
 package com.dfire.platform.alchemy.web.rest;
 
+import com.dfire.platform.alchemy.security.SecurityUtils;
 import com.dfire.platform.alchemy.service.UdfService;
 import com.dfire.platform.alchemy.web.rest.errors.BadRequestAlertException;
 import com.dfire.platform.alchemy.service.dto.UdfDTO;
@@ -25,6 +26,7 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,6 +66,14 @@ public class UdfResource {
         if (udfDTO.getId() != null) {
             throw new BadRequestAlertException("A new udf cannot already have an ID", ENTITY_NAME, "idexists");
         }
+        Optional<String> loginUser = SecurityUtils.getCurrentUserLogin();
+        if(!loginUser.isPresent()){
+            throw new BadRequestAlertException("No user was found for this cluster", ENTITY_NAME, "usernotlogin");
+        }
+        udfDTO.setCreatedBy(loginUser.get());
+        udfDTO.setCreatedDate(Instant.now());
+        udfDTO.setLastModifiedBy(loginUser.get());
+        udfDTO.setLastModifiedDate(Instant.now());
         UdfDTO result = udfService.save(udfDTO);
         return ResponseEntity.created(new URI("/api/udfs/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -85,6 +95,12 @@ public class UdfResource {
         if (udfDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
+        Optional<String> loginUser = SecurityUtils.getCurrentUserLogin();
+        if(!loginUser.isPresent()){
+            throw new BadRequestAlertException("No user was found for this cluster", ENTITY_NAME, "usernotlogin");
+        }
+        udfDTO.setLastModifiedBy(loginUser.get());
+        udfDTO.setLastModifiedDate(Instant.now());
         UdfDTO result = udfService.save(udfDTO);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, udfDTO.getId().toString()))
@@ -107,11 +123,11 @@ public class UdfResource {
     }
 
     /**
-    * {@code GET  /udfs/count} : count all the udfs.
-    *
-    * @param criteria the criteria which the requested entities should match.
-    * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
-    */
+     * {@code GET  /udfs/count} : count all the udfs.
+     *
+     * @param criteria the criteria which the requested entities should match.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
+     */
     @GetMapping("/udfs/count")
     public ResponseEntity<Long> countUdfs(UdfCriteria criteria) {
         log.debug("REST request to count Udfs by criteria: {}", criteria);

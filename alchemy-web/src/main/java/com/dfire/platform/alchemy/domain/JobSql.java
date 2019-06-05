@@ -23,7 +23,8 @@ public class JobSql implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
+    
+    @Lob
     @Column(name = "jhi_sql", nullable = false)
     private String sql;
 

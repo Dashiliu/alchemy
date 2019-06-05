@@ -6,12 +6,12 @@ import { Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import * as moment from 'moment';
 import { DATE_TIME_FORMAT } from 'app/shared/constants/input.constants';
-import { JhiAlertService } from 'ng-jhipster';
+import { JhiAlertService, JhiDataUtils } from 'ng-jhipster';
 import { ISink, Sink } from 'app/shared/model/sink.model';
 import { SinkService } from './sink.service';
 import { IBusiness } from 'app/shared/model/business.model';
 import { BusinessService } from 'app/entities/business';
-
+import 'codemirror/mode/yaml/yaml';
 @Component({
   selector: 'jhi-sink-update',
   templateUrl: './sink-update.component.html'
@@ -19,7 +19,7 @@ import { BusinessService } from 'app/entities/business';
 export class SinkUpdateComponent implements OnInit {
   sink: ISink;
   isSaving: boolean;
-
+  yamlConfig: any = { lineNumbers: true, mode: 'text/x-yaml', theme: 'material' };
   businesses: IBusiness[];
 
   editForm = this.fb.group({
@@ -35,6 +35,7 @@ export class SinkUpdateComponent implements OnInit {
   });
 
   constructor(
+    protected dataUtils: JhiDataUtils,
     protected jhiAlertService: JhiAlertService,
     protected sinkService: SinkService,
     protected businessService: BusinessService,
@@ -69,6 +70,38 @@ export class SinkUpdateComponent implements OnInit {
       lastModifiedDate: sink.lastModifiedDate != null ? sink.lastModifiedDate.format(DATE_TIME_FORMAT) : null,
       businessId: sink.businessId
     });
+  }
+
+  byteSize(field) {
+    return this.dataUtils.byteSize(field);
+  }
+
+  openFile(contentType, field) {
+    return this.dataUtils.openFile(contentType, field);
+  }
+
+  setFileData(event, field: string, isImage) {
+    return new Promise((resolve, reject) => {
+      if (event && event.target && event.target.files && event.target.files[0]) {
+        const file = event.target.files[0];
+        if (isImage && !/^image\//.test(file.type)) {
+          reject(`File was expected to be an image but was found to be ${file.type}`);
+        } else {
+          const filedContentType: string = field + 'ContentType';
+          this.dataUtils.toBase64(file, base64Data => {
+            this.editForm.patchValue({
+              [field]: base64Data,
+              [filedContentType]: file.type
+            });
+          });
+        }
+      } else {
+        reject(`Base64 data was not set as file could not be extracted from passed parameter: ${event}`);
+      }
+    }).then(
+      () => console.log('blob added'), // sucess
+      this.onError
+    );
   }
 
   previousState() {

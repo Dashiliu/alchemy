@@ -18,7 +18,6 @@
             <th jhiSortBy="name"><span jhiTranslate="alchemyApp.cluster.name">Name</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="businessId"><span jhiTranslate="alchemyApp.cluster.business">Business</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="type"><span jhiTranslate="alchemyApp.cluster.type">Type</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-            <th jhiSortBy="config"><span jhiTranslate="alchemyApp.cluster.config">Config</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="remark"><span jhiTranslate="alchemyApp.cluster.remark">Remark</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="createdBy"><span jhiTranslate="alchemyApp.cluster.createdBy">Created By</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="createdDate"><span jhiTranslate="alchemyApp.cluster.createdDate">Created Date</span> <fa-icon [icon]="'sort'"></fa-icon></th>
@@ -37,7 +36,6 @@
                     </div>
                 </td>
                 <td jhiTranslate="{{'alchemyApp.ClusterType.' + cluster.type}}">{{cluster.type}}</td>
-                <td>{{cluster.config}}</td>
                 <td>{{cluster.remark}}</td>
                 <td>{{cluster.createdBy}}</td>
                 <td>{{cluster.createdDate | date:'medium'}}</td>

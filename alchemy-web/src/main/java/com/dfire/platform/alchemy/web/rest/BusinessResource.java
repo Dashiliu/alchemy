@@ -1,5 +1,6 @@
 package com.dfire.platform.alchemy.web.rest;
 
+import com.dfire.platform.alchemy.security.SecurityUtils;
 import com.dfire.platform.alchemy.service.BusinessService;
 import com.dfire.platform.alchemy.web.rest.errors.BadRequestAlertException;
 import com.dfire.platform.alchemy.service.dto.BusinessDTO;
@@ -16,6 +17,7 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,6 +54,12 @@ public class BusinessResource {
         if (businessDTO.getId() != null) {
             throw new BadRequestAlertException("A new business cannot already have an ID", ENTITY_NAME, "idexists");
         }
+        Optional<String> loginUser = SecurityUtils.getCurrentUserLogin();
+        if(!loginUser.isPresent()){
+            throw new BadRequestAlertException("No user was found for this cluster", ENTITY_NAME, "usernotlogin");
+        }
+        businessDTO.setCreatedBy(loginUser.get());
+        businessDTO.setCreatedDate(Instant.now());
         BusinessDTO result = businessService.save(businessDTO);
         return ResponseEntity.created(new URI("/api/businesses/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))

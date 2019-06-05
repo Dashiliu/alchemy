@@ -69,8 +69,6 @@ public class JobCriteria implements Serializable, Criteria {
 
     private JobTypeFilter type;
 
-    private StringFilter config;
-
     private StringFilter remark;
 
     private StringFilter clusterJobId;
@@ -98,7 +96,6 @@ public class JobCriteria implements Serializable, Criteria {
         this.id = other.id == null ? null : other.id.copy();
         this.name = other.name == null ? null : other.name.copy();
         this.type = other.type == null ? null : other.type.copy();
-        this.config = other.config == null ? null : other.config.copy();
         this.remark = other.remark == null ? null : other.remark.copy();
         this.clusterJobId = other.clusterJobId == null ? null : other.clusterJobId.copy();
         this.status = other.status == null ? null : other.status.copy();
@@ -138,14 +135,6 @@ public class JobCriteria implements Serializable, Criteria {
 
     public void setType(JobTypeFilter type) {
         this.type = type;
-    }
-
-    public StringFilter getConfig() {
-        return config;
-    }
-
-    public void setConfig(StringFilter config) {
-        this.config = config;
     }
 
     public StringFilter getRemark() {
@@ -242,7 +231,6 @@ public class JobCriteria implements Serializable, Criteria {
             Objects.equals(id, that.id) &&
             Objects.equals(name, that.name) &&
             Objects.equals(type, that.type) &&
-            Objects.equals(config, that.config) &&
             Objects.equals(remark, that.remark) &&
             Objects.equals(clusterJobId, that.clusterJobId) &&
             Objects.equals(status, that.status) &&
@@ -261,7 +249,6 @@ public class JobCriteria implements Serializable, Criteria {
         id,
         name,
         type,
-        config,
         remark,
         clusterJobId,
         status,
@@ -281,7 +268,6 @@ public class JobCriteria implements Serializable, Criteria {
                 (id != null ? "id=" + id + ", " : "") +
                 (name != null ? "name=" + name + ", " : "") +
                 (type != null ? "type=" + type + ", " : "") +
-                (config != null ? "config=" + config + ", " : "") +
                 (remark != null ? "remark=" + remark + ", " : "") +
                 (clusterJobId != null ? "clusterJobId=" + clusterJobId + ", " : "") +
                 (status != null ? "status=" + status + ", " : "") +

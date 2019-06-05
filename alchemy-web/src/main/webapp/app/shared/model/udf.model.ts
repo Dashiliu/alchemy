@@ -9,7 +9,8 @@ export interface IUdf {
   id?: number;
   name?: string;
   type?: UdfType;
-  config?: string;
+  value?: any;
+  avg?: string;
   createdBy?: string;
   createdDate?: Moment;
   lastModifiedBy?: string;
@@ -22,7 +23,8 @@ export class Udf implements IUdf {
     public id?: number,
     public name?: string,
     public type?: UdfType,
-    public config?: string,
+    public value?: any,
+    public avg?: string,
     public createdBy?: string,
     public createdDate?: Moment,
     public lastModifiedBy?: string,

@@ -95,9 +95,6 @@ public class ClusterQueryService extends QueryService<Cluster> {
             if (criteria.getType() != null) {
                 specification = specification.and(buildSpecification(criteria.getType(), Cluster_.type));
             }
-            if (criteria.getConfig() != null) {
-                specification = specification.and(buildStringSpecification(criteria.getConfig(), Cluster_.config));
-            }
             if (criteria.getRemark() != null) {
                 specification = specification.and(buildStringSpecification(criteria.getRemark(), Cluster_.remark));
             }

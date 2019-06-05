@@ -15,7 +15,8 @@
         },
         {
             "fieldName": "config",
-            "fieldType": "String"
+            "fieldType": "byte[]",
+            "fieldTypeBlobContent": "text"
         },
         {
             "fieldName": "createdBy",

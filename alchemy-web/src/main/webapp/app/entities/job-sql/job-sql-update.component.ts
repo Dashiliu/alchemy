@@ -6,11 +6,12 @@ import { Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import * as moment from 'moment';
 import { DATE_TIME_FORMAT } from 'app/shared/constants/input.constants';
-import { JhiAlertService } from 'ng-jhipster';
+import { JhiAlertService, JhiDataUtils } from 'ng-jhipster';
 import { IJobSql, JobSql } from 'app/shared/model/job-sql.model';
 import { JobSqlService } from './job-sql.service';
 import { IJob } from 'app/shared/model/job.model';
 import { JobService } from 'app/entities/job';
+import 'codemirror/mode/sql/sql';
 
 @Component({
   selector: 'jhi-job-sql-update',
@@ -19,7 +20,7 @@ import { JobService } from 'app/entities/job';
 export class JobSqlUpdateComponent implements OnInit {
   jobSql: IJobSql;
   isSaving: boolean;
-
+  sqlConfig: any = { lineNumbers: true, mode: 'text/x-sql' };
   jobs: IJob[];
 
   editForm = this.fb.group({
@@ -33,6 +34,7 @@ export class JobSqlUpdateComponent implements OnInit {
   });
 
   constructor(
+    protected dataUtils: JhiDataUtils,
     protected jhiAlertService: JhiAlertService,
     protected jobSqlService: JobSqlService,
     protected jobService: JobService,
@@ -65,6 +67,38 @@ export class JobSqlUpdateComponent implements OnInit {
       lastModifiedDate: jobSql.lastModifiedDate != null ? jobSql.lastModifiedDate.format(DATE_TIME_FORMAT) : null,
       jobId: jobSql.jobId
     });
+  }
+
+  byteSize(field) {
+    return this.dataUtils.byteSize(field);
+  }
+
+  openFile(contentType, field) {
+    return this.dataUtils.openFile(contentType, field);
+  }
+
+  setFileData(event, field: string, isImage) {
+    return new Promise((resolve, reject) => {
+      if (event && event.target && event.target.files && event.target.files[0]) {
+        const file = event.target.files[0];
+        if (isImage && !/^image\//.test(file.type)) {
+          reject(`File was expected to be an image but was found to be ${file.type}`);
+        } else {
+          const filedContentType: string = field + 'ContentType';
+          this.dataUtils.toBase64(file, base64Data => {
+            this.editForm.patchValue({
+              [field]: base64Data,
+              [filedContentType]: file.type
+            });
+          });
+        }
+      } else {
+        reject(`Base64 data was not set as file could not be extracted from passed parameter: ${event}`);
+      }
+    }).then(
+      () => console.log('blob added'), // sucess
+      this.onError
+    );
   }
 
   previousState() {

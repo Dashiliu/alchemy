@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { JhiDataUtils } from 'ng-jhipster';
 
 import { ISource } from 'app/shared/model/source.model';
 
@@ -10,7 +11,7 @@ import { ISource } from 'app/shared/model/source.model';
 export class SourceDetailComponent implements OnInit {
   source: ISource;
 
-  constructor(protected activatedRoute: ActivatedRoute) {}
+  constructor(protected dataUtils: JhiDataUtils, protected activatedRoute: ActivatedRoute) {}
 
   ngOnInit() {
     this.activatedRoute.data.subscribe(({ source }) => {
@@ -18,6 +19,13 @@ export class SourceDetailComponent implements OnInit {
     });
   }
 
+  byteSize(field) {
+    return this.dataUtils.byteSize(field);
+  }
+
+  openFile(contentType, field) {
+    return this.dataUtils.openFile(contentType, field);
+  }
   previousState() {
     window.history.back();
   }

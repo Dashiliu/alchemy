@@ -39,7 +39,8 @@ public class Job implements Serializable {
     @Column(name = "jhi_type", nullable = false)
     private JobType type;
 
-    @NotNull
+    
+    @Lob
     @Column(name = "config", nullable = false)
     private String config;
 
