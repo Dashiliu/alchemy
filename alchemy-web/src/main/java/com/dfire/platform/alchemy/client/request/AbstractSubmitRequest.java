@@ -1,4 +1,6 @@
-package com.dfire.platform.alchemy.handle.request;
+package com.dfire.platform.alchemy.client.request;
+
+import com.dfire.platform.alchemy.common.Resource;
 
 /**
  * @author congbai
@@ -6,20 +8,13 @@ package com.dfire.platform.alchemy.handle.request;
  */
 public abstract class AbstractSubmitRequest implements FlinkRequest, SubmitRequest {
 
-    private Long clusterId;
-
     private String jobName;
 
+    private Resource resource;
+
+    private boolean yarn;
+
     private boolean test;
-
-    @Override
-    public Long getClusterId() {
-        return clusterId;
-    }
-
-    public void setClusterId(Long clusterId) {
-        this.clusterId = clusterId;
-    }
 
     public String getJobName() {
         return jobName;
@@ -27,6 +22,24 @@ public abstract class AbstractSubmitRequest implements FlinkRequest, SubmitReque
 
     public void setJobName(String jobName) {
         this.jobName = jobName;
+    }
+
+    @Override
+    public Resource getResource() {
+        return resource;
+    }
+
+    public void setResource(Resource resource) {
+        this.resource = resource;
+    }
+
+    @Override
+    public boolean isYarn() {
+        return yarn;
+    }
+
+    public void setYarn(boolean yarn) {
+        this.yarn = yarn;
     }
 
     @Override

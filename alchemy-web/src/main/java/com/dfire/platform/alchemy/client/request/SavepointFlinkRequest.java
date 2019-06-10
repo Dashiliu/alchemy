@@ -1,4 +1,4 @@
-package com.dfire.platform.alchemy.handle.request;
+package com.dfire.platform.alchemy.client.request;
 
 /**
  * @author congbai
@@ -8,15 +8,12 @@ public class SavepointFlinkRequest implements FlinkRequest {
 
     private String jobID;
 
-    private Long clusterId;
-
     private String savepointDirectory;
 
     private boolean test;
 
-    public SavepointFlinkRequest(String jobID, Long clusterId, String savepointDirectory) {
+    public SavepointFlinkRequest(String jobID, String savepointDirectory) {
         this.jobID = jobID;
-        this.clusterId = clusterId;
         this.savepointDirectory = savepointDirectory;
     }
 
@@ -26,14 +23,6 @@ public class SavepointFlinkRequest implements FlinkRequest {
 
     public void setJobID(String jobID) {
         this.jobID = jobID;
-    }
-
-    public Long getClusterId() {
-        return clusterId;
-    }
-
-    public void setClusterId(Long clusterId) {
-        this.clusterId = clusterId;
     }
 
     public String getSavepointDirectory() {

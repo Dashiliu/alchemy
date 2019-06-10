@@ -1,4 +1,4 @@
-package com.dfire.platform.alchemy.handle.request;
+package com.dfire.platform.alchemy.client.request;
 
 /**
  * @author congbai
@@ -6,14 +6,11 @@ package com.dfire.platform.alchemy.handle.request;
  */
 public class JobStatusRequest implements StatusRequest {
 
-    private Long clusterId;
-
     private String jobID;
 
     private boolean test;
 
-    public JobStatusRequest(Long cluster, String jobID) {
-        this.clusterId = clusterId;
+    public JobStatusRequest(String jobID) {
         this.jobID = jobID;
     }
 
@@ -23,15 +20,6 @@ public class JobStatusRequest implements StatusRequest {
 
     public void setJobID(String jobID) {
         this.jobID = jobID;
-    }
-
-    @Override
-    public Long getClusterId() {
-        return clusterId;
-    }
-
-    public void setClusterId(Long clusterId) {
-        this.clusterId = clusterId;
     }
 
     @Override

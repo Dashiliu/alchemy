@@ -25,6 +25,7 @@ import { JhiMainComponent, NavbarComponent, FooterComponent, PageRibbonComponent
 @NgModule({
   imports: [
     BrowserModule,
+    NgbDropdownModule,
     CodemirrorModule,
     NgxWebstorageModule.forRoot({ prefix: 'jhi', separator: '-' }),
     NgJhipsterModule.forRoot({

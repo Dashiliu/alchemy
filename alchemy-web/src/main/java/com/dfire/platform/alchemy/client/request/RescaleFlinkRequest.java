@@ -1,4 +1,4 @@
-package com.dfire.platform.alchemy.handle.request;
+package com.dfire.platform.alchemy.client.request;
 
 /**
  * @author congbai
@@ -8,15 +8,12 @@ public class RescaleFlinkRequest implements FlinkRequest {
 
     private String jobID;
 
-    private Long clusterId;
-
     private int newParallelism;
 
     private boolean test;
 
-    public RescaleFlinkRequest(String jobID, Long clusterId, int newParallelism) {
+    public RescaleFlinkRequest(String jobID, int newParallelism) {
         this.jobID = jobID;
-        this.clusterId = clusterId;
         this.newParallelism = newParallelism;
     }
 
@@ -26,15 +23,6 @@ public class RescaleFlinkRequest implements FlinkRequest {
 
     public void setJobID(String jobID) {
         this.jobID = jobID;
-    }
-
-    @Override
-    public Long getClusterId() {
-        return clusterId;
-    }
-
-    public void setClusterId(Long clusterId) {
-        this.clusterId = clusterId;
     }
 
     public int getNewParallelism() {

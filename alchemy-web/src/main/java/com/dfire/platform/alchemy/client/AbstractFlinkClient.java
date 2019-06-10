@@ -1,11 +1,12 @@
-package com.dfire.platform.alchemy.handle;
+package com.dfire.platform.alchemy.client;
 
-import static com.dfire.platform.alchemy.handle.request.SqlSubmitFlinkRequest.CONFIG_KEY_DELAY_BETWEEN_ATTEMPTS;
-import static com.dfire.platform.alchemy.handle.request.SqlSubmitFlinkRequest.CONFIG_KEY_DELAY_INTERVAL;
-import static com.dfire.platform.alchemy.handle.request.SqlSubmitFlinkRequest.CONFIG_KEY_FAILURE_INTERVAL;
-import static com.dfire.platform.alchemy.handle.request.SqlSubmitFlinkRequest.CONFIG_KEY_FAILURE_RATE;
-import static com.dfire.platform.alchemy.handle.request.SqlSubmitFlinkRequest.CONFIG_KEY_RESTART_ATTEMPTS;
+import static com.dfire.platform.alchemy.client.request.SqlSubmitFlinkRequest.CONFIG_KEY_DELAY_BETWEEN_ATTEMPTS;
+import static com.dfire.platform.alchemy.client.request.SqlSubmitFlinkRequest.CONFIG_KEY_DELAY_INTERVAL;
+import static com.dfire.platform.alchemy.client.request.SqlSubmitFlinkRequest.CONFIG_KEY_FAILURE_INTERVAL;
+import static com.dfire.platform.alchemy.client.request.SqlSubmitFlinkRequest.CONFIG_KEY_FAILURE_RATE;
+import static com.dfire.platform.alchemy.client.request.SqlSubmitFlinkRequest.CONFIG_KEY_RESTART_ATTEMPTS;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.calcite.sql.SqlJoin;
@@ -24,11 +26,21 @@ import org.apache.calcite.sql.SqlKind;
 import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.SqlSelect;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.flink.api.common.JobID;
 import org.apache.flink.api.common.JobSubmissionResult;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.api.common.time.Time;
+import org.apache.flink.client.program.ClusterClient;
 import org.apache.flink.client.program.JobWithJars;
+import org.apache.flink.client.program.PackagedProgram;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.optimizer.DataStatistics;
+import org.apache.flink.optimizer.Optimizer;
+import org.apache.flink.optimizer.costs.DefaultCostEstimator;
+import org.apache.flink.optimizer.plan.FlinkPlan;
+import org.apache.flink.runtime.jobgraph.JobStatus;
+import org.apache.flink.runtime.jobgraph.SavepointRestoreSettings;
+import org.apache.flink.runtime.messages.Acknowledge;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
@@ -39,43 +51,149 @@ import org.apache.flink.table.api.java.StreamTableEnvironment;
 import org.apache.flink.table.functions.AggregateFunction;
 import org.apache.flink.table.functions.ScalarFunction;
 import org.apache.flink.table.functions.TableFunction;
+import org.apache.flink.table.shaded.org.apache.commons.lang3.StringUtils;
 import org.apache.flink.table.sinks.TableSink;
 import org.apache.flink.table.sources.TableSource;
 import org.apache.flink.types.Row;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Component;
 
 import com.dfire.platform.alchemy.api.common.Alias;
 import com.dfire.platform.alchemy.api.util.SideParser;
-import com.dfire.platform.alchemy.client.FlinkClient;
+import com.dfire.platform.alchemy.client.request.CancelFlinkRequest;
+import com.dfire.platform.alchemy.client.request.JarSubmitFlinkRequest;
+import com.dfire.platform.alchemy.client.request.JobStatusRequest;
+import com.dfire.platform.alchemy.client.request.RescaleFlinkRequest;
+import com.dfire.platform.alchemy.client.request.SavepointFlinkRequest;
+import com.dfire.platform.alchemy.client.request.SqlSubmitFlinkRequest;
+import com.dfire.platform.alchemy.client.response.JobStatusResponse;
+import com.dfire.platform.alchemy.client.response.Response;
+import com.dfire.platform.alchemy.client.response.SubmitFlinkResponse;
 import com.dfire.platform.alchemy.common.Constants;
 import com.dfire.platform.alchemy.common.ResultMessage;
 import com.dfire.platform.alchemy.descriptor.SinkDescriptor;
 import com.dfire.platform.alchemy.descriptor.SourceDescriptor;
 import com.dfire.platform.alchemy.domain.enumeration.TableType;
 import com.dfire.platform.alchemy.function.BaseFunction;
-import com.dfire.platform.alchemy.handle.request.SqlSubmitFlinkRequest;
-import com.dfire.platform.alchemy.handle.response.SubmitFlinkResponse;
 import com.dfire.platform.alchemy.service.util.SqlParseUtil;
 import com.dfire.platform.alchemy.util.AlchemyProperties;
 import com.dfire.platform.alchemy.util.FileUtil;
+import com.dfire.platform.alchemy.util.JarArgUtil;
 import com.dfire.platform.alchemy.util.MavenJarUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
  * @author congbai
- * @date 2019/5/15
+ * @date 2019/6/10
  */
-@Component
-public class SubmitSqlHandler implements Handler<SqlSubmitFlinkRequest, SubmitFlinkResponse> {
+public abstract class AbstractFlinkClient implements FlinkClient {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SubmitSqlHandler.class);
+    protected final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
-    @Override
-    public SubmitFlinkResponse handle(FlinkClient client, SqlSubmitFlinkRequest request) throws Exception {
+    /**
+     * 集群额外依赖的公共包
+     */
+    private final List<String> avgs;
+
+    public AbstractFlinkClient(List<String> avgs) {
+        this.avgs = avgs;
+    }
+
+    public Response cancel(ClusterClient clusterClient, CancelFlinkRequest request) throws Exception {
+        boolean savePoint = request.getSavePoint() != null && request.getSavePoint().booleanValue();
+        if (savePoint) {
+            String path = clusterClient.cancelWithSavepoint(JobID.fromHexString(request.getJobID()),
+                request.getSavepointDirectory());
+            return new Response(true, path);
+        } else {
+            clusterClient.cancel(JobID.fromHexString(request.getJobID()));
+            return new Response(true);
+        }
+    }
+
+    public Response rescale(ClusterClient clusterClient, RescaleFlinkRequest request) throws Exception {
+        CompletableFuture<Acknowledge> future
+            = clusterClient.rescaleJob(JobID.fromHexString(request.getJobID()), request.getNewParallelism());;
+        future.get();
+        return new Response(true);
+    }
+
+    public Response savepoint(ClusterClient clusterClient, SavepointFlinkRequest request) throws Exception {
+        CompletableFuture<String> future
+            = clusterClient.triggerSavepoint(JobID.fromHexString(request.getJobID()), request.getSavepointDirectory());
+        return new Response(true, future.get());
+    }
+
+    public JobStatusResponse status(ClusterClient clusterClient, JobStatusRequest request) throws Exception {
+        CompletableFuture<JobStatus> jobStatusCompletableFuture
+            = clusterClient.getJobStatus(JobID.fromHexString(request.getJobID()));
+        // jobStatusCompletableFuture.
+        switch (jobStatusCompletableFuture.get()) {
+            case CREATED:
+                return new JobStatusResponse(true, com.dfire.platform.alchemy.domain.enumeration.JobStatus.SUBMIT);
+            case RESTARTING:
+                break;
+            case RUNNING:
+                return new JobStatusResponse(true, com.dfire.platform.alchemy.domain.enumeration.JobStatus.RUNNING);
+            case FAILING:
+            case FAILED:
+                return new JobStatusResponse(true, com.dfire.platform.alchemy.domain.enumeration.JobStatus.FAILED);
+            case CANCELLING:
+            case CANCELED:
+                return new JobStatusResponse(true, com.dfire.platform.alchemy.domain.enumeration.JobStatus.CANCELED);
+            case FINISHED:
+                return new JobStatusResponse(true, com.dfire.platform.alchemy.domain.enumeration.JobStatus.FINISHED);
+            case SUSPENDED:
+            case RECONCILING:
+            default:
+                // nothing to do
+        }
+        return new JobStatusResponse(null);
+    }
+
+    public SubmitFlinkResponse submitJar(ClusterClient clusterClient, JarSubmitFlinkRequest request) throws Exception {
+        if (request.isTest()) {
+            throw new UnsupportedOperationException();
+        }
+        LOGGER.trace("start submit jar request,entryClass:{}", request.getEntryClass());
+        try {
+            File file = MavenJarUtil.forAvg(request.getAvg()).getJarFile();
+            List<String> programArgs = JarArgUtil.tokenizeArguments(request.getProgramArgs());
+            PackagedProgram program = new PackagedProgram(file, request.getEntryClass(),
+                programArgs.toArray(new String[programArgs.size()]));
+            ClassLoader classLoader = null;
+            try {
+                classLoader = program.getUserCodeClassLoader();
+            } catch (Exception e) {
+                LOGGER.warn(e.getMessage());
+            }
+
+            Optimizer optimizer = new Optimizer(new DataStatistics(), new DefaultCostEstimator(), new Configuration());
+            FlinkPlan plan = ClusterClient.getOptimizedPlan(optimizer, program, request.getParallelism());
+            // Savepoint restore settings
+            SavepointRestoreSettings savepointSettings = SavepointRestoreSettings.none();
+            String savepointPath = request.getSavepointPath();
+            if (StringUtils.isNotEmpty(savepointPath)) {
+                Boolean allowNonRestoredOpt = request.getAllowNonRestoredState();
+                boolean allowNonRestoredState = allowNonRestoredOpt != null && allowNonRestoredOpt.booleanValue();
+                savepointSettings = SavepointRestoreSettings.forPath(savepointPath, allowNonRestoredState);
+            }
+            // set up the execution environment
+            List<URL> jarFiles = FileUtil.createPath(file);
+            JobSubmissionResult submissionResult
+                = clusterClient.run(plan, jarFiles, Collections.emptyList(), classLoader, savepointSettings);
+            LOGGER.trace(" submit jar request sucess,jobId:{}", submissionResult.getJobID());
+            return new SubmitFlinkResponse(true, submissionResult.getJobID().toString());
+        } catch (Exception e) {
+            String term = e.getMessage() == null ? "." : (": " + e.getMessage());
+            LOGGER.error(" submit jar request fail", e);
+            return new SubmitFlinkResponse(term);
+        }
+    }
+
+    public SubmitFlinkResponse submitSql(ClusterClient clusterClient, SqlSubmitFlinkRequest request) throws Exception {
         LOGGER.trace("start submit sql request,jobName:{},sql:{}", request.getJobName(), request.getSqls().toArray());
         if (CollectionUtils.isEmpty(request.getSources())) {
             return new SubmitFlinkResponse(ResultMessage.SOURCE_EMPTY.getMsg());
@@ -109,12 +227,12 @@ public class SubmitSqlHandler implements Handler<SqlSubmitFlinkRequest, SubmitFl
         }
         StreamGraph streamGraph = execEnv.getStreamGraph();
         streamGraph.setJobName(request.getJobName());
-        urls.addAll(createGlobalPath(client.getAvgs()));
+        urls.addAll(createGlobalPath(this.getAvgs()));
         ClassLoader usercodeClassLoader
             = JobWithJars.buildUserCodeClassLoader(urls, Collections.emptyList(), getClass().getClassLoader());
         try {
             JobSubmissionResult submissionResult
-                = client.getClusterClient().run(streamGraph, urls, Collections.emptyList(), usercodeClassLoader);
+                = clusterClient.run(streamGraph, urls, Collections.emptyList(), usercodeClassLoader);
             LOGGER.trace(" submit sql request success,jobId:{}", submissionResult.getJobID());
             return new SubmitFlinkResponse(true, submissionResult.getJobID().toString());
         } catch (Exception e) {
@@ -137,7 +255,7 @@ public class SubmitSqlHandler implements Handler<SqlSubmitFlinkRequest, SubmitFl
 
     private SinkDescriptor findSink(List<SinkDescriptor> sinks, String sink) {
         for (SinkDescriptor sinkDescriptor : sinks) {
-            if (StringUtils.equalsIgnoreCase(sinkDescriptor.getName(), sink)) {
+            if (org.apache.commons.lang3.StringUtils.equalsIgnoreCase(sinkDescriptor.getName(), sink)) {
                 return sinkDescriptor;
             }
         }
@@ -238,7 +356,8 @@ public class SubmitSqlHandler implements Handler<SqlSubmitFlinkRequest, SubmitFl
         Iterator<BaseFunction> iterator = serviceLoader.iterator();
         while (iterator.hasNext()) {
             BaseFunction function = iterator.next();
-            if (StringUtils.isEmpty(function.getFunctionName()) || functionNames.contains(function.getFunctionName())) {
+            if (org.apache.commons.lang3.StringUtils.isEmpty(function.getFunctionName())
+                || functionNames.contains(function.getFunctionName())) {
                 continue;
             }
             functionNames.add(function.getFunctionName());
@@ -295,7 +414,7 @@ public class SubmitSqlHandler implements Handler<SqlSubmitFlinkRequest, SubmitFl
         if (request.getMaxParallelism() != null) {
             execEnv.setMaxParallelism(request.getMaxParallelism());
         }
-        if (StringUtils.isNotEmpty(request.getTimeCharacteristic())) {
+        if (org.apache.commons.lang3.StringUtils.isNotEmpty(request.getTimeCharacteristic())) {
             execEnv.setStreamTimeCharacteristic(TimeCharacteristic.valueOf(request.getTimeCharacteristic()));
         } else {
             execEnv.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime);
@@ -303,7 +422,7 @@ public class SubmitSqlHandler implements Handler<SqlSubmitFlinkRequest, SubmitFl
         if (request.getBufferTimeout() != null) {
             execEnv.setBufferTimeout(request.getBufferTimeout());
         }
-        if (StringUtils.isNotEmpty(request.getRestartStrategies())) {
+        if (org.apache.commons.lang3.StringUtils.isNotEmpty(request.getRestartStrategies())) {
             String strategies = request.getRestartStrategies();
             com.dfire.platform.alchemy.common.RestartStrategies restartStrategies
                 = com.dfire.platform.alchemy.common.RestartStrategies.valueOf(strategies.toUpperCase());
@@ -345,7 +464,7 @@ public class SubmitSqlHandler implements Handler<SqlSubmitFlinkRequest, SubmitFl
     }
 
     private void loadUrl(String avg, List<URL> urls) throws MalformedURLException {
-        if (StringUtils.isEmpty(avg)) {
+        if (org.apache.commons.lang3.StringUtils.isEmpty(avg)) {
             return;
         }
         URL url = MavenJarUtil.forAvg(avg).getJarFile().getAbsoluteFile().toURI().toURL();
@@ -355,11 +474,11 @@ public class SubmitSqlHandler implements Handler<SqlSubmitFlinkRequest, SubmitFl
     }
 
     private void addUrl(String name, List<URL> urls) throws MalformedURLException {
-        if (StringUtils.isEmpty(name)) {
+        if (org.apache.commons.lang3.StringUtils.isEmpty(name)) {
             return;
         }
         String avg = AlchemyProperties.get(name);
-        if (StringUtils.isEmpty(avg)) {
+        if (org.apache.commons.lang3.StringUtils.isEmpty(avg)) {
             LOGGER.info("{} is not exist  in alchemy properties", name);
             return;
         }
@@ -371,5 +490,9 @@ public class SubmitSqlHandler implements Handler<SqlSubmitFlinkRequest, SubmitFl
 
     private List<URL> createGlobalPath(List<String> avgs) throws MalformedURLException {
         return FileUtil.createPath(avgs);
+    }
+
+    public List<String> getAvgs() {
+        return avgs;
     }
 }

@@ -5,12 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.dfire.platform.alchemy.domain.enumeration.JobStatus;
-import com.dfire.platform.alchemy.domain.enumeration.TableType;
-import com.dfire.platform.alchemy.handle.HandlerManager;
-import com.dfire.platform.alchemy.handle.request.RescaleFlinkRequest;
-import com.dfire.platform.alchemy.handle.request.SavepointFlinkRequest;
-import com.dfire.platform.alchemy.handle.response.SubmitFlinkResponse;
+import com.dfire.platform.alchemy.client.FlinkClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -20,11 +15,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import com.dfire.platform.alchemy.client.ClientManager;
-import com.dfire.platform.alchemy.handle.request.CancelFlinkRequest;
-import com.dfire.platform.alchemy.handle.request.JarSubmitFlinkRequest;
-import com.dfire.platform.alchemy.handle.request.SqlSubmitFlinkRequest;
-import com.dfire.platform.alchemy.handle.request.SubmitRequest;
-import com.dfire.platform.alchemy.handle.response.Response;
+import com.dfire.platform.alchemy.client.request.CancelFlinkRequest;
+import com.dfire.platform.alchemy.client.request.JarSubmitFlinkRequest;
+import com.dfire.platform.alchemy.client.request.RescaleFlinkRequest;
+import com.dfire.platform.alchemy.client.request.SavepointFlinkRequest;
+import com.dfire.platform.alchemy.client.request.SqlSubmitFlinkRequest;
+import com.dfire.platform.alchemy.client.request.SubmitRequest;
+import com.dfire.platform.alchemy.client.response.Response;
+import com.dfire.platform.alchemy.client.response.SubmitFlinkResponse;
 import com.dfire.platform.alchemy.descriptor.SinkDescriptor;
 import com.dfire.platform.alchemy.descriptor.SourceDescriptor;
 import com.dfire.platform.alchemy.descriptor.UdfDescriptor;
@@ -33,7 +31,9 @@ import com.dfire.platform.alchemy.domain.JobSql;
 import com.dfire.platform.alchemy.domain.Sink;
 import com.dfire.platform.alchemy.domain.Source;
 import com.dfire.platform.alchemy.domain.Udf;
+import com.dfire.platform.alchemy.domain.enumeration.JobStatus;
 import com.dfire.platform.alchemy.domain.enumeration.JobType;
+import com.dfire.platform.alchemy.domain.enumeration.TableType;
 import com.dfire.platform.alchemy.repository.JobRepository;
 import com.dfire.platform.alchemy.repository.JobSqlRepository;
 import com.dfire.platform.alchemy.repository.SinkRepository;
@@ -67,18 +67,18 @@ public class JobServiceImpl implements JobService {
 
     private final JobMapper jobMapper;
 
-    private final HandlerManager handlerManager;
+    private final ClientManager clientManager;
 
     public JobServiceImpl(JobRepository jobRepository, JobSqlRepository jobSqlRepository,
-                          SourceRepository sourceRepository, UdfRepository udfRepository, SinkRepository sinkRepository,
-                          JobMapper jobMapper, HandlerManager handlerManager) {
+        SourceRepository sourceRepository, UdfRepository udfRepository, SinkRepository sinkRepository,
+        JobMapper jobMapper, ClientManager clientManager) {
         this.jobRepository = jobRepository;
         this.jobSqlRepository = jobSqlRepository;
         this.sourceRepository = sourceRepository;
         this.udfRepository = udfRepository;
         this.sinkRepository = sinkRepository;
         this.jobMapper = jobMapper;
-        this.handlerManager = handlerManager;
+        this.clientManager = clientManager;
     }
 
     /**
@@ -137,20 +137,24 @@ public class JobServiceImpl implements JobService {
     public Response submit(Long id) throws Exception {
         Optional<Job> jobOptional = jobRepository.findById(id);
         Job job = jobOptional.get();
+        if (job.getCluster() == null) {
+            return new Response(false, "the job's cluster is null ");
+        }
+        final FlinkClient client = clientManager.getClient(job.getCluster().getId());
         SubmitRequest submitRequest;
         if (JobType.JAR == job.getType()) {
             submitRequest = createJarSubmitRequest(job);
         } else {
             List<JobSql> jobSqls = jobSqlRepository.findByJobId(id);
             if (CollectionUtils.isEmpty(jobSqls)) {
-                return new Response(false, "sql未配置");
+                return new Response(false, "the job's sql is null");
             }
             submitRequest = createSqlSubmitRequest(job, jobSqls);
         }
-        SubmitFlinkResponse response = (SubmitFlinkResponse) handlerManager.send(submitRequest);
-        if(response.isSuccess()){
+        SubmitFlinkResponse response =client.submit(submitRequest);
+        if (response.isSuccess()) {
             job.setClusterJobId(response.getJobId());
-        }else{
+        } else {
             job.setStatus(JobStatus.FAILED);
         }
         jobRepository.save(job);
@@ -178,15 +182,16 @@ public class JobServiceImpl implements JobService {
         return sqlSubmitFlinkRequest;
     }
 
-    private void parseView(Job job, List<String> tableNames, List<String> sourceNames, List<String> udfNames, List<String> sinkNames) throws Exception {
-        for(String name : sourceNames) {
-            if (tableNames.contains(name)){
+    private void parseView(Job job, List<String> tableNames, List<String> sourceNames, List<String> udfNames,
+        List<String> sinkNames) throws Exception {
+        for (String name : sourceNames) {
+            if (tableNames.contains(name)) {
                 continue;
             }
             Source source = findSource(job, name);
             if (TableType.VIEW != source.getTableType()) {
                 continue;
-            }else{
+            } else {
                 tableNames.add(name);
             }
             String sql = source.getConfig();
@@ -194,7 +199,6 @@ public class JobServiceImpl implements JobService {
             parseView(job, tableNames, sourceNames, udfNames, sinkNames);
         }
     }
-
 
     private List<SinkDescriptor> findSinks(Job job, List<String> sinkNames) {
         List<SinkDescriptor> sinkDescriptors = new ArrayList<>(sinkNames.size());
@@ -230,8 +234,7 @@ public class JobServiceImpl implements JobService {
     }
 
     private Source findSource(Job job, String name) throws Exception {
-        Optional<Source> sourceOptional
-            = sourceRepository.findOneByBusinessIdAndName(job.getBusiness().getId(), name);
+        Optional<Source> sourceOptional = sourceRepository.findOneByBusinessIdAndName(job.getBusiness().getId(), name);
         if (!sourceOptional.isPresent()) {
             throw new IllegalArgumentException("table source：" + name + "doesn't exist");
         }
@@ -241,7 +244,6 @@ public class JobServiceImpl implements JobService {
     private SubmitRequest createJarSubmitRequest(Job job) throws Exception {
         JarSubmitFlinkRequest jarSubmitFlinkRequest
             = BindPropertiesUtil.bindProperties(job.getConfig(), JarSubmitFlinkRequest.class);
-        jarSubmitFlinkRequest.setClusterId(job.getCluster().getId());
         jarSubmitFlinkRequest.setJobName(job.getName());
         return jarSubmitFlinkRequest;
     }
@@ -250,31 +252,50 @@ public class JobServiceImpl implements JobService {
     public Response cancel(Long id) throws Exception {
         Optional<Job> jobOptional = jobRepository.findById(id);
         Job job = jobOptional.get();
-        CancelFlinkRequest cancelFlinkRequest = new CancelFlinkRequest(job.getClusterJobId(), job.getCluster().getId());
-        return handlerManager.send(cancelFlinkRequest);
+        if (job.getCluster() == null) {
+            return new Response(false, "the job's cluster is null ");
+        }
+        final FlinkClient client = clientManager.getClient(job.getCluster().getId());
+        CancelFlinkRequest cancelFlinkRequest = new CancelFlinkRequest(job.getClusterJobId());
+        return client.cancel(cancelFlinkRequest);
     }
 
     @Override
     public Response cancelWithSavepoint(Long id, String savepointDirectory) throws Exception {
         Optional<Job> jobOptional = jobRepository.findById(id);
         Job job = jobOptional.get();
-        CancelFlinkRequest cancelFlinkRequest = new CancelFlinkRequest(job.getClusterJobId(), job.getCluster().getId(), true, savepointDirectory);
-        return handlerManager.send(cancelFlinkRequest);
+        if (job.getCluster() == null) {
+            return new Response(false, "the job's cluster is null ");
+        }
+        final FlinkClient client = clientManager.getClient(job.getCluster().getId());
+        CancelFlinkRequest cancelFlinkRequest
+            = new CancelFlinkRequest(job.getClusterJobId(), true, savepointDirectory);
+        return client.cancel(cancelFlinkRequest);
     }
 
     @Override
     public Response rescale(Long id, int newParallelism) throws Exception {
         Optional<Job> jobOptional = jobRepository.findById(id);
         Job job = jobOptional.get();
-        RescaleFlinkRequest flinkRequest = new RescaleFlinkRequest(job.getClusterJobId(), job.getCluster().getId(), newParallelism);
-        return handlerManager.send(flinkRequest);
+        if (job.getCluster() == null) {
+            return new Response(false, "the job's cluster is null ");
+        }
+        final FlinkClient client = clientManager.getClient(job.getCluster().getId());
+        RescaleFlinkRequest flinkRequest
+            = new RescaleFlinkRequest(job.getClusterJobId(), newParallelism);
+        return client.rescale(flinkRequest);
     }
 
     @Override
     public Response triggerSavepoint(Long id, String savepointDirectory) throws Exception {
         Optional<Job> jobOptional = jobRepository.findById(id);
         Job job = jobOptional.get();
-        SavepointFlinkRequest flinkRequest = new SavepointFlinkRequest(job.getClusterJobId(), job.getCluster().getId(), savepointDirectory);
-        return handlerManager.send(flinkRequest);
+        if (job.getCluster() == null) {
+            return new Response(false, "the job's cluster is null ");
+        }
+        final FlinkClient client = clientManager.getClient(job.getCluster().getId());
+        SavepointFlinkRequest flinkRequest
+            = new SavepointFlinkRequest(job.getClusterJobId(), savepointDirectory);
+        return client.savepoint(flinkRequest);
     }
 }

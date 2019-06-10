@@ -1,32 +1,30 @@
 package com.dfire.platform.alchemy.client;
 
-import java.util.List;
-
-import org.apache.flink.client.program.ClusterClient;
+import com.dfire.platform.alchemy.client.request.CancelFlinkRequest;
+import com.dfire.platform.alchemy.client.request.JarSubmitFlinkRequest;
+import com.dfire.platform.alchemy.client.request.JobStatusRequest;
+import com.dfire.platform.alchemy.client.request.RescaleFlinkRequest;
+import com.dfire.platform.alchemy.client.request.SavepointFlinkRequest;
+import com.dfire.platform.alchemy.client.request.SqlSubmitFlinkRequest;
+import com.dfire.platform.alchemy.client.request.SubmitRequest;
+import com.dfire.platform.alchemy.client.response.JobStatusResponse;
+import com.dfire.platform.alchemy.client.response.Response;
+import com.dfire.platform.alchemy.client.response.SubmitFlinkResponse;
 
 /**
  * @author congbai
  * @date 2019/6/4
  */
-public class FlinkClient {
+public interface FlinkClient {
 
-    private final ClusterClient clusterClient;
+    Response cancel(CancelFlinkRequest request) throws Exception;
 
-    /**
-     * 集群额外依赖的公共包
-     */
-    private final List<String> avgs;
+    Response rescale(RescaleFlinkRequest request) throws Exception;
 
-    public FlinkClient(ClusterClient clusterClient, List<String> avgs) {
-        this.clusterClient = clusterClient;
-        this.avgs = avgs;
-    }
+    Response savepoint(SavepointFlinkRequest request) throws Exception;
 
-    public ClusterClient getClusterClient() {
-        return clusterClient;
-    }
+    JobStatusResponse status(JobStatusRequest request) throws Exception;
 
-    public List<String> getAvgs() {
-        return avgs;
-    }
+    SubmitFlinkResponse submit(SubmitRequest request) throws Exception;
+
 }

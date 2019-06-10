@@ -3,7 +3,6 @@ package com.dfire.platform.alchemy.client;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import com.dfire.platform.alchemy.domain.Cluster;

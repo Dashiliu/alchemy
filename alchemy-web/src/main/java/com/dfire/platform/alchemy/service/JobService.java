@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.dfire.platform.alchemy.handle.response.Response;
+import com.dfire.platform.alchemy.client.response.Response;
 import com.dfire.platform.alchemy.service.dto.JobDTO;
 
 /**

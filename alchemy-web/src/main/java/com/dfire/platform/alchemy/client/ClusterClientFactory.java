@@ -1,6 +1,5 @@
 package com.dfire.platform.alchemy.client;
 
-import com.dfire.platform.alchemy.domain.enumeration.ClusterType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.client.deployment.StandaloneClusterId;
 import org.apache.flink.client.program.ClusterClient;
@@ -11,6 +10,7 @@ import org.apache.flink.configuration.HighAvailabilityOptions;
 import org.apache.flink.configuration.JobManagerOptions;
 
 import com.dfire.platform.alchemy.domain.Cluster;
+import com.dfire.platform.alchemy.domain.enumeration.ClusterType;
 import com.dfire.platform.alchemy.util.BindPropertiesUtil;
 
 /**
@@ -21,11 +21,11 @@ public class ClusterClientFactory {
 
     public static FlinkClient get(Cluster cluster) throws Exception {
         ClusterType clusterType = cluster.getType();
-        switch (clusterType){
+        switch (clusterType) {
             case REST:
                 return createRestClient(cluster);
             case YARN:
-                //todo 支持yarn client
+                // todo 支持yarn client
             default:
                 throw new UnsupportedOperationException("only support rest client ");
         }
@@ -61,7 +61,7 @@ public class ClusterClientFactory {
             ClusterClient clusterClient = new RestClusterClient(configuration, clusterId);
             clusterClient.setPrintStatusDuringExecution(true);
             clusterClient.setDetached(true);
-            return new FlinkClient(clusterClient, clusterInfo.getAvgs());
+            return new RestFlinkClient(clusterClient, clusterInfo.getAvgs());
         } catch (Exception e) {
             throw new RuntimeException("Cannot establish connection to JobManager: " + e.getMessage(), e);
         }

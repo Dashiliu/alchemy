@@ -1,4 +1,4 @@
-package com.dfire.platform.alchemy.handle.response;
+package com.dfire.platform.alchemy.client.response;
 
 import com.dfire.platform.alchemy.domain.enumeration.JobStatus;
 

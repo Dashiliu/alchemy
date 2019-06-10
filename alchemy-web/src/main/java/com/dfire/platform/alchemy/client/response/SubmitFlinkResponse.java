@@ -1,4 +1,4 @@
-package com.dfire.platform.alchemy.handle.response;
+package com.dfire.platform.alchemy.client.response;
 
 /**
  * @author congbai

@@ -1,7 +1,7 @@
 package com.dfire.platform.alchemy.web.rest;
 
 import com.dfire.platform.alchemy.domain.enumeration.JobStatus;
-import com.dfire.platform.alchemy.handle.response.Response;
+import com.dfire.platform.alchemy.client.response.Response;
 import com.dfire.platform.alchemy.security.SecurityUtils;
 import com.dfire.platform.alchemy.service.JobService;
 import com.dfire.platform.alchemy.web.rest.errors.BadRequestAlertException;
