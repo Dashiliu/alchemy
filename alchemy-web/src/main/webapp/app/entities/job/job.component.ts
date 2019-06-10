@@ -29,6 +29,7 @@ export class JobComponent implements OnInit, OnDestroy {
   predicate: any;
   previousPage: any;
   reverse: any;
+  isNavbarCollapsed: boolean;
 
   constructor(
     protected jobService: JobService,
@@ -127,5 +128,13 @@ export class JobComponent implements OnInit, OnDestroy {
 
   protected onError(errorMessage: string) {
     this.jhiAlertService.error(errorMessage, null, null);
+  }
+
+  isAuthenticated() {
+    return this.accountService.isAuthenticated();
+  }
+
+  collapseNavbar() {
+    this.isNavbarCollapsed = true;
   }
 }

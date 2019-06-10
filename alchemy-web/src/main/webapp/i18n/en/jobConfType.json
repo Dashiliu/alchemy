@@ -1,9 +1,0 @@
-{
-  "alchemyApp": {
-    "JobConfType": {
-      "null": "",
-      "BASIC": "BASIC",
-      "SQL": "SQL"
-    }
-  }
-}

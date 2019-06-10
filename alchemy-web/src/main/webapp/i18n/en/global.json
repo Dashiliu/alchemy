@@ -40,7 +40,16 @@
         "database": "Database",
         "jhipster-needle-menu-add-admin-element": "JHipster will add additional menu entries here (do not translate!)"
       },
-      "language": "Language"
+      "language": "Language",
+      "job":{
+        "main": "Operate",
+        "submit": "Submit",
+        "cancel": "Cancel",
+        "cancelWithSavepoint": "CancelWithSavepoint",
+        "rescale": "Rescale",
+        "triggerSavepoint": "TriggerSavepoint",
+        "delete": "Delete"
+      }
     },
     "form": {
       "username.label": "Username",

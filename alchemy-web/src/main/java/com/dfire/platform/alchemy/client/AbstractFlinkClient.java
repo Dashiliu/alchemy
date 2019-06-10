@@ -102,6 +102,9 @@ public abstract class AbstractFlinkClient implements FlinkClient {
     }
 
     public Response cancel(ClusterClient clusterClient, CancelFlinkRequest request) throws Exception {
+        if(StringUtils.isEmpty(request.getJobID())){
+            return new Response("the job is not submit yet");
+        }
         boolean savePoint = request.getSavePoint() != null && request.getSavePoint().booleanValue();
         if (savePoint) {
             String path = clusterClient.cancelWithSavepoint(JobID.fromHexString(request.getJobID()),
@@ -114,6 +117,9 @@ public abstract class AbstractFlinkClient implements FlinkClient {
     }
 
     public Response rescale(ClusterClient clusterClient, RescaleFlinkRequest request) throws Exception {
+        if(StringUtils.isEmpty(request.getJobID())){
+            return new Response("the job is not submit yet");
+        }
         CompletableFuture<Acknowledge> future
             = clusterClient.rescaleJob(JobID.fromHexString(request.getJobID()), request.getNewParallelism());;
         future.get();
@@ -121,12 +127,18 @@ public abstract class AbstractFlinkClient implements FlinkClient {
     }
 
     public Response savepoint(ClusterClient clusterClient, SavepointFlinkRequest request) throws Exception {
+        if(StringUtils.isEmpty(request.getJobID())){
+            return new Response("the job is not submit yet");
+        }
         CompletableFuture<String> future
             = clusterClient.triggerSavepoint(JobID.fromHexString(request.getJobID()), request.getSavepointDirectory());
         return new Response(true, future.get());
     }
 
     public JobStatusResponse status(ClusterClient clusterClient, JobStatusRequest request) throws Exception {
+        if(StringUtils.isEmpty(request.getJobID())){
+            return new JobStatusResponse("the job is not submit yet");
+        }
         CompletableFuture<JobStatus> jobStatusCompletableFuture
             = clusterClient.getJobStatus(JobID.fromHexString(request.getJobID()));
         // jobStatusCompletableFuture.

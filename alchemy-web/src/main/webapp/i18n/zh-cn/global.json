@@ -41,7 +41,16 @@
         "database": "数据库",
         "jhipster-needle-menu-add-admin-element": "JHipster will add additional menu entries here (do not translate!)"
       },
-      "language": "语言"
+      "language": "语言",
+      "job":{
+        "main": "操作",
+        "submit": "提交任务",
+        "cancel": "取消任务",
+        "cancelWithSavepoint": "带savepoint的取消",
+        "rescale": "调整并发",
+        "triggerSavepoint": "触发savepoint",
+        "delete": "删除"
+      }
     },
     "form": {
       "username.label": "账号",

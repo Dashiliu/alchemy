@@ -65,15 +65,61 @@
                             <fa-icon [icon]="'pencil-alt'"></fa-icon>
                             <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
                         </button>
-                        <button type="submit"
-                                [routerLink]="['/', 'job', { outlets: { popup: job.id + '/delete'} }]"
-                                replaceUrl="true"
-                                queryParamsHandling="merge"
-                                class="btn btn-danger btn-sm">
-                            <fa-icon [icon]="'times'"></fa-icon>
-                            <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
-                        </button>
-
+                        <div class="navbar-collapse collapse" id="navbarResponsive" [ngbCollapse]="isNavbarCollapsed" [ngSwitch]="isAuthenticated()">
+                            <ul class="navbar-nav ml-auto">
+                                <!-- jhipster-needle-add-element-to-menu - JHipster will add new menu items here -->
+                                <li *ngSwitchCase="true" ngbDropdown class="nav-item dropdown pointer" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+                                    <a class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="job-operator-menu">
+                                        <span>
+                                            <fa-icon icon="th-list"></fa-icon>
+                                            <span jhiTranslate="global.menu.job.main">
+                                                操作
+                                            </span>
+                                        </span>
+                                    </a>
+                                    <ul class="dropdown-menu" ngbDropdownMenu aria-labelledby="job-operator-menu">
+                                        <li>
+                                            <a class="dropdown-item" routerLink="business" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
+                                                <fa-icon icon="asterisk" fixedWidth="true"></fa-icon>
+                                                <span jhiTranslate="global.menu.job.submit">Submit</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" routerLink="business" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
+                                                <fa-icon icon="asterisk" fixedWidth="true"></fa-icon>
+                                                <span jhiTranslate="global.menu.job.cancel">Cancel</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" routerLink="business" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
+                                                <fa-icon icon="asterisk" fixedWidth="true"></fa-icon>
+                                                <span jhiTranslate="global.menu.job.cancelWithSavepoint">CancelWithSavepoint</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" routerLink="business" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
+                                                <fa-icon icon="asterisk" fixedWidth="true"></fa-icon>
+                                                <span jhiTranslate="global.menu.job.rescale">Rescale</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" routerLink="business" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
+                                                <fa-icon icon="asterisk" fixedWidth="true"></fa-icon>
+                                                <span jhiTranslate="global.menu.job.triggerSavepoint">TriggerSavepoint</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" [routerLink]="['/', 'job', { outlets: { popup: job.id + '/delete'} }]" replaceUrl="true"
+                                               queryParamsHandling="merge"  routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
+                                                <fa-icon icon="asterisk" fixedWidth="true"></fa-icon>
+                                                <span jhiTranslate="global.menu.job.delete">Delete</span>
+                                            </a>
+                                        </li>
+                                        <!-- jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here -->
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </td>
             </tr>
