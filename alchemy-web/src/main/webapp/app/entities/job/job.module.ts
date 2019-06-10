@@ -3,6 +3,7 @@ import { RouterModule } from '@angular/router';
 import { JhiLanguageService } from 'ng-jhipster';
 import { JhiLanguageHelper } from 'app/core';
 import { CodemirrorModule } from 'ng2-codemirror';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { AlchemySharedModule } from 'app/shared';
 import {
@@ -18,7 +19,7 @@ import {
 const ENTITY_STATES = [...jobRoute, ...jobPopupRoute];
 
 @NgModule({
-  imports: [AlchemySharedModule, CodemirrorModule, RouterModule.forChild(ENTITY_STATES)],
+  imports: [AlchemySharedModule, CodemirrorModule,NgbDropdownModule , RouterModule.forChild(ENTITY_STATES)],
   declarations: [JobComponent, JobDetailComponent, JobUpdateComponent, JobDeleteDialogComponent, JobDeletePopupComponent],
   entryComponents: [JobComponent, JobUpdateComponent, JobDeleteDialogComponent, JobDeletePopupComponent],
   providers: [{ provide: JhiLanguageService, useClass: JhiLanguageService }],
