@@ -119,7 +119,12 @@
       "save": "保存",
       "view": "查看",
       "submit": "提交",
-      "ok": "确定"
+      "ok": "确定",
+      "cluster": "集群",
+      "source": "数据源",
+      "udf": "用户函数",
+      "sink": "写入端",
+      "job": "任务"
     },
     "detail": {
       "field": "字段",

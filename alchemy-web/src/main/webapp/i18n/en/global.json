@@ -118,7 +118,12 @@
       "save": "Save",
       "view": "View",
       "submit": "Submit",
-      "ok": "OK"
+      "ok": "OK",
+      "cluster": "Cluster",
+      "source": "Souce",
+      "udf": "Udf",
+      "sink": "Sink",
+      "job": "Job"
     },
     "detail": {
       "field": "Field",

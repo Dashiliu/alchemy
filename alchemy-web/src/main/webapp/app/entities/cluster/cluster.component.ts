@@ -9,12 +9,15 @@ import { AccountService } from 'app/core';
 
 import { ITEMS_PER_PAGE } from 'app/shared';
 import { ClusterService } from './cluster.service';
+import {IBusiness} from "app/shared/model/business.model";
+import {ActivatedRoute} from "@angular/router";
 
 @Component({
   selector: 'jhi-cluster',
   templateUrl: './cluster.component.html'
 })
 export class ClusterComponent implements OnInit, OnDestroy {
+  business: IBusiness;
   clusters: ICluster[];
   currentAccount: any;
   eventSubscriber: Subscription;
@@ -30,7 +33,8 @@ export class ClusterComponent implements OnInit, OnDestroy {
     protected jhiAlertService: JhiAlertService,
     protected eventManager: JhiEventManager,
     protected parseLinks: JhiParseLinks,
-    protected accountService: AccountService
+    protected accountService: AccountService,
+    protected activatedRoute: ActivatedRoute
   ) {
     this.clusters = [];
     this.itemsPerPage = ITEMS_PER_PAGE;
@@ -45,6 +49,7 @@ export class ClusterComponent implements OnInit, OnDestroy {
   loadAll() {
     this.clusterService
       .query({
+        "businessId.specified": this.business.id,
         page: this.page,
         size: this.itemsPerPage,
         sort: this.sort()
@@ -67,7 +72,10 @@ export class ClusterComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.loadAll();
+    this.activatedRoute.data.subscribe(({ business }) => {
+      this.business = business;
+      this.loadAll();
+    });
     this.accountService.identity().then(account => {
       this.currentAccount = account;
     });

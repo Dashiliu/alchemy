@@ -11,6 +11,7 @@ import { ClusterDetailComponent } from './cluster-detail.component';
 import { ClusterUpdateComponent } from './cluster-update.component';
 import { ClusterDeletePopupComponent } from './cluster-delete-dialog.component';
 import { ICluster } from 'app/shared/model/cluster.model';
+import {BusinessResolve} from "app/home";
 
 @Injectable({ providedIn: 'root' })
 export class ClusterResolve implements Resolve<ICluster> {
@@ -30,8 +31,11 @@ export class ClusterResolve implements Resolve<ICluster> {
 
 export const clusterRoute: Routes = [
   {
-    path: '',
+    path: ':id',
     component: ClusterComponent,
+    resolve: {
+      business: BusinessResolve
+    },
     data: {
       authorities: ['ROLE_USER'],
       pageTitle: 'alchemyApp.cluster.home.title'
@@ -51,10 +55,10 @@ export const clusterRoute: Routes = [
     canActivate: [UserRouteAccessService]
   },
   {
-    path: 'new',
+    path: ':id/new',
     component: ClusterUpdateComponent,
     resolve: {
-      cluster: ClusterResolve
+      data: BusinessResolve
     },
     data: {
       authorities: ['ROLE_USER'],
@@ -66,7 +70,7 @@ export const clusterRoute: Routes = [
     path: ':id/edit',
     component: ClusterUpdateComponent,
     resolve: {
-      cluster: ClusterResolve
+      data: ClusterResolve
     },
     data: {
       authorities: ['ROLE_USER'],

@@ -9,7 +9,7 @@ import { DATE_TIME_FORMAT } from 'app/shared/constants/input.constants';
 import { JhiAlertService } from 'ng-jhipster';
 import { ICluster, Cluster } from 'app/shared/model/cluster.model';
 import { ClusterService } from './cluster.service';
-import { IBusiness } from 'app/shared/model/business.model';
+import {Business, IBusiness} from 'app/shared/model/business.model';
 import { BusinessService } from 'app/entities/business';
 import 'codemirror/mode/yaml/yaml';
 
@@ -20,8 +20,7 @@ import 'codemirror/mode/yaml/yaml';
 export class ClusterUpdateComponent implements OnInit {
   cluster: ICluster;
   isSaving: boolean;
-
-  businesses: IBusiness[];
+  business: IBusiness;
 
   yamlConfig: any = { lineNumbers: true, mode: 'text/x-yaml', theme: 'material' };
 
@@ -48,17 +47,18 @@ export class ClusterUpdateComponent implements OnInit {
 
   ngOnInit() {
     this.isSaving = false;
-    this.activatedRoute.data.subscribe(({ cluster }) => {
-      this.updateForm(cluster);
-      this.cluster = cluster;
+    this.activatedRoute.data.subscribe(({ data }) => {
+      if(data.lastModifiedDate){
+        this.updateForm(data);
+        this.cluster = data;
+        this.business = new Business();
+        this.business.id = this.cluster.businessId;
+      } else{
+        this.business = data;
+        this.cluster = new Cluster();
+      }
+
     });
-    this.businessService
-      .query()
-      .pipe(
-        filter((mayBeOk: HttpResponse<IBusiness[]>) => mayBeOk.ok),
-        map((response: HttpResponse<IBusiness[]>) => response.body)
-      )
-      .subscribe((res: IBusiness[]) => (this.businesses = res), (res: HttpErrorResponse) => this.onError(res.message));
   }
 
   updateForm(cluster: ICluster) {
@@ -83,7 +83,7 @@ export class ClusterUpdateComponent implements OnInit {
   save() {
     this.isSaving = true;
     const cluster = this.createFromForm();
-    if (cluster.id !== undefined) {
+    if (cluster.id !== undefined && cluster.id != null) {
       this.subscribeToSaveResponse(this.clusterService.update(cluster));
     } else {
       this.subscribeToSaveResponse(this.clusterService.create(cluster));
@@ -106,7 +106,7 @@ export class ClusterUpdateComponent implements OnInit {
         this.editForm.get(['lastModifiedDate']).value != null
           ? moment(this.editForm.get(['lastModifiedDate']).value, DATE_TIME_FORMAT)
           : undefined,
-      businessId: this.editForm.get(['businessId']).value
+      businessId: this.business.id
     };
     return entity;
   }

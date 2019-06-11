@@ -1,44 +1,66 @@
-import { Component, OnInit } from '@angular/core';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { JhiEventManager } from 'ng-jhipster';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
+import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
-import { LoginModalService, AccountService, Account } from 'app/core';
+import { IBusiness } from 'app/shared/model/business.model';
+import { AccountService } from 'app/core';
+import { BusinessService } from './business.service';
 
 @Component({
-  selector: 'jhi-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['home.scss']
+  selector: 'jhi-business',
+  templateUrl: './home.component.html'
 })
-export class HomeComponent implements OnInit {
-  account: Account;
-  modalRef: NgbModalRef;
+export class HomeComponent implements OnInit, OnDestroy {
+  businesses: IBusiness[];
+  currentAccount: any;
+  eventSubscriber: Subscription;
+  isNavbarCollapsed: boolean;
 
   constructor(
-    private accountService: AccountService,
-    private loginModalService: LoginModalService,
-    private eventManager: JhiEventManager
+    protected businessService: BusinessService,
+    protected jhiAlertService: JhiAlertService,
+    protected eventManager: JhiEventManager,
+    protected accountService: AccountService
   ) {}
 
+  loadAll() {
+    this.businessService
+      .query()
+      .pipe(
+        filter((res: HttpResponse<IBusiness[]>) => res.ok),
+        map((res: HttpResponse<IBusiness[]>) => res.body)
+      )
+      .subscribe(
+        (res: IBusiness[]) => {
+          this.businesses = res;
+        },
+        (res: HttpErrorResponse) => this.onError(res.message)
+      );
+  }
+
   ngOnInit() {
-    this.accountService.identity().then((account: Account) => {
-      this.account = account;
+    this.loadAll();
+    this.accountService.identity().then(account => {
+      this.currentAccount = account;
     });
-    this.registerAuthenticationSuccess();
+    this.registerChangeInBusinesses();
   }
 
-  registerAuthenticationSuccess() {
-    this.eventManager.subscribe('authenticationSuccess', message => {
-      this.accountService.identity().then(account => {
-        this.account = account;
-      });
-    });
+  ngOnDestroy() {
+    this.eventManager.destroy(this.eventSubscriber);
   }
 
-  isAuthenticated() {
-    return this.accountService.isAuthenticated();
+  trackId(index: number, item: IBusiness) {
+    return item.id;
   }
 
-  login() {
-    this.modalRef = this.loginModalService.open();
+  registerChangeInBusinesses() {
+    this.eventSubscriber = this.eventManager.subscribe('businessListModification', response => this.loadAll());
+  }
+
+  protected onError(errorMessage: string) {
+    this.jhiAlertService.error(errorMessage, null, null);
   }
 }

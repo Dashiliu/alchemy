@@ -1,7 +1,7 @@
 <div>
     <h2 id="page-heading">
         <span jhiTranslate="alchemyApp.cluster.home.title">Clusters</span>
-        <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-cluster" [routerLink]="['/cluster/new']">
+        <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-cluster" [routerLink]="['/cluster', business.id , 'new']">
             <fa-icon [icon]="'plus'"></fa-icon>
             <span  jhiTranslate="alchemyApp.cluster.home.createLabel">
             Create new Cluster
