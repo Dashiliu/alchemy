@@ -79,31 +79,36 @@
                                     </a>
                                     <ul class="dropdown-menu" ngbDropdownMenu aria-labelledby="job-operator-menu">
                                         <li>
-                                            <a class="dropdown-item" routerLink="business" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
+                                            <a class="dropdown-item"  [routerLink]="['/', 'job', { outlets: { popup: job.id + '/submit'} }]" replaceUrl="true"
+                                               queryParamsHandling="merge"  routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
                                                 <fa-icon icon="asterisk" fixedWidth="true"></fa-icon>
                                                 <span jhiTranslate="global.menu.job.submit">Submit</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item" routerLink="business" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
+                                            <a class="dropdown-item"  [routerLink]="['/', 'job', { outlets: { popup: job.id + '/calcel'} }]" replaceUrl="true"
+                                               queryParamsHandling="merge"  routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
                                                 <fa-icon icon="asterisk" fixedWidth="true"></fa-icon>
                                                 <span jhiTranslate="global.menu.job.cancel">Cancel</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item" routerLink="business" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
+                                            <a class="dropdown-item"  [routerLink]="['/', 'job', { outlets: { popup: job.id + '/cancel-savepoint'} }]" replaceUrl="true"
+                                               queryParamsHandling="merge"  routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
                                                 <fa-icon icon="asterisk" fixedWidth="true"></fa-icon>
                                                 <span jhiTranslate="global.menu.job.cancelWithSavepoint">CancelWithSavepoint</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item" routerLink="business" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
+                                            <a class="dropdown-item"  [routerLink]="['/', 'job', { outlets: { popup: job.id + '/rescale'} }]" replaceUrl="true"
+                                               queryParamsHandling="merge"  routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
                                                 <fa-icon icon="asterisk" fixedWidth="true"></fa-icon>
                                                 <span jhiTranslate="global.menu.job.rescale">Rescale</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item" routerLink="business" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
+                                            <a class="dropdown-item"  [routerLink]="['/', 'job', { outlets: { popup: job.id + '/savepoint'} }]" replaceUrl="true"
+                                               queryParamsHandling="merge"  routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
                                                 <fa-icon icon="asterisk" fixedWidth="true"></fa-icon>
                                                 <span jhiTranslate="global.menu.job.triggerSavepoint">TriggerSavepoint</span>
                                             </a>

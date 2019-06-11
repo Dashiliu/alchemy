@@ -29,9 +29,6 @@ public class SqlParseUtil {
 
     public static void parse(List<String> sqls, List<String> sources, List<String> udfs, List<String> sinks)
         throws SqlParseException {
-        List<String> newSourcs = Lists.newArrayList();
-        List<String> newUdfs = Lists.newArrayList();
-        List<String> newSinks = Lists.newArrayList();
         for (String sql : sqls) {
             SqlParser sqlParser = SqlParser.create(sql, config);
             SqlNode sqlNode = sqlParser.parseStmt();
@@ -39,33 +36,12 @@ public class SqlParseUtil {
                 throw new IllegalArgumentException("It must be an insert SQL, sql:" + sql);
             }
             SqlInsert sqlInsert = (SqlInsert)sqlNode;
-            addSink(newSinks, findSinkName(sqlInsert));
+            addSink(sinks, findSinkName(sqlInsert));
             SqlNode source = sqlInsert.getSource();
             if (SqlKind.SELECT != source.getKind()) {
                 throw new IllegalArgumentException("invalid insert SQL, sql:" + sql);
             }
-            parseSource((SqlSelect)source, newSourcs, newUdfs);
-        }
-        addSource(newSourcs, sources);
-        addUdf(newUdfs, udfs);
-        addSink(newSinks, sinks);
-    }
-
-    private static void addSource(List<String> newSources, List<String> sourceNames) {
-        for (String sourceName : sourceNames) {
-            addSource(newSources, sourceName);
-        }
-    }
-
-    private static void addUdf(List<String> newUdfs, List<String> udfNames) {
-        for (String udfName : udfNames) {
-            addUdf(newUdfs, udfName);
-        }
-    }
-
-    private static void addSink(List<String> newSinks, List<String> sinkNames) {
-        for (String sinkName : sinkNames) {
-            addSink(newSinks, sinkName);
+            parseSource((SqlSelect)source, sources, udfs);
         }
     }
 
@@ -198,7 +174,7 @@ public class SqlParseUtil {
     }
 
     public static void main(String[] args) throws SqlParseException {
-        String sql1 = "insert into mySink select * from myTable";
+        String sql1 = "insert into first_sink select * from ngx_log";
         String sql2
             = "insert into test select CASE WHEN 1>0 THEN H.vv ELSE '' END ,h.id, h.age, FLOOR(h.age), TF(h.xxx) AS tf , t.height as he, (select * from fsdkdf f where f.id in(1,2,3)) from hah h join tets t on t.id = h.id where h.age > 10 ";
         List<String> sourcs = Lists.newArrayList();

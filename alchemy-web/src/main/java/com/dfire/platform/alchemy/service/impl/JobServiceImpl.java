@@ -236,7 +236,7 @@ public class JobServiceImpl implements JobService {
     private Source findSource(Job job, String name) throws Exception {
         Optional<Source> sourceOptional = sourceRepository.findOneByBusinessIdAndName(job.getBusiness().getId(), name);
         if (!sourceOptional.isPresent()) {
-            throw new IllegalArgumentException("table source：" + name + "doesn't exist");
+            throw new IllegalArgumentException("table source：" + name + " doesn't exist");
         }
         return sourceOptional.get();
     }

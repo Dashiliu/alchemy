@@ -116,7 +116,9 @@
       "edit": "Edit",
       "open": "Open",
       "save": "Save",
-      "view": "View"
+      "view": "View",
+      "submit": "Submit",
+      "ok": "OK"
     },
     "detail": {
       "field": "Field",
@@ -124,6 +126,18 @@
     },
     "delete": {
       "title": "Confirm delete operation"
+    },
+    "submit": {
+      "title": "Confirm submit operation"
+    },
+    "cancel": {
+      "title": "Confirm cancel operation"
+    },
+    "savepoint": {
+      "title": "Confirm savepoint operation"
+    },
+    "rescale": {
+      "title": "Confirm rescale operation"
     },
     "validation": {
       "required": "This field is required.",

@@ -12,6 +12,8 @@ import { JobDetailComponent } from './job-detail.component';
 import { JobUpdateComponent } from './job-update.component';
 import { JobDeletePopupComponent } from './job-delete-dialog.component';
 import { IJob } from 'app/shared/model/job.model';
+import {JobSubmitPopupComponent} from "app/entities/job/job-submit-dialog.component";
+import {JobCancelPopupComponent} from "app/entities/job/job-cancel-dialog.component";
 
 @Injectable({ providedIn: 'root' })
 export class JobResolve implements Resolve<IJob> {
@@ -85,6 +87,32 @@ export const jobPopupRoute: Routes = [
   {
     path: ':id/delete',
     component: JobDeletePopupComponent,
+    resolve: {
+      job: JobResolve
+    },
+    data: {
+      authorities: ['ROLE_USER'],
+      pageTitle: 'alchemyApp.job.home.title'
+    },
+    canActivate: [UserRouteAccessService],
+    outlet: 'popup'
+  },
+  {
+    path: ':id/cancel',
+    component: JobCancelPopupComponent,
+    resolve: {
+      job: JobResolve
+    },
+    data: {
+      authorities: ['ROLE_USER'],
+      pageTitle: 'alchemyApp.job.home.title'
+    },
+    canActivate: [UserRouteAccessService],
+    outlet: 'popup'
+  },
+  {
+    path: ':id/submit',
+    component: JobSubmitPopupComponent,
     resolve: {
       job: JobResolve
     },

@@ -1,5 +1,6 @@
 package com.dfire.platform.alchemy.descriptor;
 
+import com.dfire.platform.alchemy.common.Constants;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.springframework.beans.BeanUtils;
@@ -30,7 +31,7 @@ public class UdfDescriptor implements CoreDescriptor {
      */
     private String value;
 
-    private UdfType type;
+    private UdfType udfType;
 
     private String avg;
 
@@ -49,12 +50,12 @@ public class UdfDescriptor implements CoreDescriptor {
         this.name = name;
     }
 
-    public UdfType getType() {
-        return type;
+    public UdfType getUdfType() {
+        return udfType;
     }
 
-    public void setType(UdfType type) {
-        this.type = type;
+    public void setUdfType(UdfType udfType) {
+        this.udfType = udfType;
     }
 
     public String getAvg() {
@@ -73,7 +74,7 @@ public class UdfDescriptor implements CoreDescriptor {
     @Override
     public <T, R> T transform(R param) throws Exception {
         Class clazz;
-        if (UdfType.CODE == type) {
+        if (UdfType.CODE == udfType) {
             clazz = GroovyCompiler.compile(this.getValue(), this.getName());
         } else {
             if (param == null || !(param instanceof ClassLoader)) {
@@ -110,7 +111,7 @@ public class UdfDescriptor implements CoreDescriptor {
 
     @Override
     public String type() {
-        return type.toString();
+        return Constants.TYPE_VALUE_UDF;
     }
 
     @Override

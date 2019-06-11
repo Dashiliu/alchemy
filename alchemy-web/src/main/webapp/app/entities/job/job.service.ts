@@ -49,6 +49,14 @@ export class JobService {
     return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
 
+  submit(id: number): Observable<HttpResponse<any>> {
+    return this.http.get<any>(`${this.resourceUrl}/submit/${id}`, { observe: 'response' });
+  }
+
+  cancel(id: number): Observable<HttpResponse<any>> {
+    return this.http.get<any>(`${this.resourceUrl}/cancel/${id}`, { observe: 'response' });
+  }
+
   protected convertDateFromClient(job: IJob): IJob {
     const copy: IJob = Object.assign({}, job, {
       createdDate: job.createdDate != null && job.createdDate.isValid() ? job.createdDate.toJSON() : null,

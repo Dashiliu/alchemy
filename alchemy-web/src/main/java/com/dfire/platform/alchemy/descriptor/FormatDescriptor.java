@@ -77,9 +77,9 @@ public class FormatDescriptor implements CoreDescriptor {
         } else if (Constants.TYPE_VALUE_FORMAT_PB.equalsIgnoreCase(type)) {
             Class clazz = findClazz();
             return (T)new ProtostuffRowDeserializationSchema(typeInformation, clazz);
-        } else if (Constants.TYPE_VALUE_FORMAT_GROK.equalsIgnoreCase(type)) {
-            return (T)new JsonRowDeserializationSchema(type);
         } else if (Constants.TYPE_VALUE_FORMAT_JSON.equalsIgnoreCase(type)) {
+            return (T)new JsonRowDeserializationSchema(type);
+        } else if (Constants.TYPE_VALUE_FORMAT_GROK.equalsIgnoreCase(type)) {
             String regular = findRegular();
             return (T)new GrokRowDeserializationSchema(typeInformation, regular);
         }

@@ -3,13 +3,16 @@ import { RouterModule } from '@angular/router';
 import { JhiLanguageService } from 'ng-jhipster';
 import { JhiLanguageHelper } from 'app/core';
 import { CodemirrorModule } from 'ng2-codemirror';
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { AlchemySharedModule } from 'app/shared';
 import {
   JobComponent,
   JobDetailComponent,
   JobUpdateComponent,
+  JobSubmitPopupComponent,
+  JobSubmitDialogComponent,
+  JobCancelPopupComponent,
+  JobCancelDialogComponent,
   JobDeletePopupComponent,
   JobDeleteDialogComponent,
   jobRoute,
@@ -19,9 +22,11 @@ import {
 const ENTITY_STATES = [...jobRoute, ...jobPopupRoute];
 
 @NgModule({
-  imports: [AlchemySharedModule, CodemirrorModule,NgbDropdownModule , RouterModule.forChild(ENTITY_STATES)],
-  declarations: [JobComponent, JobDetailComponent, JobUpdateComponent, JobDeleteDialogComponent, JobDeletePopupComponent],
-  entryComponents: [JobComponent, JobUpdateComponent, JobDeleteDialogComponent, JobDeletePopupComponent],
+  imports: [AlchemySharedModule, CodemirrorModule , RouterModule.forChild(ENTITY_STATES)],
+  declarations: [JobComponent, JobDetailComponent, JobUpdateComponent, JobCancelPopupComponent,
+    JobCancelDialogComponent,JobSubmitPopupComponent,JobSubmitDialogComponent,JobDeleteDialogComponent, JobDeletePopupComponent],
+  entryComponents: [JobComponent, JobUpdateComponent, JobCancelPopupComponent,
+    JobCancelDialogComponent,JobSubmitPopupComponent,JobSubmitDialogComponent, JobDeleteDialogComponent, JobDeletePopupComponent],
   providers: [{ provide: JhiLanguageService, useClass: JhiLanguageService }],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

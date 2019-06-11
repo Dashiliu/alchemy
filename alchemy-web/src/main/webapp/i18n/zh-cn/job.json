@@ -12,6 +12,18 @@
       "delete": {
         "question": "你确定要删除 Job {{ id }} 吗？"
       },
+      "submit": {
+        "question": "你确定要提交 Job {{ id }} 吗？"
+      },
+      "cancel": {
+        "question": "你确定要取消 Job {{ id }} 吗？"
+      },
+      "rescale": {
+        "question": "你确定要调整 Job {{ id }} 吗？"
+      },
+      "savepoint": {
+        "question": "你确定要savepoint Job {{ id }} 吗？"
+      },
       "detail": {
         "title": "Job"
       },

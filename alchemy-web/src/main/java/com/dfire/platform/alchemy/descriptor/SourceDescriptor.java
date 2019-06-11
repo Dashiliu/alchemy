@@ -35,10 +35,6 @@ public class SourceDescriptor implements CoreDescriptor {
 
     private FormatDescriptor format;
 
-    private SourceDescriptor() {
-
-    }
-
     public static void validate(Source source) throws Exception {
         SourceDescriptor sourceDescriptor = from(source);
         sourceDescriptor.validate();
@@ -53,11 +49,12 @@ public class SourceDescriptor implements CoreDescriptor {
             sourceDescriptor.setSql(source.getConfig());
         } else {
             sourceDescriptor = BindPropertiesUtil.bindProperties(source.getConfig(), SourceDescriptor.class);
-            ConnectorDescriptor connectorDescriptor
+            ConnectorDescriptor descriptor
                 = DescriptorFactory.me.find(sourceType.toString().toLowerCase(), ConnectorDescriptor.class);
-            if (connectorDescriptor == null) {
+            if (descriptor == null) {
                 throw new UnsupportedOperationException("Unknow source type:" + sourceType);
             }
+            ConnectorDescriptor connectorDescriptor = BindPropertiesUtil.bindProperties(sourceDescriptor.getConnector(), descriptor.getClass());
             sourceDescriptor.setConnectorDescriptor(connectorDescriptor);
 
         }
