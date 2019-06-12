@@ -18,6 +18,13 @@
             "fieldType": "byte[]",
             "fieldTypeBlobContent": "text"
         },
+      {
+        "fieldName": "remark",
+        "fieldType": "String",
+        "fieldValidateRules": [
+          "required"
+        ]
+      },
         {
             "fieldName": "createdBy",
             "fieldType": "String"

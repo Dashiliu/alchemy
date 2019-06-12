@@ -37,6 +37,10 @@ public class Sink implements Serializable {
     @Column(name = "config")
     private String config;
 
+    @NotNull
+    @Column(name = "remark", nullable = false)
+    private String remark;
+
     @Column(name = "created_by")
     private String createdBy;
 
@@ -99,6 +103,19 @@ public class Sink implements Serializable {
 
     public void setConfig(String config) {
         this.config = config;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public Sink remark(String remark) {
+        this.remark = remark;
+        return this;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 
     public String getCreatedBy() {
@@ -190,6 +207,7 @@ public class Sink implements Serializable {
             ", name='" + getName() + "'" +
             ", type='" + getType() + "'" +
             ", config='" + getConfig() + "'" +
+            ", remark='" + getRemark() + "'" +
             ", createdBy='" + getCreatedBy() + "'" +
             ", createdDate='" + getCreatedDate() + "'" +
             ", lastModifiedBy='" + getLastModifiedBy() + "'" +

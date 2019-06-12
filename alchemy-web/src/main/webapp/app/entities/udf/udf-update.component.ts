@@ -27,6 +27,7 @@ export class UdfUpdateComponent implements OnInit {
     id: [],
     name: [null, [Validators.required]],
     type: [null, [Validators.required]],
+    remark: [null, [Validators.required]],
     value: [null, [Validators.required]],
     avg: [],
     createdBy: [],

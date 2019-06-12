@@ -9,7 +9,7 @@ import { DATE_TIME_FORMAT } from 'app/shared/constants/input.constants';
 import { JhiAlertService } from 'ng-jhipster';
 import { IJob, Job } from 'app/shared/model/job.model';
 import { JobService } from './job.service';
-import { IBusiness } from 'app/shared/model/business.model';
+import {Business, IBusiness} from 'app/shared/model/business.model';
 import { BusinessService } from 'app/entities/business';
 import { ICluster } from 'app/shared/model/cluster.model';
 import { ClusterService } from 'app/entities/cluster';
@@ -24,7 +24,7 @@ export class JobUpdateComponent implements OnInit {
   isSaving: boolean;
   yamlConfig: any = { lineNumbers: true, mode: 'text/x-yaml', theme: 'material' };
 
-  businesses: IBusiness[];
+  businesse: IBusiness;
 
   clusters: ICluster[];
 
@@ -47,7 +47,6 @@ export class JobUpdateComponent implements OnInit {
   constructor(
     protected jhiAlertService: JhiAlertService,
     protected jobService: JobService,
-    protected businessService: BusinessService,
     protected clusterService: ClusterService,
     protected activatedRoute: ActivatedRoute,
     private fb: FormBuilder
@@ -55,17 +54,21 @@ export class JobUpdateComponent implements OnInit {
 
   ngOnInit() {
     this.isSaving = false;
-    this.activatedRoute.data.subscribe(({ job }) => {
-      this.updateForm(job);
-      this.job = job;
+    this.activatedRoute.data.subscribe(({ business }) => {
+      if(business){
+        this.businesse = business;
+        this.job = new Job();
+      }
     });
-    this.businessService
-      .query()
-      .pipe(
-        filter((mayBeOk: HttpResponse<IBusiness[]>) => mayBeOk.ok),
-        map((response: HttpResponse<IBusiness[]>) => response.body)
-      )
-      .subscribe((res: IBusiness[]) => (this.businesses = res), (res: HttpErrorResponse) => this.onError(res.message));
+    this.activatedRoute.data.subscribe(({ job }) => {
+      if(job){
+        this.updateForm(job);
+        this.job = job;
+        this.businesse = new Business();
+        this.businesse.id = this.job.businessId;
+      }
+
+    });
     this.clusterService
       .query()
       .pipe(
@@ -100,7 +103,7 @@ export class JobUpdateComponent implements OnInit {
   save() {
     this.isSaving = true;
     const job = this.createFromForm();
-    if (job.id !== undefined) {
+    if (job.id !== undefined && job.id != null) {
       this.subscribeToSaveResponse(this.jobService.update(job));
     } else {
       this.subscribeToSaveResponse(this.jobService.create(job));
@@ -126,7 +129,7 @@ export class JobUpdateComponent implements OnInit {
           ? moment(this.editForm.get(['lastModifiedDate']).value, DATE_TIME_FORMAT)
           : undefined,
       businessId: this.editForm.get(['businessId']).value,
-      clusterId: this.editForm.get(['clusterId']).value
+      clusterId: this.businesse.id
     };
     return entity;
   }

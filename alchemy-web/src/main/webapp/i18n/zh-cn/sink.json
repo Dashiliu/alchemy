@@ -18,6 +18,7 @@
       "name": "Name",
       "type": "Type",
       "config": "Config",
+      "remark": "Remark",
       "createdBy": "Created By",
       "createdDate": "Created Date",
       "lastModifiedBy": "Last Modified By",

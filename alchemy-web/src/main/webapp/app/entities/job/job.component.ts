@@ -10,12 +10,14 @@ import { AccountService } from 'app/core';
 
 import { ITEMS_PER_PAGE } from 'app/shared';
 import { JobService } from './job.service';
+import {IBusiness} from "app/shared/model/business.model";
 
 @Component({
   selector: 'jhi-job',
   templateUrl: './job.component.html'
 })
 export class JobComponent implements OnInit, OnDestroy {
+  business: IBusiness;
   currentAccount: any;
   jobs: IJob[];
   error: any;
@@ -93,7 +95,10 @@ export class JobComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.loadAll();
+    this.activatedRoute.data.subscribe(({ business }) => {
+      this.business = business;
+      this.loadAll();
+    });
     this.accountService.identity().then(account => {
       this.currentAccount = account;
     });

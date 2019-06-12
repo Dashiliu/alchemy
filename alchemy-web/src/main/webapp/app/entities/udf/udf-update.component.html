@@ -37,7 +37,7 @@
                     <label class="form-control-label" jhiTranslate="alchemyApp.udf.value" for="field_value">Value</label>
                     <textarea *ngIf="editForm.get('type').value == 'AVG'" class="form-control" name="value" id="field_value"
                               formControlName="value"></textarea>
-                    <codemirror *ngIf="editForm.get('type').value == 'CODE'" formControlName="config" [config]="groovyConfig" id="field_config"></codemirror>
+                    <codemirror *ngIf="editForm.get('type').value == 'CODE'" formControlName="value" [config]="groovyConfig" id="field_config"></codemirror>
                     <div *ngIf="editForm.get('value').invalid && (editForm.get('value').dirty || editForm.get('value').touched)">
                         <small class="form-text text-danger"
                                *ngIf="editForm.get('value').errors.required" jhiTranslate="entity.validation.required">

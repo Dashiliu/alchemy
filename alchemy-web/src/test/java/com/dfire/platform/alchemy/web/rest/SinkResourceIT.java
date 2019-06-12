@@ -52,6 +52,9 @@ public class SinkResourceIT {
     private static final String DEFAULT_CONFIG = "AAAAAAAAAA";
     private static final String UPDATED_CONFIG = "BBBBBBBBBB";
 
+    private static final String DEFAULT_REMARK = "AAAAAAAAAA";
+    private static final String UPDATED_REMARK = "BBBBBBBBBB";
+
     private static final String DEFAULT_CREATED_BY = "AAAAAAAAAA";
     private static final String UPDATED_CREATED_BY = "BBBBBBBBBB";
 
@@ -118,6 +121,7 @@ public class SinkResourceIT {
             .name(DEFAULT_NAME)
             .type(DEFAULT_TYPE)
             .config(DEFAULT_CONFIG)
+            .remark(DEFAULT_REMARK)
             .createdBy(DEFAULT_CREATED_BY)
             .createdDate(DEFAULT_CREATED_DATE)
             .lastModifiedBy(DEFAULT_LAST_MODIFIED_BY)
@@ -135,6 +139,7 @@ public class SinkResourceIT {
             .name(UPDATED_NAME)
             .type(UPDATED_TYPE)
             .config(UPDATED_CONFIG)
+            .remark(UPDATED_REMARK)
             .createdBy(UPDATED_CREATED_BY)
             .createdDate(UPDATED_CREATED_DATE)
             .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
@@ -166,6 +171,7 @@ public class SinkResourceIT {
         assertThat(testSink.getName()).isEqualTo(DEFAULT_NAME);
         assertThat(testSink.getType()).isEqualTo(DEFAULT_TYPE);
         assertThat(testSink.getConfig()).isEqualTo(DEFAULT_CONFIG);
+        assertThat(testSink.getRemark()).isEqualTo(DEFAULT_REMARK);
         assertThat(testSink.getCreatedBy()).isEqualTo(DEFAULT_CREATED_BY);
         assertThat(testSink.getCreatedDate()).isEqualTo(DEFAULT_CREATED_DATE);
         assertThat(testSink.getLastModifiedBy()).isEqualTo(DEFAULT_LAST_MODIFIED_BY);
@@ -214,6 +220,25 @@ public class SinkResourceIT {
 
     @Test
     @Transactional
+    public void checkRemarkIsRequired() throws Exception {
+        int databaseSizeBeforeTest = sinkRepository.findAll().size();
+        // set the field null
+        sink.setRemark(null);
+
+        // Create the Sink, which fails.
+        SinkDTO sinkDTO = sinkMapper.toDto(sink);
+
+        restSinkMockMvc.perform(post("/api/sinks")
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .content(TestUtil.convertObjectToJsonBytes(sinkDTO)))
+            .andExpect(status().isBadRequest());
+
+        List<Sink> sinkList = sinkRepository.findAll();
+        assertThat(sinkList).hasSize(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
     public void getAllSinks() throws Exception {
         // Initialize the database
         sinkRepository.saveAndFlush(sink);
@@ -226,6 +251,7 @@ public class SinkResourceIT {
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
             .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())))
             .andExpect(jsonPath("$.[*].config").value(hasItem(DEFAULT_CONFIG.toString())))
+            .andExpect(jsonPath("$.[*].remark").value(hasItem(DEFAULT_REMARK.toString())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.toString())))
             .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY.toString())))
@@ -246,6 +272,7 @@ public class SinkResourceIT {
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
             .andExpect(jsonPath("$.type").value(DEFAULT_TYPE.toString()))
             .andExpect(jsonPath("$.config").value(DEFAULT_CONFIG.toString()))
+            .andExpect(jsonPath("$.remark").value(DEFAULT_REMARK.toString()))
             .andExpect(jsonPath("$.createdBy").value(DEFAULT_CREATED_BY.toString()))
             .andExpect(jsonPath("$.createdDate").value(DEFAULT_CREATED_DATE.toString()))
             .andExpect(jsonPath("$.lastModifiedBy").value(DEFAULT_LAST_MODIFIED_BY.toString()))
@@ -328,6 +355,45 @@ public class SinkResourceIT {
 
         // Get all the sinkList where type is null
         defaultSinkShouldNotBeFound("type.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllSinksByRemarkIsEqualToSomething() throws Exception {
+        // Initialize the database
+        sinkRepository.saveAndFlush(sink);
+
+        // Get all the sinkList where remark equals to DEFAULT_REMARK
+        defaultSinkShouldBeFound("remark.equals=" + DEFAULT_REMARK);
+
+        // Get all the sinkList where remark equals to UPDATED_REMARK
+        defaultSinkShouldNotBeFound("remark.equals=" + UPDATED_REMARK);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSinksByRemarkIsInShouldWork() throws Exception {
+        // Initialize the database
+        sinkRepository.saveAndFlush(sink);
+
+        // Get all the sinkList where remark in DEFAULT_REMARK or UPDATED_REMARK
+        defaultSinkShouldBeFound("remark.in=" + DEFAULT_REMARK + "," + UPDATED_REMARK);
+
+        // Get all the sinkList where remark equals to UPDATED_REMARK
+        defaultSinkShouldNotBeFound("remark.in=" + UPDATED_REMARK);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSinksByRemarkIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        sinkRepository.saveAndFlush(sink);
+
+        // Get all the sinkList where remark is not null
+        defaultSinkShouldBeFound("remark.specified=true");
+
+        // Get all the sinkList where remark is null
+        defaultSinkShouldNotBeFound("remark.specified=false");
     }
 
     @Test
@@ -515,6 +581,7 @@ public class SinkResourceIT {
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())))
             .andExpect(jsonPath("$.[*].config").value(hasItem(DEFAULT_CONFIG.toString())))
+            .andExpect(jsonPath("$.[*].remark").value(hasItem(DEFAULT_REMARK)))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY)))
             .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY)))
@@ -569,6 +636,7 @@ public class SinkResourceIT {
             .name(UPDATED_NAME)
             .type(UPDATED_TYPE)
             .config(UPDATED_CONFIG)
+            .remark(UPDATED_REMARK)
             .createdBy(UPDATED_CREATED_BY)
             .createdDate(UPDATED_CREATED_DATE)
             .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
@@ -587,6 +655,7 @@ public class SinkResourceIT {
         assertThat(testSink.getName()).isEqualTo(UPDATED_NAME);
         assertThat(testSink.getType()).isEqualTo(UPDATED_TYPE);
         assertThat(testSink.getConfig()).isEqualTo(UPDATED_CONFIG);
+        assertThat(testSink.getRemark()).isEqualTo(UPDATED_REMARK);
         assertThat(testSink.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
         assertThat(testSink.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
         assertThat(testSink.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY);

@@ -12,6 +12,7 @@ import { SinkDetailComponent } from './sink-detail.component';
 import { SinkUpdateComponent } from './sink-update.component';
 import { SinkDeletePopupComponent } from './sink-delete-dialog.component';
 import { ISink } from 'app/shared/model/sink.model';
+import {BusinessResolve} from "app/home";
 
 @Injectable({ providedIn: 'root' })
 export class SinkResolve implements Resolve<ISink> {
@@ -31,10 +32,11 @@ export class SinkResolve implements Resolve<ISink> {
 
 export const sinkRoute: Routes = [
   {
-    path: '',
+    path: ':id',
     component: SinkComponent,
     resolve: {
-      pagingParams: JhiResolvePagingParams
+      pagingParams: JhiResolvePagingParams,
+      business: BusinessResolve
     },
     data: {
       authorities: ['ROLE_USER'],
@@ -56,10 +58,10 @@ export const sinkRoute: Routes = [
     canActivate: [UserRouteAccessService]
   },
   {
-    path: 'new',
+    path: ':id/new',
     component: SinkUpdateComponent,
     resolve: {
-      sink: SinkResolve
+      business: BusinessResolve
     },
     data: {
       authorities: ['ROLE_USER'],

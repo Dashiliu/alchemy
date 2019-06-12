@@ -27,7 +27,7 @@ describe('Service Tests', () => {
       httpMock = injector.get(HttpTestingController);
       currentDate = moment();
 
-      elemDefault = new Sink(0, 'AAAAAAA', SinkType.REDIS, 'AAAAAAA', 'AAAAAAA', currentDate, 'AAAAAAA', currentDate);
+      elemDefault = new Sink(0, 'AAAAAAA', SinkType.REDIS, 'AAAAAAA', 'AAAAAAA', 'AAAAAAA', currentDate, 'AAAAAAA', currentDate);
     });
 
     describe('Service methods', () => {
@@ -80,6 +80,7 @@ describe('Service Tests', () => {
             name: 'BBBBBB',
             type: 'BBBBBB',
             config: 'BBBBBB',
+            remark: 'BBBBBB',
             createdBy: 'BBBBBB',
             createdDate: currentDate.format(DATE_TIME_FORMAT),
             lastModifiedBy: 'BBBBBB',
@@ -110,6 +111,7 @@ describe('Service Tests', () => {
             name: 'BBBBBB',
             type: 'BBBBBB',
             config: 'BBBBBB',
+            remark: 'BBBBBB',
             createdBy: 'BBBBBB',
             createdDate: currentDate.format(DATE_TIME_FORMAT),
             lastModifiedBy: 'BBBBBB',

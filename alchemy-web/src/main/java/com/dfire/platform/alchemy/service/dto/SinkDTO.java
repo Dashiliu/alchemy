@@ -21,6 +21,9 @@ public class SinkDTO implements Serializable {
     @Lob
     private String config;
 
+    @NotNull
+    private String remark;
+
     private String createdBy;
 
     private Instant createdDate;
@@ -29,7 +32,7 @@ public class SinkDTO implements Serializable {
 
     private Instant lastModifiedDate;
 
-    @NotNull
+
     private Long businessId;
 
     public Long getId() {
@@ -62,6 +65,14 @@ public class SinkDTO implements Serializable {
 
     public void setConfig(String config) {
         this.config = config;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 
     public String getCreatedBy() {
@@ -132,6 +143,7 @@ public class SinkDTO implements Serializable {
             ", name='" + getName() + "'" +
             ", type='" + getType() + "'" +
             ", config='" + getConfig() + "'" +
+            ", remark='" + getRemark() + "'" +
             ", createdBy='" + getCreatedBy() + "'" +
             ", createdDate='" + getCreatedDate() + "'" +
             ", lastModifiedBy='" + getLastModifiedBy() + "'" +

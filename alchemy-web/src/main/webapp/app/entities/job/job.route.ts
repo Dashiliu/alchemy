@@ -14,6 +14,7 @@ import { JobDeletePopupComponent } from './job-delete-dialog.component';
 import { IJob } from 'app/shared/model/job.model';
 import {JobSubmitPopupComponent} from "app/entities/job/job-submit-dialog.component";
 import {JobCancelPopupComponent} from "app/entities/job/job-cancel-dialog.component";
+import {BusinessResolve} from "app/home";
 
 @Injectable({ providedIn: 'root' })
 export class JobResolve implements Resolve<IJob> {
@@ -33,10 +34,11 @@ export class JobResolve implements Resolve<IJob> {
 
 export const jobRoute: Routes = [
   {
-    path: '',
+    path: ':id',
     component: JobComponent,
     resolve: {
-      pagingParams: JhiResolvePagingParams
+      pagingParams: JhiResolvePagingParams,
+      business: BusinessResolve
     },
     data: {
       authorities: ['ROLE_USER'],
@@ -58,10 +60,10 @@ export const jobRoute: Routes = [
     canActivate: [UserRouteAccessService]
   },
   {
-    path: 'new',
+    path: ':id/new',
     component: JobUpdateComponent,
     resolve: {
-      job: JobResolve
+      business: BusinessResolve
     },
     data: {
       authorities: ['ROLE_USER'],

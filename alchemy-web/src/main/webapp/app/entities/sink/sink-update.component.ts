@@ -9,7 +9,7 @@ import { DATE_TIME_FORMAT } from 'app/shared/constants/input.constants';
 import { JhiAlertService, JhiDataUtils } from 'ng-jhipster';
 import { ISink, Sink } from 'app/shared/model/sink.model';
 import { SinkService } from './sink.service';
-import { IBusiness } from 'app/shared/model/business.model';
+import {Business, IBusiness} from 'app/shared/model/business.model';
 import { BusinessService } from 'app/entities/business';
 import 'codemirror/mode/yaml/yaml';
 @Component({
@@ -20,13 +20,14 @@ export class SinkUpdateComponent implements OnInit {
   sink: ISink;
   isSaving: boolean;
   yamlConfig: any = { lineNumbers: true, mode: 'text/x-yaml', theme: 'material' };
-  businesses: IBusiness[];
+  businesse: IBusiness;
 
   editForm = this.fb.group({
     id: [],
     name: [],
     type: [null, [Validators.required]],
     config: [],
+    remark: [null, [Validators.required]],
     createdBy: [],
     createdDate: [],
     lastModifiedBy: [],
@@ -38,24 +39,27 @@ export class SinkUpdateComponent implements OnInit {
     protected dataUtils: JhiDataUtils,
     protected jhiAlertService: JhiAlertService,
     protected sinkService: SinkService,
-    protected businessService: BusinessService,
     protected activatedRoute: ActivatedRoute,
     private fb: FormBuilder
   ) {}
 
   ngOnInit() {
     this.isSaving = false;
-    this.activatedRoute.data.subscribe(({ sink }) => {
-      this.updateForm(sink);
-      this.sink = sink;
+    this.activatedRoute.data.subscribe(({ business }) => {
+      if(business){
+        this.businesse = business;
+        this.sink = new Sink();
+      }
     });
-    this.businessService
-      .query()
-      .pipe(
-        filter((mayBeOk: HttpResponse<IBusiness[]>) => mayBeOk.ok),
-        map((response: HttpResponse<IBusiness[]>) => response.body)
-      )
-      .subscribe((res: IBusiness[]) => (this.businesses = res), (res: HttpErrorResponse) => this.onError(res.message));
+    this.activatedRoute.data.subscribe(({ sink }) => {
+      if(sink){
+        this.updateForm(sink);
+        this.sink = sink;
+        this.businesse = new Business();
+        this.businesse.id = this.sink.businessId;
+      }
+
+    });
   }
 
   updateForm(sink: ISink) {
@@ -68,6 +72,7 @@ export class SinkUpdateComponent implements OnInit {
       createdDate: sink.createdDate != null ? sink.createdDate.format(DATE_TIME_FORMAT) : null,
       lastModifiedBy: sink.lastModifiedBy,
       lastModifiedDate: sink.lastModifiedDate != null ? sink.lastModifiedDate.format(DATE_TIME_FORMAT) : null,
+      remark: sink.remark,
       businessId: sink.businessId
     });
   }
@@ -111,7 +116,7 @@ export class SinkUpdateComponent implements OnInit {
   save() {
     this.isSaving = true;
     const sink = this.createFromForm();
-    if (sink.id !== undefined) {
+    if (sink.id !== undefined && sink.id != null) {
       this.subscribeToSaveResponse(this.sinkService.update(sink));
     } else {
       this.subscribeToSaveResponse(this.sinkService.create(sink));
@@ -133,7 +138,8 @@ export class SinkUpdateComponent implements OnInit {
         this.editForm.get(['lastModifiedDate']).value != null
           ? moment(this.editForm.get(['lastModifiedDate']).value, DATE_TIME_FORMAT)
           : undefined,
-      businessId: this.editForm.get(['businessId']).value
+      remark: this.editForm.get(['remark']).value,
+      businessId: this.businesse.id
     };
     return entity;
   }

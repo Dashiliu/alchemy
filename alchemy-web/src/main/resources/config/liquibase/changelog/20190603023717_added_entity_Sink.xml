@@ -28,6 +28,10 @@
                 <constraints nullable="true" />
             </column>
 
+            <column name="remark" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+
             <column name="created_by" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
@@ -73,6 +77,7 @@
             <column name="name" type="string"/>
             <column name="jhi_type" type="string"/>
             <column name="config" type="string"/>
+            <column name="remark" type="string"/>
             <column name="created_by" type="string"/>
             <column name="created_date" type="date"/>
             <column name="last_modified_by" type="string"/>
