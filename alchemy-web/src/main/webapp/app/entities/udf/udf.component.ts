@@ -10,12 +10,14 @@ import { AccountService } from 'app/core';
 
 import { ITEMS_PER_PAGE } from 'app/shared';
 import { UdfService } from './udf.service';
+import {IBusiness} from "app/shared/model/business.model";
 
 @Component({
   selector: 'jhi-udf',
   templateUrl: './udf.component.html'
 })
 export class UdfComponent implements OnInit, OnDestroy {
+  business: IBusiness;
   currentAccount: any;
   udfs: IUdf[];
   error: any;
@@ -52,6 +54,7 @@ export class UdfComponent implements OnInit, OnDestroy {
   loadAll() {
     this.udfService
       .query({
+        "businessId.specified": this.business.id,
         page: this.page - 1,
         size: this.itemsPerPage,
         sort: this.sort()
@@ -93,7 +96,10 @@ export class UdfComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.loadAll();
+    this.activatedRoute.data.subscribe(({ business }) => {
+      this.business = business;
+      this.loadAll();
+    });
     this.accountService.identity().then(account => {
       this.currentAccount = account;
     });

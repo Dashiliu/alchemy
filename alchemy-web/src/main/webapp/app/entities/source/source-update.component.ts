@@ -9,9 +9,10 @@ import { DATE_TIME_FORMAT } from 'app/shared/constants/input.constants';
 import { JhiAlertService, JhiDataUtils } from 'ng-jhipster';
 import { ISource, Source } from 'app/shared/model/source.model';
 import { SourceService } from './source.service';
-import { IBusiness } from 'app/shared/model/business.model';
+import {Business, IBusiness} from 'app/shared/model/business.model';
 import { BusinessService } from 'app/entities/business';
 import 'codemirror/mode/yaml/yaml';
+import {Cluster} from "app/shared/model/cluster.model";
 @Component({
   selector: 'jhi-source-update',
   templateUrl: './source-update.component.html'
@@ -20,7 +21,7 @@ export class SourceUpdateComponent implements OnInit {
   source: ISource;
   isSaving: boolean;
   yamlConfig: any = { lineNumbers: true, mode: 'text/x-yaml', theme: 'material' };
-  businesses: IBusiness[];
+  business: IBusiness;
 
   editForm = this.fb.group({
     id: [],
@@ -46,17 +47,21 @@ export class SourceUpdateComponent implements OnInit {
 
   ngOnInit() {
     this.isSaving = false;
-    this.activatedRoute.data.subscribe(({ source }) => {
-      this.updateForm(source);
-      this.source = source;
+    this.activatedRoute.data.subscribe(({ business }) => {
+      if(business){
+        this.business = business;
+        this.source = new Source();
+      }
     });
-    this.businessService
-      .query()
-      .pipe(
-        filter((mayBeOk: HttpResponse<IBusiness[]>) => mayBeOk.ok),
-        map((response: HttpResponse<IBusiness[]>) => response.body)
-      )
-      .subscribe((res: IBusiness[]) => (this.businesses = res), (res: HttpErrorResponse) => this.onError(res.message));
+    this.activatedRoute.data.subscribe(({ source }) => {
+      if(source){
+        this.updateForm(source);
+        this.source = source;
+        this.business = new Business();
+        this.business.id = this.source.businessId;
+      }
+
+    });
   }
 
   updateForm(source: ISource) {
@@ -113,7 +118,7 @@ export class SourceUpdateComponent implements OnInit {
   save() {
     this.isSaving = true;
     const source = this.createFromForm();
-    if (source.id !== undefined) {
+    if (source.id !== undefined && source.id != null) {
       this.subscribeToSaveResponse(this.sourceService.update(source));
     } else {
       this.subscribeToSaveResponse(this.sourceService.create(source));
@@ -136,7 +141,7 @@ export class SourceUpdateComponent implements OnInit {
         this.editForm.get(['lastModifiedDate']).value != null
           ? moment(this.editForm.get(['lastModifiedDate']).value, DATE_TIME_FORMAT)
           : undefined,
-      businessId: this.editForm.get(['businessId']).value
+      businessId: this.business.id
     };
     return entity;
   }

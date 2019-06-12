@@ -12,6 +12,7 @@ import { UdfDetailComponent } from './udf-detail.component';
 import { UdfUpdateComponent } from './udf-update.component';
 import { UdfDeletePopupComponent } from './udf-delete-dialog.component';
 import { IUdf } from 'app/shared/model/udf.model';
+import {BusinessResolve} from "app/home";
 
 @Injectable({ providedIn: 'root' })
 export class UdfResolve implements Resolve<IUdf> {
@@ -31,10 +32,11 @@ export class UdfResolve implements Resolve<IUdf> {
 
 export const udfRoute: Routes = [
   {
-    path: '',
+    path: ':id',
     component: UdfComponent,
     resolve: {
-      pagingParams: JhiResolvePagingParams
+      pagingParams: JhiResolvePagingParams,
+      business: BusinessResolve
     },
     data: {
       authorities: ['ROLE_USER'],
@@ -56,10 +58,10 @@ export const udfRoute: Routes = [
     canActivate: [UserRouteAccessService]
   },
   {
-    path: 'new',
+    path: ':id/new',
     component: UdfUpdateComponent,
     resolve: {
-      udf: UdfResolve
+      business: BusinessResolve
     },
     data: {
       authorities: ['ROLE_USER'],

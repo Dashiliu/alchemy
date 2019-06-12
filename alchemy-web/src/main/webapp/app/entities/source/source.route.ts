@@ -12,6 +12,7 @@ import { SourceDetailComponent } from './source-detail.component';
 import { SourceUpdateComponent } from './source-update.component';
 import { SourceDeletePopupComponent } from './source-delete-dialog.component';
 import { ISource } from 'app/shared/model/source.model';
+import {BusinessResolve} from "app/home";
 
 @Injectable({ providedIn: 'root' })
 export class SourceResolve implements Resolve<ISource> {
@@ -31,10 +32,11 @@ export class SourceResolve implements Resolve<ISource> {
 
 export const sourceRoute: Routes = [
   {
-    path: '',
+    path: ':id',
     component: SourceComponent,
     resolve: {
-      pagingParams: JhiResolvePagingParams
+      pagingParams: JhiResolvePagingParams,
+      business: BusinessResolve
     },
     data: {
       authorities: ['ROLE_USER'],
@@ -56,10 +58,10 @@ export const sourceRoute: Routes = [
     canActivate: [UserRouteAccessService]
   },
   {
-    path: 'new',
+    path: ':id/new',
     component: SourceUpdateComponent,
     resolve: {
-      source: SourceResolve
+      business: BusinessResolve
     },
     data: {
       authorities: ['ROLE_USER'],

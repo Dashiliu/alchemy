@@ -9,7 +9,7 @@ import { DATE_TIME_FORMAT } from 'app/shared/constants/input.constants';
 import { JhiAlertService, JhiDataUtils } from 'ng-jhipster';
 import { IUdf, Udf } from 'app/shared/model/udf.model';
 import { UdfService } from './udf.service';
-import { IBusiness } from 'app/shared/model/business.model';
+import {Business, IBusiness} from 'app/shared/model/business.model';
 import { BusinessService } from 'app/entities/business';
 import 'codemirror/mode/groovy/groovy';
 
@@ -21,7 +21,7 @@ export class UdfUpdateComponent implements OnInit {
   udf: IUdf;
   isSaving: boolean;
   groovyConfig: any = { lineNumbers: true, mode: 'text/x-groovy', theme: 'material' };
-  businesses: IBusiness[];
+  business: IBusiness;
 
   editForm = this.fb.group({
     id: [],
@@ -40,24 +40,26 @@ export class UdfUpdateComponent implements OnInit {
     protected dataUtils: JhiDataUtils,
     protected jhiAlertService: JhiAlertService,
     protected udfService: UdfService,
-    protected businessService: BusinessService,
     protected activatedRoute: ActivatedRoute,
     private fb: FormBuilder
   ) {}
 
   ngOnInit() {
     this.isSaving = false;
-    this.activatedRoute.data.subscribe(({ udf }) => {
-      this.updateForm(udf);
-      this.udf = udf;
+    this.activatedRoute.data.subscribe(({ business }) => {
+      if(business){
+        this.business = business;
+        this.udf = new Udf()
+      }
     });
-    this.businessService
-      .query()
-      .pipe(
-        filter((mayBeOk: HttpResponse<IBusiness[]>) => mayBeOk.ok),
-        map((response: HttpResponse<IBusiness[]>) => response.body)
-      )
-      .subscribe((res: IBusiness[]) => (this.businesses = res), (res: HttpErrorResponse) => this.onError(res.message));
+    this.activatedRoute.data.subscribe(({ udf }) => {
+      if(udf){
+        this.updateForm(udf);
+        this.udf = udf;
+        this.business = new Business();
+        this.business.id = this.udf.businessId;
+      }
+    });
   }
 
   updateForm(udf: IUdf) {
@@ -114,7 +116,7 @@ export class UdfUpdateComponent implements OnInit {
   save() {
     this.isSaving = true;
     const udf = this.createFromForm();
-    if (udf.id !== undefined) {
+    if (udf.id !== undefined && udf.id != null) {
       this.subscribeToSaveResponse(this.udfService.update(udf));
     } else {
       this.subscribeToSaveResponse(this.udfService.create(udf));
@@ -137,7 +139,7 @@ export class UdfUpdateComponent implements OnInit {
         this.editForm.get(['lastModifiedDate']).value != null
           ? moment(this.editForm.get(['lastModifiedDate']).value, DATE_TIME_FORMAT)
           : undefined,
-      businessId: this.editForm.get(['businessId']).value
+      businessId: this.business.id
     };
     return entity;
   }

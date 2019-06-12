@@ -47,17 +47,19 @@ export class ClusterUpdateComponent implements OnInit {
 
   ngOnInit() {
     this.isSaving = false;
-    this.activatedRoute.data.subscribe(({ data }) => {
-      if(data.lastModifiedDate){
-        this.updateForm(data);
-        this.cluster = data;
-        this.business = new Business();
-        this.business.id = this.cluster.businessId;
-      } else{
-        this.business = data;
+    this.activatedRoute.data.subscribe(({ business }) => {
+      if(business){
+        this.business = business;
         this.cluster = new Cluster();
       }
-
+    });
+    this.activatedRoute.data.subscribe(({ cluster }) => {
+      if(cluster){
+        this.updateForm(cluster);
+        this.cluster = cluster;
+        this.business = new Business();
+        this.business.id = this.cluster.businessId;
+      }
     });
   }
 

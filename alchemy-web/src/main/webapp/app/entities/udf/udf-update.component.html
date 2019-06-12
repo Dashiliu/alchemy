@@ -35,8 +35,9 @@
                 </div>
                 <div class="form-group">
                     <label class="form-control-label" jhiTranslate="alchemyApp.udf.value" for="field_value">Value</label>
-                    <textarea class="form-control" name="value" id="field_value"
+                    <textarea *ngIf="editForm.get('type').value == 'AVG'" class="form-control" name="value" id="field_value"
                               formControlName="value"></textarea>
+                    <codemirror *ngIf="editForm.get('type').value == 'CODE'" formControlName="config" [config]="groovyConfig" id="field_config"></codemirror>
                     <div *ngIf="editForm.get('value').invalid && (editForm.get('value').dirty || editForm.get('value').touched)">
                         <small class="form-text text-danger"
                                *ngIf="editForm.get('value').errors.required" jhiTranslate="entity.validation.required">
@@ -48,13 +49,6 @@
                     <label class="form-control-label" jhiTranslate="alchemyApp.udf.avg" for="field_avg">Avg</label>
                     <input type="text" class="form-control" name="avg" id="field_avg"
                            formControlName="avg"/>
-                </div>
-                <div class="form-group">
-                    <label class="form-control-label" jhiTranslate="alchemyApp.udf.business" for="field_business">Business</label>
-                    <select class="form-control" id="field_business" name="business" formControlName="businessId">
-                        <option [ngValue]="null"></option>
-                        <option [ngValue]="businessOption.id" *ngFor="let businessOption of businesses; trackBy: trackBusinessById">{{businessOption.id}}</option>
-                    </select>
                 </div>
             </div>
             <div class="row">

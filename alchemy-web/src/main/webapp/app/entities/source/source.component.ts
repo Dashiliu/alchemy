@@ -10,12 +10,14 @@ import { AccountService } from 'app/core';
 
 import { ITEMS_PER_PAGE } from 'app/shared';
 import { SourceService } from './source.service';
+import {IBusiness} from "app/shared/model/business.model";
 
 @Component({
   selector: 'jhi-source',
   templateUrl: './source.component.html'
 })
 export class SourceComponent implements OnInit, OnDestroy {
+  business: IBusiness;
   currentAccount: any;
   sources: ISource[];
   error: any;
@@ -52,6 +54,7 @@ export class SourceComponent implements OnInit, OnDestroy {
   loadAll() {
     this.sourceService
       .query({
+        "businessId.specified": this.business.id,
         page: this.page - 1,
         size: this.itemsPerPage,
         sort: this.sort()
@@ -93,7 +96,10 @@ export class SourceComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.loadAll();
+    this.activatedRoute.data.subscribe(({ business }) => {
+      this.business = business;
+      this.loadAll();
+    });
     this.accountService.identity().then(account => {
       this.currentAccount = account;
     });

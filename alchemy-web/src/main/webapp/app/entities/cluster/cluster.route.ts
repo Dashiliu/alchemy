@@ -58,7 +58,7 @@ export const clusterRoute: Routes = [
     path: ':id/new',
     component: ClusterUpdateComponent,
     resolve: {
-      data: BusinessResolve
+      business: BusinessResolve
     },
     data: {
       authorities: ['ROLE_USER'],
@@ -70,7 +70,7 @@ export const clusterRoute: Routes = [
     path: ':id/edit',
     component: ClusterUpdateComponent,
     resolve: {
-      data: ClusterResolve
+      cluster: ClusterResolve
     },
     data: {
       authorities: ['ROLE_USER'],
