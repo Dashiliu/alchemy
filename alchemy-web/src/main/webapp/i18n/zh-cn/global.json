@@ -124,7 +124,8 @@
       "source": "数据源",
       "udf": "用户函数",
       "sink": "写入端",
-      "job": "任务"
+      "job": "任务",
+      "sql": "sql"
     },
     "detail": {
       "field": "字段",

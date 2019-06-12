@@ -12,6 +12,7 @@
       "delete": {
         "question": "Are you sure you want to delete Job {{ id }}?"
       },
+      "rescale": "Please enter the newParallelism",
       "detail": {
         "title": "Job"
       },

@@ -10,13 +10,6 @@
                         readonly />
                 </div>
                 <div class="form-group">
-                    <label class="form-control-label" jhiTranslate="alchemyApp.jobSql.job" for="field_job">Job</label>
-                    <select class="form-control" id="field_job" name="job" formControlName="jobId">
-                        <option [ngValue]="null"></option>
-                        <option [ngValue]="jobOption.id" *ngFor="let jobOption of jobs; trackBy: trackJobById">{{jobOption.name}}</option>
-                    </select>
-                </div>
-                <div class="form-group">
                     <label class="form-control-label" jhiTranslate="alchemyApp.jobSql.sql" for="field_sql">Sql</label>
                     <div>
                         <codemirror  formControlName="sql" [config]="sqlConfig"  id="field_sql"></codemirror>

@@ -7,12 +7,15 @@ import { JhiEventManager, JhiAlertService, JhiDataUtils } from 'ng-jhipster';
 import { IJobSql } from 'app/shared/model/job-sql.model';
 import { AccountService } from 'app/core';
 import { JobSqlService } from './job-sql.service';
+import {IJob} from "app/shared/model/job.model";
+import {ActivatedRoute} from "@angular/router";
 
 @Component({
   selector: 'jhi-job-sql',
   templateUrl: './job-sql.component.html'
 })
 export class JobSqlComponent implements OnInit, OnDestroy {
+  job: IJob;
   jobSqls: IJobSql[];
   currentAccount: any;
   eventSubscriber: Subscription;
@@ -22,7 +25,8 @@ export class JobSqlComponent implements OnInit, OnDestroy {
     protected jhiAlertService: JhiAlertService,
     protected dataUtils: JhiDataUtils,
     protected eventManager: JhiEventManager,
-    protected accountService: AccountService
+    protected accountService: AccountService,
+    protected activatedRoute: ActivatedRoute,
   ) {}
 
   loadAll() {
@@ -41,7 +45,10 @@ export class JobSqlComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.loadAll();
+    this.activatedRoute.data.subscribe(({ job }) => {
+      this.job = job;
+      this.loadAll();
+    });
     this.accountService.identity().then(account => {
       this.currentAccount = account;
     });

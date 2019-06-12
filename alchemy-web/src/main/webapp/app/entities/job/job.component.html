@@ -59,6 +59,12 @@
                             <fa-icon [icon]="'eye'"></fa-icon>
                             <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
                         </button>
+                        <button type="submit" *ngIf="job.type == 'SQL'"
+                                [routerLink]="['/job-sql', job.id]"
+                                class="btn btn-primary btn-sm">
+                            <fa-icon [icon]="'eye'"></fa-icon>
+                            <span class="d-none d-md-inline" jhiTranslate="entity.action.sql">Sql</span>
+                        </button>
                         <button type="submit"
                                 [routerLink]="['/job', job.id, 'edit']"
                                 class="btn btn-primary btn-sm">
@@ -86,7 +92,7 @@
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item"  [routerLink]="['/', 'job', { outlets: { popup: job.id + '/calcel'} }]" replaceUrl="true"
+                                            <a class="dropdown-item"  [routerLink]="['/', 'job', { outlets: { popup: job.id + '/cancel'} }]" replaceUrl="true"
                                                queryParamsHandling="merge"  routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
                                                 <fa-icon icon="asterisk" fixedWidth="true"></fa-icon>
                                                 <span jhiTranslate="global.menu.job.cancel">Cancel</span>

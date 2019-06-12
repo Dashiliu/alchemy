@@ -9,7 +9,7 @@ import { DATE_TIME_FORMAT } from 'app/shared/constants/input.constants';
 import { JhiAlertService, JhiDataUtils } from 'ng-jhipster';
 import { IJobSql, JobSql } from 'app/shared/model/job-sql.model';
 import { JobSqlService } from './job-sql.service';
-import { IJob } from 'app/shared/model/job.model';
+import {IJob, Job} from 'app/shared/model/job.model';
 import { JobService } from 'app/entities/job';
 import 'codemirror/mode/sql/sql';
 
@@ -21,7 +21,7 @@ export class JobSqlUpdateComponent implements OnInit {
   jobSql: IJobSql;
   isSaving: boolean;
   sqlConfig: any = { lineNumbers: true, mode: 'text/x-sql' };
-  jobs: IJob[];
+  job: IJob;
 
   editForm = this.fb.group({
     id: [],
@@ -37,24 +37,27 @@ export class JobSqlUpdateComponent implements OnInit {
     protected dataUtils: JhiDataUtils,
     protected jhiAlertService: JhiAlertService,
     protected jobSqlService: JobSqlService,
-    protected jobService: JobService,
     protected activatedRoute: ActivatedRoute,
     private fb: FormBuilder
   ) {}
 
   ngOnInit() {
     this.isSaving = false;
-    this.activatedRoute.data.subscribe(({ jobSql }) => {
-      this.updateForm(jobSql);
-      this.jobSql = jobSql;
+    this.activatedRoute.data.subscribe(({ job }) => {
+      if(job){
+        this.job = job;
+        this.jobSql = new JobSql();
+      }
     });
-    this.jobService
-      .query()
-      .pipe(
-        filter((mayBeOk: HttpResponse<IJob[]>) => mayBeOk.ok),
-        map((response: HttpResponse<IJob[]>) => response.body)
-      )
-      .subscribe((res: IJob[]) => (this.jobs = res), (res: HttpErrorResponse) => this.onError(res.message));
+    this.activatedRoute.data.subscribe(({ jobSql }) => {
+      if(jobSql){
+        this.updateForm(jobSql);
+        this.jobSql = jobSql;
+        this.job = new Job();
+        this.job.id = this.jobSql.jobId;
+      }
+
+    });
   }
 
   updateForm(jobSql: IJobSql) {
@@ -108,7 +111,7 @@ export class JobSqlUpdateComponent implements OnInit {
   save() {
     this.isSaving = true;
     const jobSql = this.createFromForm();
-    if (jobSql.id !== undefined) {
+    if (jobSql.id !== undefined && jobSql.id != null) {
       this.subscribeToSaveResponse(this.jobSqlService.update(jobSql));
     } else {
       this.subscribeToSaveResponse(this.jobSqlService.create(jobSql));
@@ -128,7 +131,7 @@ export class JobSqlUpdateComponent implements OnInit {
         this.editForm.get(['lastModifiedDate']).value != null
           ? moment(this.editForm.get(['lastModifiedDate']).value, DATE_TIME_FORMAT)
           : undefined,
-      jobId: this.editForm.get(['jobId']).value
+      jobId: this.job.id
     };
     return entity;
   }

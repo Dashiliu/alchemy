@@ -2,7 +2,7 @@
   "alchemyApp": {
     "ClusterType": {
       "null": "",
-      "REST": "REST",
+      "STANDALONE": "STANDALONE",
       "YARN": "YARN"
     }
   }

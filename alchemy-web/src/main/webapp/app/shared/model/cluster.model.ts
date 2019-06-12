@@ -2,7 +2,7 @@ import { Moment } from 'moment';
 import { IJob } from 'app/shared/model/job.model';
 
 export const enum ClusterType {
-  REST = 'REST',
+  STANDALONE = 'STANDALONE',
   YARN = 'YARN'
 }
 

@@ -47,7 +47,7 @@ public class ClusterResourceIT {
     private static final String DEFAULT_NAME = "AAAAAAAAAA";
     private static final String UPDATED_NAME = "BBBBBBBBBB";
 
-    private static final ClusterType DEFAULT_TYPE = ClusterType.REST;
+    private static final ClusterType DEFAULT_TYPE = ClusterType.STANDALONE;
     private static final ClusterType UPDATED_TYPE = ClusterType.YARN;
 
     private static final String DEFAULT_CONFIG = "AAAAAAAAAA";

@@ -1,5 +1,6 @@
 package com.dfire.platform.alchemy.service.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.calcite.config.Lex;
@@ -43,6 +44,21 @@ public class SqlParseUtil {
             }
             parseSource((SqlSelect)source, sources, udfs);
         }
+    }
+
+    public static List<String> findQuerySql(List<String> sqls)
+        throws SqlParseException {
+        List<String> newSqls = new ArrayList<>(sqls.size());
+        for (String sql : sqls) {
+            SqlParser sqlParser = SqlParser.create(sql, config);
+            SqlNode sqlNode = sqlParser.parseStmt();
+            if (sqlNode.getKind() != SqlKind.INSERT) {
+                throw new IllegalArgumentException("It must be an insert SQL, sql:" + sql);
+            }
+            SqlInsert sqlInsert = (SqlInsert)sqlNode;
+            newSqls.add(sqlInsert.getSource().toString());
+        }
+        return newSqls;
     }
 
     private static void addSink(List<String> newSinks, String sinkName) {

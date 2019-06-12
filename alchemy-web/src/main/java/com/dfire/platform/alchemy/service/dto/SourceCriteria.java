@@ -71,6 +71,8 @@ public class SourceCriteria implements Serializable, Criteria {
 
     private SourceTypeFilter sourceType;
 
+    private StringFilter remark;
+
     private StringFilter createdBy;
 
     private InstantFilter createdDate;
@@ -89,6 +91,7 @@ public class SourceCriteria implements Serializable, Criteria {
         this.name = other.name == null ? null : other.name.copy();
         this.tableType = other.tableType == null ? null : other.tableType.copy();
         this.sourceType = other.sourceType == null ? null : other.sourceType.copy();
+        this.remark = other.remark == null ? null : other.remark.copy();
         this.createdBy = other.createdBy == null ? null : other.createdBy.copy();
         this.createdDate = other.createdDate == null ? null : other.createdDate.copy();
         this.lastModifiedBy = other.lastModifiedBy == null ? null : other.lastModifiedBy.copy();
@@ -131,6 +134,14 @@ public class SourceCriteria implements Serializable, Criteria {
 
     public void setSourceType(SourceTypeFilter sourceType) {
         this.sourceType = sourceType;
+    }
+
+    public StringFilter getRemark() {
+        return remark;
+    }
+
+    public void setRemark(StringFilter remark) {
+        this.remark = remark;
     }
 
     public StringFilter getCreatedBy() {
@@ -188,6 +199,7 @@ public class SourceCriteria implements Serializable, Criteria {
             Objects.equals(name, that.name) &&
             Objects.equals(tableType, that.tableType) &&
             Objects.equals(sourceType, that.sourceType) &&
+            Objects.equals(remark, that.remark) &&
             Objects.equals(createdBy, that.createdBy) &&
             Objects.equals(createdDate, that.createdDate) &&
             Objects.equals(lastModifiedBy, that.lastModifiedBy) &&
@@ -202,6 +214,7 @@ public class SourceCriteria implements Serializable, Criteria {
         name,
         tableType,
         sourceType,
+        remark,
         createdBy,
         createdDate,
         lastModifiedBy,
@@ -217,6 +230,7 @@ public class SourceCriteria implements Serializable, Criteria {
                 (name != null ? "name=" + name + ", " : "") +
                 (tableType != null ? "tableType=" + tableType + ", " : "") +
                 (sourceType != null ? "sourceType=" + sourceType + ", " : "") +
+                (remark != null ? "remark=" + remark + ", " : "") +
                 (createdBy != null ? "createdBy=" + createdBy + ", " : "") +
                 (createdDate != null ? "createdDate=" + createdDate + ", " : "") +
                 (lastModifiedBy != null ? "lastModifiedBy=" + lastModifiedBy + ", " : "") +

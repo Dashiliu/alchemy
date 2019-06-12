@@ -38,6 +38,7 @@ public class UdfDescriptor implements CoreDescriptor {
     public static UdfDescriptor from(Udf udf) {
         UdfDescriptor udfDescriptor = new UdfDescriptor();
         BeanUtils.copyProperties(udf, udfDescriptor);
+        udfDescriptor.setName(udf.getName());
         return udfDescriptor;
     }
 

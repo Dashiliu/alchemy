@@ -19,11 +19,11 @@ import com.dfire.platform.alchemy.client.response.SubmitFlinkResponse;
  * @author congbai
  * @date 2019/6/10
  */
-public class RestFlinkClient extends AbstractFlinkClient {
+public class StandaloneClusterFlinkClient extends AbstractFlinkClient {
 
     private final ClusterClient clusterClient;
 
-    public RestFlinkClient(ClusterClient clusterClient, List<String> avgs) {
+    public StandaloneClusterFlinkClient(ClusterClient clusterClient, List<String> avgs) {
         super(avgs);
         this.clusterClient = clusterClient;
     }

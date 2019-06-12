@@ -98,6 +98,9 @@ public class SourceQueryService extends QueryService<Source> {
             if (criteria.getSourceType() != null) {
                 specification = specification.and(buildSpecification(criteria.getSourceType(), Source_.sourceType));
             }
+            if (criteria.getRemark() != null) {
+                specification = specification.and(buildStringSpecification(criteria.getRemark(), Source_.remark));
+            }
             if (criteria.getCreatedBy() != null) {
                 specification = specification.and(buildStringSpecification(criteria.getCreatedBy(), Source_.createdBy));
             }

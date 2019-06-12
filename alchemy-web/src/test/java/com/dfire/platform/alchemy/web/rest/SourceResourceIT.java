@@ -56,6 +56,9 @@ public class SourceResourceIT {
     private static final String DEFAULT_CONFIG = "AAAAAAAAAA";
     private static final String UPDATED_CONFIG = "BBBBBBBBBB";
 
+    private static final String DEFAULT_REMARK = "AAAAAAAAAA";
+    private static final String UPDATED_REMARK = "BBBBBBBBBB";
+
     private static final String DEFAULT_CREATED_BY = "AAAAAAAAAA";
     private static final String UPDATED_CREATED_BY = "BBBBBBBBBB";
 
@@ -123,6 +126,7 @@ public class SourceResourceIT {
             .tableType(DEFAULT_TABLE_TYPE)
             .sourceType(DEFAULT_SOURCE_TYPE)
             .config(DEFAULT_CONFIG)
+            .remark(DEFAULT_REMARK)
             .createdBy(DEFAULT_CREATED_BY)
             .createdDate(DEFAULT_CREATED_DATE)
             .lastModifiedBy(DEFAULT_LAST_MODIFIED_BY)
@@ -141,6 +145,7 @@ public class SourceResourceIT {
             .tableType(UPDATED_TABLE_TYPE)
             .sourceType(UPDATED_SOURCE_TYPE)
             .config(UPDATED_CONFIG)
+            .remark(UPDATED_REMARK)
             .createdBy(UPDATED_CREATED_BY)
             .createdDate(UPDATED_CREATED_DATE)
             .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
@@ -173,6 +178,7 @@ public class SourceResourceIT {
         assertThat(testSource.getTableType()).isEqualTo(DEFAULT_TABLE_TYPE);
         assertThat(testSource.getSourceType()).isEqualTo(DEFAULT_SOURCE_TYPE);
         assertThat(testSource.getConfig()).isEqualTo(DEFAULT_CONFIG);
+        assertThat(testSource.getRemark()).isEqualTo(DEFAULT_REMARK);
         assertThat(testSource.getCreatedBy()).isEqualTo(DEFAULT_CREATED_BY);
         assertThat(testSource.getCreatedDate()).isEqualTo(DEFAULT_CREATED_DATE);
         assertThat(testSource.getLastModifiedBy()).isEqualTo(DEFAULT_LAST_MODIFIED_BY);
@@ -259,6 +265,25 @@ public class SourceResourceIT {
 
     @Test
     @Transactional
+    public void checkRemarkIsRequired() throws Exception {
+        int databaseSizeBeforeTest = sourceRepository.findAll().size();
+        // set the field null
+        source.setRemark(null);
+
+        // Create the Source, which fails.
+        SourceDTO sourceDTO = sourceMapper.toDto(source);
+
+        restSourceMockMvc.perform(post("/api/sources")
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .content(TestUtil.convertObjectToJsonBytes(sourceDTO)))
+            .andExpect(status().isBadRequest());
+
+        List<Source> sourceList = sourceRepository.findAll();
+        assertThat(sourceList).hasSize(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
     public void getAllSources() throws Exception {
         // Initialize the database
         sourceRepository.saveAndFlush(source);
@@ -272,6 +297,7 @@ public class SourceResourceIT {
             .andExpect(jsonPath("$.[*].tableType").value(hasItem(DEFAULT_TABLE_TYPE.toString())))
             .andExpect(jsonPath("$.[*].sourceType").value(hasItem(DEFAULT_SOURCE_TYPE.toString())))
             .andExpect(jsonPath("$.[*].config").value(hasItem(DEFAULT_CONFIG.toString())))
+            .andExpect(jsonPath("$.[*].remark").value(hasItem(DEFAULT_REMARK.toString())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.toString())))
             .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY.toString())))
@@ -293,6 +319,7 @@ public class SourceResourceIT {
             .andExpect(jsonPath("$.tableType").value(DEFAULT_TABLE_TYPE.toString()))
             .andExpect(jsonPath("$.sourceType").value(DEFAULT_SOURCE_TYPE.toString()))
             .andExpect(jsonPath("$.config").value(DEFAULT_CONFIG.toString()))
+            .andExpect(jsonPath("$.remark").value(DEFAULT_REMARK.toString()))
             .andExpect(jsonPath("$.createdBy").value(DEFAULT_CREATED_BY.toString()))
             .andExpect(jsonPath("$.createdDate").value(DEFAULT_CREATED_DATE.toString()))
             .andExpect(jsonPath("$.lastModifiedBy").value(DEFAULT_LAST_MODIFIED_BY.toString()))
@@ -414,6 +441,45 @@ public class SourceResourceIT {
 
         // Get all the sourceList where sourceType is null
         defaultSourceShouldNotBeFound("sourceType.specified=false");
+    }
+
+    @Test
+    @Transactional
+    public void getAllSourcesByRemarkIsEqualToSomething() throws Exception {
+        // Initialize the database
+        sourceRepository.saveAndFlush(source);
+
+        // Get all the sourceList where remark equals to DEFAULT_REMARK
+        defaultSourceShouldBeFound("remark.equals=" + DEFAULT_REMARK);
+
+        // Get all the sourceList where remark equals to UPDATED_REMARK
+        defaultSourceShouldNotBeFound("remark.equals=" + UPDATED_REMARK);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSourcesByRemarkIsInShouldWork() throws Exception {
+        // Initialize the database
+        sourceRepository.saveAndFlush(source);
+
+        // Get all the sourceList where remark in DEFAULT_REMARK or UPDATED_REMARK
+        defaultSourceShouldBeFound("remark.in=" + DEFAULT_REMARK + "," + UPDATED_REMARK);
+
+        // Get all the sourceList where remark equals to UPDATED_REMARK
+        defaultSourceShouldNotBeFound("remark.in=" + UPDATED_REMARK);
+    }
+
+    @Test
+    @Transactional
+    public void getAllSourcesByRemarkIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        sourceRepository.saveAndFlush(source);
+
+        // Get all the sourceList where remark is not null
+        defaultSourceShouldBeFound("remark.specified=true");
+
+        // Get all the sourceList where remark is null
+        defaultSourceShouldNotBeFound("remark.specified=false");
     }
 
     @Test
@@ -602,6 +668,7 @@ public class SourceResourceIT {
             .andExpect(jsonPath("$.[*].tableType").value(hasItem(DEFAULT_TABLE_TYPE.toString())))
             .andExpect(jsonPath("$.[*].sourceType").value(hasItem(DEFAULT_SOURCE_TYPE.toString())))
             .andExpect(jsonPath("$.[*].config").value(hasItem(DEFAULT_CONFIG.toString())))
+            .andExpect(jsonPath("$.[*].remark").value(hasItem(DEFAULT_REMARK)))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY)))
             .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY)))
@@ -657,6 +724,7 @@ public class SourceResourceIT {
             .tableType(UPDATED_TABLE_TYPE)
             .sourceType(UPDATED_SOURCE_TYPE)
             .config(UPDATED_CONFIG)
+            .remark(UPDATED_REMARK)
             .createdBy(UPDATED_CREATED_BY)
             .createdDate(UPDATED_CREATED_DATE)
             .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
@@ -676,6 +744,7 @@ public class SourceResourceIT {
         assertThat(testSource.getTableType()).isEqualTo(UPDATED_TABLE_TYPE);
         assertThat(testSource.getSourceType()).isEqualTo(UPDATED_SOURCE_TYPE);
         assertThat(testSource.getConfig()).isEqualTo(UPDATED_CONFIG);
+        assertThat(testSource.getRemark()).isEqualTo(UPDATED_REMARK);
         assertThat(testSource.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
         assertThat(testSource.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
         assertThat(testSource.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY);

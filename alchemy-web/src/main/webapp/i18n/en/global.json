@@ -123,7 +123,8 @@
       "source": "Souce",
       "udf": "Udf",
       "sink": "Sink",
-      "job": "Job"
+      "job": "Job",
+      "sql": "sql"
     },
     "detail": {
       "field": "Field",

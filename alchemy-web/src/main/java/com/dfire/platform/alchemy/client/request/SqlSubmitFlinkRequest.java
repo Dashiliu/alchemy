@@ -25,7 +25,7 @@ public class SqlSubmitFlinkRequest extends AbstractSubmitRequest {
     private static int DEFAULT_PARALLELISM = 1;
     public List<SourceDescriptor> sources;
     public List<UdfDescriptor> udfs;
-    public volatile List<SinkDescriptor> sinks;
+    public List<SinkDescriptor> sinks;
     private List<String> avgs;
     private int parallelism = DEFAULT_PARALLELISM;
     private Integer maxParallelism;

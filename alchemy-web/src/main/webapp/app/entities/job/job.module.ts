@@ -13,8 +13,14 @@ import {
   JobSubmitDialogComponent,
   JobCancelPopupComponent,
   JobCancelDialogComponent,
+  JobCancelSavepointDialogComponent,
+  JobCancelSavepointPopupComponent,
   JobDeletePopupComponent,
   JobDeleteDialogComponent,
+  JobReScaleDialogComponent,
+  JobRescalePopupComponent,
+  JobSavepointDialogComponent,
+  JobSavepointPopupComponent,
   jobRoute,
   jobPopupRoute
 } from './';
@@ -23,9 +29,13 @@ const ENTITY_STATES = [...jobRoute, ...jobPopupRoute];
 
 @NgModule({
   imports: [AlchemySharedModule, CodemirrorModule , RouterModule.forChild(ENTITY_STATES)],
-  declarations: [JobComponent, JobDetailComponent, JobUpdateComponent, JobCancelPopupComponent,
+  declarations: [JobComponent, JobDetailComponent, JobUpdateComponent,JobReScaleDialogComponent,JobSavepointDialogComponent,
+    JobSavepointPopupComponent,
+    JobRescalePopupComponent, JobCancelPopupComponent,JobCancelSavepointDialogComponent, JobCancelSavepointPopupComponent,
     JobCancelDialogComponent,JobSubmitPopupComponent,JobSubmitDialogComponent,JobDeleteDialogComponent, JobDeletePopupComponent],
-  entryComponents: [JobComponent, JobUpdateComponent, JobCancelPopupComponent,
+  entryComponents: [JobComponent, JobUpdateComponent, JobReScaleDialogComponent,JobSavepointDialogComponent,
+    JobSavepointPopupComponent,
+    JobRescalePopupComponent,JobCancelPopupComponent,JobCancelSavepointDialogComponent, JobCancelSavepointPopupComponent,
     JobCancelDialogComponent,JobSubmitPopupComponent,JobSubmitDialogComponent, JobDeleteDialogComponent, JobDeletePopupComponent],
   providers: [{ provide: JhiLanguageService, useClass: JhiLanguageService }],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]

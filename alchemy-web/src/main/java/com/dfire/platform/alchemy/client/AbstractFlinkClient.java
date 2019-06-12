@@ -216,6 +216,9 @@ public abstract class AbstractFlinkClient implements FlinkClient {
         if (CollectionUtils.isEmpty(request.getSqls())) {
             return new SubmitFlinkResponse(ResultMessage.SQL_EMPTY.getMsg());
         }
+        if(request.getSqls().size() != request.getSinks().size()){
+            return new SubmitFlinkResponse(ResultMessage.INVALID_SQL.getMsg());
+        }
         final StreamExecutionEnvironment execEnv = StreamExecutionEnvironment.createLocalEnvironment();
         StreamTableEnvironment env = StreamTableEnvironment.getTableEnvironment(execEnv);
         List<URL> urls = new ArrayList<>();
@@ -228,10 +231,10 @@ public abstract class AbstractFlinkClient implements FlinkClient {
         setBaseInfo(execEnv, request);
         registerSource(env, request, urls, tableSources, sideSources);
         registerFunction(env, request, urls);
-        for (String sql : request.getSqls()) {
-            String sink = SqlParseUtil.parseSinkName(sql);
-            Table table = registerSql(env, sql, tableSources, sideSources);
-            registerSink(table, request, sink, urls);
+        List<String> sqls = request.getSqls();
+        for (int i =0 ; i< sqls.size(); i++) {
+            Table table = registerSql(env, sqls.get(i), tableSources, sideSources);
+            registerSink(table, request.getSinks().get(i), urls);
         }
         if (request.isTest()) {
             execEnv.execute(request.getJobName());
@@ -254,24 +257,11 @@ public abstract class AbstractFlinkClient implements FlinkClient {
         }
     }
 
-    private void registerSink(Table table, SqlSubmitFlinkRequest request, String sink, List<URL> urls)
+    private void registerSink(Table table, SinkDescriptor sinkDescriptor , List<URL> urls)
         throws Exception {
-        if (request.getSinks() == null) {
-            throw new IllegalArgumentException("table sink can'be null");
-        }
-        SinkDescriptor sinkDescriptor = findSink(request.getSinks(), sink);
         TableSink tableSink = sinkDescriptor.transform();
         table.writeToSink(tableSink);
         addUrl(sinkDescriptor.type(), urls);
-    }
-
-    private SinkDescriptor findSink(List<SinkDescriptor> sinks, String sink) {
-        for (SinkDescriptor sinkDescriptor : sinks) {
-            if (org.apache.commons.lang3.StringUtils.equalsIgnoreCase(sinkDescriptor.getName(), sink)) {
-                return sinkDescriptor;
-            }
-        }
-        throw new IllegalArgumentException("can’t find the sink:" + sink);
     }
 
     private Table registerSql(StreamTableEnvironment env, String sql, Map<String, TableSource> tableSources,

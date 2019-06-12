@@ -18,6 +18,7 @@ export interface ISource {
   tableType?: TableType;
   sourceType?: SourceType;
   config?: any;
+  remark?: string;
   createdBy?: string;
   createdDate?: Moment;
   lastModifiedBy?: string;
@@ -32,6 +33,7 @@ export class Source implements ISource {
     public tableType?: TableType,
     public sourceType?: SourceType,
     public config?: any,
+    public remark?: string,
     public createdBy?: string,
     public createdDate?: Moment,
     public lastModifiedBy?: string,

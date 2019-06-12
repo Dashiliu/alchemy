@@ -15,6 +15,9 @@ import { IJob } from 'app/shared/model/job.model';
 import {JobSubmitPopupComponent} from "app/entities/job/job-submit-dialog.component";
 import {JobCancelPopupComponent} from "app/entities/job/job-cancel-dialog.component";
 import {BusinessResolve} from "app/home";
+import {JobCancelSavepointPopupComponent} from "app/entities/job/job-cancel-savepoint-dialog.component";
+import {JobRescalePopupComponent} from "app/entities/job/job-rescale-dialog.component";
+import {JobSavepointPopupComponent} from "app/entities/job/job-savepoint-dialog.component";
 
 @Injectable({ providedIn: 'root' })
 export class JobResolve implements Resolve<IJob> {
@@ -115,6 +118,45 @@ export const jobPopupRoute: Routes = [
   {
     path: ':id/submit',
     component: JobSubmitPopupComponent,
+    resolve: {
+      job: JobResolve
+    },
+    data: {
+      authorities: ['ROLE_USER'],
+      pageTitle: 'alchemyApp.job.home.title'
+    },
+    canActivate: [UserRouteAccessService],
+    outlet: 'popup'
+  },
+  {
+    path: ':id/cancel-savepoint',
+    component: JobCancelSavepointPopupComponent,
+    resolve: {
+      job: JobResolve
+    },
+    data: {
+      authorities: ['ROLE_USER'],
+      pageTitle: 'alchemyApp.job.home.title'
+    },
+    canActivate: [UserRouteAccessService],
+    outlet: 'popup'
+  },
+  {
+    path: ':id/rescale',
+    component: JobRescalePopupComponent,
+    resolve: {
+      job: JobResolve
+    },
+    data: {
+      authorities: ['ROLE_USER'],
+      pageTitle: 'alchemyApp.job.home.title'
+    },
+    canActivate: [UserRouteAccessService],
+    outlet: 'popup'
+  },
+  {
+    path: ':id/savepoint',
+    component: JobSavepointPopupComponent,
     resolve: {
       job: JobResolve
     },

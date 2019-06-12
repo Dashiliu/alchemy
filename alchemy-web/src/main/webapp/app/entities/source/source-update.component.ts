@@ -28,6 +28,7 @@ export class SourceUpdateComponent implements OnInit {
     name: [null, [Validators.required]],
     tableType: [null, [Validators.required]],
     sourceType: [null, [Validators.required]],
+    remark: [null, [Validators.required]],
     config: [null, [Validators.required]],
     createdBy: [],
     createdDate: [],
@@ -71,6 +72,7 @@ export class SourceUpdateComponent implements OnInit {
       tableType: source.tableType,
       sourceType: source.sourceType,
       config: source.config,
+      remark: source.remark,
       createdBy: source.createdBy,
       createdDate: source.createdDate != null ? source.createdDate.format(DATE_TIME_FORMAT) : null,
       lastModifiedBy: source.lastModifiedBy,
@@ -141,6 +143,7 @@ export class SourceUpdateComponent implements OnInit {
         this.editForm.get(['lastModifiedDate']).value != null
           ? moment(this.editForm.get(['lastModifiedDate']).value, DATE_TIME_FORMAT)
           : undefined,
+      remark: this.editForm.get(['remark']).value,
       businessId: this.business.id
     };
     return entity;

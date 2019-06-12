@@ -57,6 +57,22 @@ export class JobService {
     return this.http.get<any>(`${this.resourceUrl}/cancel/${id}`, { observe: 'response' });
   }
 
+  cancelWithSavepoint(id: number, savepointDirectory: string): Observable<HttpResponse<any>> {
+    const copy = {id: id, savepointDirectory: savepointDirectory}
+    return this.http
+      .get<any>(`${this.resourceUrl}/cancel-savepoint?id=`+id+`&savepointDirectory=`+savepointDirectory, { observe: 'response' });
+  }
+
+  savepoint(id: number, savepointDirectory: string): Observable<HttpResponse<any>> {
+    return this.http
+      .get<any>(`${this.resourceUrl}/trigger-savepoint?id=`+id+`&savepointDirectory=`+savepointDirectory, { observe: 'response' });
+  }
+
+  rescale(id: number, newParallelism: number): Observable<HttpResponse<any>> {
+    return this.http
+      .get<any>(`${this.resourceUrl}/rescale?id=`+id+`&newParallelism=`+newParallelism, { observe: 'response' });
+  }
+
   protected convertDateFromClient(job: IJob): IJob {
     const copy: IJob = Object.assign({}, job, {
       createdDate: job.createdDate != null && job.createdDate.isValid() ? job.createdDate.toJSON() : null,

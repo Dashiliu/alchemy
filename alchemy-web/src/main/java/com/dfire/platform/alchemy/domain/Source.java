@@ -46,6 +46,10 @@ public class Source implements Serializable {
     @Column(name = "config", nullable = false)
     private String config;
 
+    @NotNull
+    @Column(name = "remark", nullable = false)
+    private String remark;
+
     @Column(name = "created_by")
     private String createdBy;
 
@@ -121,6 +125,19 @@ public class Source implements Serializable {
 
     public void setConfig(String config) {
         this.config = config;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public Source remark(String remark) {
+        this.remark = remark;
+        return this;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 
     public String getCreatedBy() {
@@ -213,6 +230,7 @@ public class Source implements Serializable {
             ", tableType='" + getTableType() + "'" +
             ", sourceType='" + getSourceType() + "'" +
             ", config='" + getConfig() + "'" +
+            ", remark='" + getRemark() + "'" +
             ", createdBy='" + getCreatedBy() + "'" +
             ", createdDate='" + getCreatedDate() + "'" +
             ", lastModifiedBy='" + getLastModifiedBy() + "'" +

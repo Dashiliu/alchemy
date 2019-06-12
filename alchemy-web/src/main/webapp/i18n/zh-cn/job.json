@@ -16,11 +16,10 @@
         "question": "你确定要提交 Job {{ id }} 吗？"
       },
       "cancel": {
-        "question": "你确定要取消 Job {{ id }} 吗？"
+        "question": "你确定要取消 Job {{ id }} 吗？",
+        "savepoint": "请输入savepoint的目录"
       },
-      "rescale": {
-        "question": "你确定要调整 Job {{ id }} 吗？"
-      },
+      "rescale": "请输入任务新的并发数",
       "savepoint": {
         "question": "你确定要savepoint Job {{ id }} 吗？"
       },

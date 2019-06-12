@@ -6,7 +6,7 @@
     </div>
     <div class="modal-body">
         <jhi-alert-error></jhi-alert-error>
-        <p *ngIf="!message" id="jhi-submit-job-heading" jhiTranslate="alchemyApp.job.submit.question" [translateValues]="{id: job.id}">Are you sure you want to submit this Job?</p>
+        <p *ngIf="!message" id="jhi-submit-job-heading" jhiTranslate="alchemyApp.job.submit.question" [translateValues]="{id: job.name}">Are you sure you want to submit this Job?</p>
         <p *ngIf="message"  style="color: red;">{{message.message}}</p>
     </div>
     <div class="modal-footer">

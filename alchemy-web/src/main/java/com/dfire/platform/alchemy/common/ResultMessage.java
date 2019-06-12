@@ -15,4 +15,7 @@ public class ResultMessage {
 
     public static final RespCode CLUSTER_NOT_EXIST = new RespCode("10004", "指定集群不存在");
 
+    public static final RespCode INVALID_SQL = new RespCode("10005", "sql不合法");
+
+
 }

@@ -1,7 +1,7 @@
 <div>
     <h2 id="page-heading">
         <span jhiTranslate="alchemyApp.jobSql.home.title">Job Sqls</span>
-        <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-job-sql" [routerLink]="['/job-sql/new']">
+        <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-job-sql" [routerLink]="['/job-sql', job.id,'new']">
             <fa-icon [icon]="'plus'"></fa-icon>
             <span  jhiTranslate="alchemyApp.jobSql.home.createLabel">
             Create new Job Sql

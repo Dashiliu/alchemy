@@ -128,8 +128,8 @@ export class JobUpdateComponent implements OnInit {
         this.editForm.get(['lastModifiedDate']).value != null
           ? moment(this.editForm.get(['lastModifiedDate']).value, DATE_TIME_FORMAT)
           : undefined,
-      businessId: this.editForm.get(['businessId']).value,
-      clusterId: this.businesse.id
+      businessId: this.businesse.id,
+      clusterId: this.editForm.get(['clusterId']).value
     };
     return entity;
   }

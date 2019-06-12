@@ -27,7 +27,18 @@ describe('Service Tests', () => {
       httpMock = injector.get(HttpTestingController);
       currentDate = moment();
 
-      elemDefault = new Source(0, 'AAAAAAA', TableType.TABLE, SourceType.KAFKA, 'AAAAAAA', 'AAAAAAA', currentDate, 'AAAAAAA', currentDate);
+      elemDefault = new Source(
+        0,
+        'AAAAAAA',
+        TableType.TABLE,
+        SourceType.KAFKA,
+        'AAAAAAA',
+        'AAAAAAA',
+        'AAAAAAA',
+        currentDate,
+        'AAAAAAA',
+        currentDate
+      );
     });
 
     describe('Service methods', () => {
@@ -81,6 +92,7 @@ describe('Service Tests', () => {
             tableType: 'BBBBBB',
             sourceType: 'BBBBBB',
             config: 'BBBBBB',
+            remark: 'BBBBBB',
             createdBy: 'BBBBBB',
             createdDate: currentDate.format(DATE_TIME_FORMAT),
             lastModifiedBy: 'BBBBBB',
@@ -112,6 +124,7 @@ describe('Service Tests', () => {
             tableType: 'BBBBBB',
             sourceType: 'BBBBBB',
             config: 'BBBBBB',
+            remark: 'BBBBBB',
             createdBy: 'BBBBBB',
             createdDate: currentDate.format(DATE_TIME_FORMAT),
             lastModifiedBy: 'BBBBBB',

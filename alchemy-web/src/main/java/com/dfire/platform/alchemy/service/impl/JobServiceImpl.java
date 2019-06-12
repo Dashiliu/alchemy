@@ -175,10 +175,11 @@ public class JobServiceImpl implements JobService {
         List<SourceDescriptor> sourceDescriptors = findSources(job, sourceNames);
         List<UdfDescriptor> udfDescriptors = findUdfs(job, udfNames);
         List<SinkDescriptor> sinkDescriptors = findSinks(job, sinkNames);
+        sqlSubmitFlinkRequest.setJobName(job.getName());
         sqlSubmitFlinkRequest.setSources(sourceDescriptors);
         sqlSubmitFlinkRequest.setUdfs(udfDescriptors);
         sqlSubmitFlinkRequest.setSinks(sinkDescriptors);
-        sqlSubmitFlinkRequest.setSqls(sqlList);
+        sqlSubmitFlinkRequest.setSqls(SqlParseUtil.findQuerySql(sqlList));
         return sqlSubmitFlinkRequest;
     }
 
@@ -200,7 +201,7 @@ public class JobServiceImpl implements JobService {
         }
     }
 
-    private List<SinkDescriptor> findSinks(Job job, List<String> sinkNames) {
+    private List<SinkDescriptor> findSinks(Job job, List<String> sinkNames) throws Exception {
         List<SinkDescriptor> sinkDescriptors = new ArrayList<>(sinkNames.size());
         for (String name : sinkNames) {
             Optional<Sink> sinkOptional = sinkRepository.findOneByBusinessIdAndName(job.getBusiness().getId(), name);

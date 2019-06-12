@@ -19,6 +19,7 @@
             <th jhiSortBy="businessId"><span jhiTranslate="alchemyApp.source.business">Business</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="tableType"><span jhiTranslate="alchemyApp.source.tableType">Table Type</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="sourceType"><span jhiTranslate="alchemyApp.source.sourceType">Source Type</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+            <th jhiSortBy="remark"><span jhiTranslate="alchemyApp.source.remark">Remark</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="createdBy"><span jhiTranslate="alchemyApp.source.createdBy">Created By</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="createdDate"><span jhiTranslate="alchemyApp.source.createdDate">Created Date</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="lastModifiedBy"><span jhiTranslate="alchemyApp.source.lastModifiedBy">Last Modified By</span> <fa-icon [icon]="'sort'"></fa-icon></th>
@@ -37,6 +38,7 @@
                 </td>
                 <td jhiTranslate="{{'alchemyApp.TableType.' + source.tableType}}">{{source.tableType}}</td>
                 <td jhiTranslate="{{'alchemyApp.SourceType.' + source.sourceType}}">{{source.sourceType}}</td>
+                <td>{{source.remark}}</td>
                 <td>{{source.createdBy}}</td>
                 <td>{{source.createdDate | date:'medium'}}</td>
                 <td>{{source.lastModifiedBy}}</td>

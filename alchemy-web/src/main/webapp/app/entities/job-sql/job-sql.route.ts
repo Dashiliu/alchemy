@@ -11,6 +11,7 @@ import { JobSqlDetailComponent } from './job-sql-detail.component';
 import { JobSqlUpdateComponent } from './job-sql-update.component';
 import { JobSqlDeletePopupComponent } from './job-sql-delete-dialog.component';
 import { IJobSql } from 'app/shared/model/job-sql.model';
+import {JobResolve} from "app/entities/job";
 
 @Injectable({ providedIn: 'root' })
 export class JobSqlResolve implements Resolve<IJobSql> {
@@ -30,8 +31,11 @@ export class JobSqlResolve implements Resolve<IJobSql> {
 
 export const jobSqlRoute: Routes = [
   {
-    path: '',
+    path: ':id',
     component: JobSqlComponent,
+    resolve: {
+      job: JobResolve
+    },
     data: {
       authorities: ['ROLE_USER'],
       pageTitle: 'alchemyApp.jobSql.home.title'
@@ -51,10 +55,10 @@ export const jobSqlRoute: Routes = [
     canActivate: [UserRouteAccessService]
   },
   {
-    path: 'new',
+    path: ':id/new',
     component: JobSqlUpdateComponent,
     resolve: {
-      jobSql: JobSqlResolve
+      job: JobResolve
     },
     data: {
       authorities: ['ROLE_USER'],
