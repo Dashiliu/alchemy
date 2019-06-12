@@ -42,7 +42,7 @@
         "jhipster-needle-menu-add-admin-element": "JHipster will add additional menu entries here (do not translate!)"
       },
       "language": "语言",
-      "job":{
+      "job": {
         "main": "操作",
         "submit": "提交任务",
         "cancel": "取消任务",

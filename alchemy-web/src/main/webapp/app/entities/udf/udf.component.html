@@ -18,6 +18,7 @@
             <th jhiSortBy="name"><span jhiTranslate="alchemyApp.udf.name">Name</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="type"><span jhiTranslate="alchemyApp.udf.type">Type</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="avg"><span jhiTranslate="alchemyApp.udf.avg">Avg</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+            <th jhiSortBy="remark"><span jhiTranslate="alchemyApp.udf.remark">Remark</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="createdBy"><span jhiTranslate="alchemyApp.udf.createdBy">Created By</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="createdDate"><span jhiTranslate="alchemyApp.udf.createdDate">Created Date</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="lastModifiedBy"><span jhiTranslate="alchemyApp.udf.lastModifiedBy">Last Modified By</span> <fa-icon [icon]="'sort'"></fa-icon></th>
@@ -32,6 +33,7 @@
                 <td>{{udf.name}}</td>
                 <td jhiTranslate="{{'alchemyApp.UdfType.' + udf.type}}">{{udf.type}}</td>
                 <td>{{udf.avg}}</td>
+                <td>{{udf.remark}}</td>
                 <td>{{udf.createdBy}}</td>
                 <td>{{udf.createdDate | date:'medium'}}</td>
                 <td>{{udf.lastModifiedBy}}</td>

@@ -1,11 +1,21 @@
 {
-    "name": "Udf",
+    "fluentMethods": true,
+    "clientRootFolder": "",
+    "relationships": [
+        {
+            "relationshipName": "business",
+            "otherEntityName": "business",
+            "relationshipType": "many-to-one",
+            "otherEntityField": "id",
+            "otherEntityRelationshipName": "udf"
+        }
+    ],
     "fields": [
         {
             "fieldName": "name",
             "fieldType": "String",
             "fieldValidateRules": [
-              "required"
+                "required"
             ]
         },
         {
@@ -21,12 +31,12 @@
             "fieldType": "byte[]",
             "fieldTypeBlobContent": "text",
             "fieldValidateRules": [
-              "required"
+                "required"
             ]
         },
         {
-          "fieldName": "avg",
-          "fieldType": "String"
+            "fieldName": "avg",
+            "fieldType": "String"
         },
         {
             "fieldName": "createdBy",
@@ -43,23 +53,19 @@
         {
             "fieldName": "lastModifiedDate",
             "fieldType": "Instant"
-        }
-    ],
-    "relationships": [
+        },
         {
-            "relationshipName": "business",
-            "otherEntityName": "business",
-            "relationshipType": "many-to-one",
-            "otherEntityField": "id"
+            "fieldName": "remark",
+            "fieldType": "String",
+            "fieldValidateRules": []
         }
     ],
     "changelogDate": "20190603023716",
-    "entityTableName": "udf",
     "dto": "mapstruct",
-    "pagination": "pagination",
+    "searchEngine": false,
     "service": "serviceImpl",
+    "entityTableName": "udf",
+    "databaseType": "sql",
     "jpaMetamodelFiltering": true,
-    "fluentMethods": true,
-    "clientRootFolder": "",
-    "applications": "*"
+    "pagination": "pagination"
 }

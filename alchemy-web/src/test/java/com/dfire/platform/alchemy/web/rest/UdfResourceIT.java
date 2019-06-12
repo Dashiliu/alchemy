@@ -67,6 +67,9 @@ public class UdfResourceIT {
     private static final Instant DEFAULT_LAST_MODIFIED_DATE = Instant.ofEpochMilli(0L);
     private static final Instant UPDATED_LAST_MODIFIED_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
+    private static final String DEFAULT_REMARK = "AAAAAAAAAA";
+    private static final String UPDATED_REMARK = "BBBBBBBBBB";
+
     @Autowired
     private UdfRepository udfRepository;
 
@@ -125,7 +128,8 @@ public class UdfResourceIT {
             .createdBy(DEFAULT_CREATED_BY)
             .createdDate(DEFAULT_CREATED_DATE)
             .lastModifiedBy(DEFAULT_LAST_MODIFIED_BY)
-            .lastModifiedDate(DEFAULT_LAST_MODIFIED_DATE);
+            .lastModifiedDate(DEFAULT_LAST_MODIFIED_DATE)
+            .remark(DEFAULT_REMARK);
         return udf;
     }
     /**
@@ -143,7 +147,8 @@ public class UdfResourceIT {
             .createdBy(UPDATED_CREATED_BY)
             .createdDate(UPDATED_CREATED_DATE)
             .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
-            .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
+            .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE)
+            .remark(UPDATED_REMARK);
         return udf;
     }
 
@@ -176,6 +181,7 @@ public class UdfResourceIT {
         assertThat(testUdf.getCreatedDate()).isEqualTo(DEFAULT_CREATED_DATE);
         assertThat(testUdf.getLastModifiedBy()).isEqualTo(DEFAULT_LAST_MODIFIED_BY);
         assertThat(testUdf.getLastModifiedDate()).isEqualTo(DEFAULT_LAST_MODIFIED_DATE);
+        assertThat(testUdf.getRemark()).isEqualTo(DEFAULT_REMARK);
     }
 
     @Test
@@ -255,7 +261,8 @@ public class UdfResourceIT {
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.toString())))
             .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY.toString())))
-            .andExpect(jsonPath("$.[*].lastModifiedDate").value(hasItem(DEFAULT_LAST_MODIFIED_DATE.toString())));
+            .andExpect(jsonPath("$.[*].lastModifiedDate").value(hasItem(DEFAULT_LAST_MODIFIED_DATE.toString())))
+            .andExpect(jsonPath("$.[*].remark").value(hasItem(DEFAULT_REMARK.toString())));
     }
     
     @Test
@@ -276,7 +283,8 @@ public class UdfResourceIT {
             .andExpect(jsonPath("$.createdBy").value(DEFAULT_CREATED_BY.toString()))
             .andExpect(jsonPath("$.createdDate").value(DEFAULT_CREATED_DATE.toString()))
             .andExpect(jsonPath("$.lastModifiedBy").value(DEFAULT_LAST_MODIFIED_BY.toString()))
-            .andExpect(jsonPath("$.lastModifiedDate").value(DEFAULT_LAST_MODIFIED_DATE.toString()));
+            .andExpect(jsonPath("$.lastModifiedDate").value(DEFAULT_LAST_MODIFIED_DATE.toString()))
+            .andExpect(jsonPath("$.remark").value(DEFAULT_REMARK.toString()));
     }
 
     @Test
@@ -554,6 +562,45 @@ public class UdfResourceIT {
 
     @Test
     @Transactional
+    public void getAllUdfsByRemarkIsEqualToSomething() throws Exception {
+        // Initialize the database
+        udfRepository.saveAndFlush(udf);
+
+        // Get all the udfList where remark equals to DEFAULT_REMARK
+        defaultUdfShouldBeFound("remark.equals=" + DEFAULT_REMARK);
+
+        // Get all the udfList where remark equals to UPDATED_REMARK
+        defaultUdfShouldNotBeFound("remark.equals=" + UPDATED_REMARK);
+    }
+
+    @Test
+    @Transactional
+    public void getAllUdfsByRemarkIsInShouldWork() throws Exception {
+        // Initialize the database
+        udfRepository.saveAndFlush(udf);
+
+        // Get all the udfList where remark in DEFAULT_REMARK or UPDATED_REMARK
+        defaultUdfShouldBeFound("remark.in=" + DEFAULT_REMARK + "," + UPDATED_REMARK);
+
+        // Get all the udfList where remark equals to UPDATED_REMARK
+        defaultUdfShouldNotBeFound("remark.in=" + UPDATED_REMARK);
+    }
+
+    @Test
+    @Transactional
+    public void getAllUdfsByRemarkIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        udfRepository.saveAndFlush(udf);
+
+        // Get all the udfList where remark is not null
+        defaultUdfShouldBeFound("remark.specified=true");
+
+        // Get all the udfList where remark is null
+        defaultUdfShouldNotBeFound("remark.specified=false");
+    }
+
+    @Test
+    @Transactional
     public void getAllUdfsByBusinessIsEqualToSomething() throws Exception {
         // Initialize the database
         Business business = BusinessResourceIT.createEntity(em);
@@ -585,7 +632,8 @@ public class UdfResourceIT {
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY)))
             .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY)))
-            .andExpect(jsonPath("$.[*].lastModifiedDate").value(hasItem(DEFAULT_LAST_MODIFIED_DATE.toString())));
+            .andExpect(jsonPath("$.[*].lastModifiedDate").value(hasItem(DEFAULT_LAST_MODIFIED_DATE.toString())))
+            .andExpect(jsonPath("$.[*].remark").value(hasItem(DEFAULT_REMARK)));
 
         // Check, that the count call also returns 1
         restUdfMockMvc.perform(get("/api/udfs/count?sort=id,desc&" + filter))
@@ -640,7 +688,8 @@ public class UdfResourceIT {
             .createdBy(UPDATED_CREATED_BY)
             .createdDate(UPDATED_CREATED_DATE)
             .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
-            .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE);
+            .lastModifiedDate(UPDATED_LAST_MODIFIED_DATE)
+            .remark(UPDATED_REMARK);
         UdfDTO udfDTO = udfMapper.toDto(updatedUdf);
 
         restUdfMockMvc.perform(put("/api/udfs")
@@ -660,6 +709,7 @@ public class UdfResourceIT {
         assertThat(testUdf.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
         assertThat(testUdf.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY);
         assertThat(testUdf.getLastModifiedDate()).isEqualTo(UPDATED_LAST_MODIFIED_DATE);
+        assertThat(testUdf.getRemark()).isEqualTo(UPDATED_REMARK);
     }
 
     @Test

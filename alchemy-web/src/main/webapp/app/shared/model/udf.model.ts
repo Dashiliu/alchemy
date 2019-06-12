@@ -15,6 +15,7 @@ export interface IUdf {
   createdDate?: Moment;
   lastModifiedBy?: string;
   lastModifiedDate?: Moment;
+  remark?: string;
   businessId?: number;
 }
 
@@ -29,6 +30,7 @@ export class Udf implements IUdf {
     public createdDate?: Moment,
     public lastModifiedBy?: string,
     public lastModifiedDate?: Moment,
+    public remark?: string,
     public businessId?: number
   ) {}
 }

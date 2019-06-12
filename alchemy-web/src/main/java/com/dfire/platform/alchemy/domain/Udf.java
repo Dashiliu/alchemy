@@ -54,6 +54,9 @@ public class Udf implements Serializable {
     @Column(name = "last_modified_date")
     private Instant lastModifiedDate;
 
+    @Column(name = "remark")
+    private String remark;
+
     @ManyToOne
     @JsonIgnoreProperties("udfs")
     private Business business;
@@ -171,6 +174,19 @@ public class Udf implements Serializable {
         this.lastModifiedDate = lastModifiedDate;
     }
 
+    public String getRemark() {
+        return remark;
+    }
+
+    public Udf remark(String remark) {
+        this.remark = remark;
+        return this;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
     public Business getBusiness() {
         return business;
     }
@@ -213,6 +229,7 @@ public class Udf implements Serializable {
             ", createdDate='" + getCreatedDate() + "'" +
             ", lastModifiedBy='" + getLastModifiedBy() + "'" +
             ", lastModifiedDate='" + getLastModifiedDate() + "'" +
+            ", remark='" + getRemark() + "'" +
             "}";
     }
 }

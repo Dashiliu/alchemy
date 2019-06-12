@@ -110,6 +110,9 @@ public class UdfQueryService extends QueryService<Udf> {
             if (criteria.getLastModifiedDate() != null) {
                 specification = specification.and(buildRangeSpecification(criteria.getLastModifiedDate(), Udf_.lastModifiedDate));
             }
+            if (criteria.getRemark() != null) {
+                specification = specification.and(buildStringSpecification(criteria.getRemark(), Udf_.remark));
+            }
             if (criteria.getBusinessId() != null) {
                 specification = specification.and(buildSpecification(criteria.getBusinessId(),
                     root -> root.join(Udf_.business, JoinType.LEFT).get(Business_.id)));

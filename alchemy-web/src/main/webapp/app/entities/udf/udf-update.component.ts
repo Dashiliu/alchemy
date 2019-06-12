@@ -73,7 +73,9 @@ export class UdfUpdateComponent implements OnInit {
       createdDate: udf.createdDate != null ? udf.createdDate.format(DATE_TIME_FORMAT) : null,
       lastModifiedBy: udf.lastModifiedBy,
       lastModifiedDate: udf.lastModifiedDate != null ? udf.lastModifiedDate.format(DATE_TIME_FORMAT) : null,
+      remark: udf.remark,
       businessId: udf.businessId
+
     });
   }
 
@@ -139,6 +141,7 @@ export class UdfUpdateComponent implements OnInit {
         this.editForm.get(['lastModifiedDate']).value != null
           ? moment(this.editForm.get(['lastModifiedDate']).value, DATE_TIME_FORMAT)
           : undefined,
+      remark: this.editForm.get(['remark']).value,
       businessId: this.business.id
     };
     return entity;

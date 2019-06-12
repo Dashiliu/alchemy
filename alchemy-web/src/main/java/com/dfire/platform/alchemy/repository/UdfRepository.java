@@ -15,4 +15,5 @@ import java.util.Optional;
 public interface UdfRepository extends JpaRepository<Udf, Long>, JpaSpecificationExecutor<Udf> {
 
     Optional<Udf> findOneByBusinessIdAndName(Long id, String name);
+
 }

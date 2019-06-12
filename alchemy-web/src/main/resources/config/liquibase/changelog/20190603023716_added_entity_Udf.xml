@@ -48,6 +48,10 @@
                 <constraints nullable="true" />
             </column>
 
+            <column name="remark" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+
             <column name="business_id" type="bigint">
                 <constraints nullable="true" />
             </column>
@@ -82,6 +86,7 @@
             <column name="created_date" type="date"/>
             <column name="last_modified_by" type="string"/>
             <column name="last_modified_date" type="date"/>
+            <column name="remark" type="string"/>
         </loadData>
     </changeSet>
 

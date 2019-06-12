@@ -33,6 +33,8 @@ public class UdfDTO implements Serializable {
 
     private Instant lastModifiedDate;
 
+    private String remark;
+
 
     private Long businessId;
 
@@ -108,6 +110,14 @@ public class UdfDTO implements Serializable {
         this.lastModifiedDate = lastModifiedDate;
     }
 
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
     public Long getBusinessId() {
         return businessId;
     }
@@ -149,6 +159,7 @@ public class UdfDTO implements Serializable {
             ", createdDate='" + getCreatedDate() + "'" +
             ", lastModifiedBy='" + getLastModifiedBy() + "'" +
             ", lastModifiedDate='" + getLastModifiedDate() + "'" +
+            ", remark='" + getRemark() + "'" +
             ", business=" + getBusinessId() +
             "}";
     }

@@ -23,6 +23,7 @@
       "createdDate": "Created Date",
       "lastModifiedBy": "Last Modified By",
       "lastModifiedDate": "Last Modified Date",
+      "remark": "Remark",
       "business": "Business"
     }
   }

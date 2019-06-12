@@ -60,6 +60,8 @@ public class UdfCriteria implements Serializable, Criteria {
 
     private InstantFilter lastModifiedDate;
 
+    private StringFilter remark;
+
     private LongFilter businessId;
 
     public UdfCriteria(){
@@ -74,6 +76,7 @@ public class UdfCriteria implements Serializable, Criteria {
         this.createdDate = other.createdDate == null ? null : other.createdDate.copy();
         this.lastModifiedBy = other.lastModifiedBy == null ? null : other.lastModifiedBy.copy();
         this.lastModifiedDate = other.lastModifiedDate == null ? null : other.lastModifiedDate.copy();
+        this.remark = other.remark == null ? null : other.remark.copy();
         this.businessId = other.businessId == null ? null : other.businessId.copy();
     }
 
@@ -146,6 +149,14 @@ public class UdfCriteria implements Serializable, Criteria {
         this.lastModifiedDate = lastModifiedDate;
     }
 
+    public StringFilter getRemark() {
+        return remark;
+    }
+
+    public void setRemark(StringFilter remark) {
+        this.remark = remark;
+    }
+
     public LongFilter getBusinessId() {
         return businessId;
     }
@@ -173,6 +184,7 @@ public class UdfCriteria implements Serializable, Criteria {
             Objects.equals(createdDate, that.createdDate) &&
             Objects.equals(lastModifiedBy, that.lastModifiedBy) &&
             Objects.equals(lastModifiedDate, that.lastModifiedDate) &&
+            Objects.equals(remark, that.remark) &&
             Objects.equals(businessId, that.businessId);
     }
 
@@ -187,6 +199,7 @@ public class UdfCriteria implements Serializable, Criteria {
         createdDate,
         lastModifiedBy,
         lastModifiedDate,
+        remark,
         businessId
         );
     }
@@ -202,6 +215,7 @@ public class UdfCriteria implements Serializable, Criteria {
                 (createdDate != null ? "createdDate=" + createdDate + ", " : "") +
                 (lastModifiedBy != null ? "lastModifiedBy=" + lastModifiedBy + ", " : "") +
                 (lastModifiedDate != null ? "lastModifiedDate=" + lastModifiedDate + ", " : "") +
+                (remark != null ? "remark=" + remark + ", " : "") +
                 (businessId != null ? "businessId=" + businessId + ", " : "") +
             "}";
     }
