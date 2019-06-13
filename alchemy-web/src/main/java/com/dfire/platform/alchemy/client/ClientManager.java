@@ -1,11 +1,10 @@
 package com.dfire.platform.alchemy.client;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
+import com.dfire.platform.alchemy.domain.Cluster;
 import org.springframework.stereotype.Component;
 
-import com.dfire.platform.alchemy.domain.Cluster;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author congbai

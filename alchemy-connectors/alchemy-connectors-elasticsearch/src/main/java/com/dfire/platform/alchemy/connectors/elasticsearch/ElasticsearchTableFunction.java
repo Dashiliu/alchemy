@@ -22,19 +22,23 @@ public class ElasticsearchTableFunction implements ElasticsearchSinkFunction<Row
 
     private final String index;
 
-    private final String fieldIndex;
+    private final String indexField;
 
     private final JsonRowStringSchema jsonRowSchema;
 
-    public ElasticsearchTableFunction(String index, String fieldIndex, String formatDate, JsonRowStringSchema jsonRowSchema) {
+    private final String[] fieldNames;
+
+
+    public ElasticsearchTableFunction(String index, String indexField, String formatDate, JsonRowStringSchema jsonRowSchema, String[] fieldNames) {
         this.index = index;
         this.jsonRowSchema = jsonRowSchema;
-        this.fieldIndex = fieldIndex;
+        this.indexField = indexField;
         if (StringUtils.isNotBlank(formatDate)){
             this.dateFormat = new SimpleDateFormat(formatDate);
         }else {
             this.dateFormat = new SimpleDateFormat("yyyy.MM.dd");
         }
+        this.fieldNames = fieldNames;
     }
 
     @Override
@@ -61,21 +65,13 @@ public class ElasticsearchTableFunction implements ElasticsearchSinkFunction<Row
      * @return
      */
     private String getIndex(Row row) {
-        if (StringUtils.isBlank(fieldIndex)) {
+        if (StringUtils.isBlank(indexField)) {
             return this.index;
         }
-
-        int arrayIndex = 0;
-        boolean result = false;
-        for (int i = 0; i < this.jsonRowSchema.getFieldNames().length; i++) {
-            if (fieldIndex.equals(this.jsonRowSchema.getFieldNames()[i])) {
-                arrayIndex = i;
-                result = true;
-                break;
+        for (int i = 0; i < this.fieldNames.length; i++) {
+            if (indexField.equals(this.fieldNames[i])) {
+                return (String) row.getField(i);
             }
-        }
-        if (result) {
-            return (String) row.getField(arrayIndex);
         }
         return this.index;
     }

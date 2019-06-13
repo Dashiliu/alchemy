@@ -10,7 +10,6 @@ import { JhiAlertService, JhiDataUtils } from 'ng-jhipster';
 import { ISource, Source } from 'app/shared/model/source.model';
 import { SourceService } from './source.service';
 import {Business, IBusiness} from 'app/shared/model/business.model';
-import { BusinessService } from 'app/entities/business';
 import 'codemirror/mode/yaml/yaml';
 import {Cluster} from "app/shared/model/cluster.model";
 @Component({
@@ -41,7 +40,6 @@ export class SourceUpdateComponent implements OnInit {
     protected dataUtils: JhiDataUtils,
     protected jhiAlertService: JhiAlertService,
     protected sourceService: SourceService,
-    protected businessService: BusinessService,
     protected activatedRoute: ActivatedRoute,
     private fb: FormBuilder
   ) {}

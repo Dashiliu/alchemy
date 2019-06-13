@@ -19,6 +19,7 @@ import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonNode;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.flink.table.shaded.org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.flink.types.Row;
 import org.apache.flink.util.Preconditions;
 import org.slf4j.Logger;
@@ -36,6 +37,8 @@ import java.util.Map;
  */
 public class JsonRowStringSchema implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     private static final Logger logger = LoggerFactory.getLogger(JsonRowStringSchema.class);
 
     private static final String KVMAP = "kvmap";
@@ -51,12 +54,7 @@ public class JsonRowStringSchema implements Serializable {
      */
     private final String[] fieldNames;
 
-    private static final ThreadLocal<SimpleDateFormat> DATE_FORMA = new ThreadLocal<SimpleDateFormat>() {
-        @Override
-        protected SimpleDateFormat initialValue() {
-            return new SimpleDateFormat(FORMAT);
-        }
-    };
+    private final FastDateFormat dateFormat = FastDateFormat.getInstance(FORMAT);
 
     /**
      * Creates a JSON serialization schema for the given fields and types.
@@ -105,7 +103,7 @@ public class JsonRowStringSchema implements Serializable {
                 }
             } else if (fieldNames[i].equals(DATEFORMAT)) {
                 try {
-                    Date date = DATE_FORMA.get().parse(row.getField(i).toString());
+                    Date date = dateFormat.parse(row.getField(i).toString());
                     objectNode.set(TIMESTAMP, mapper.valueToTree(date));
                 } catch (ParseException e) {
                     logger.error("timestamp is fail",e);

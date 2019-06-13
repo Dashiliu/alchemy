@@ -62,14 +62,14 @@ public class FileUtil {
         return jarFiles;
     }
 
-    public static List<URL> createPath(List<String> avgs) throws MalformedURLException {
+    public static List<URL> createPath(List<String> avgs, boolean cache) throws MalformedURLException {
         if (CollectionUtils.isEmpty(avgs)){
             return new ArrayList<>(0);
         }
         List<URL> jarFiles = new ArrayList<>(avgs.size());
         for (String avg : avgs){
             try {
-                URL jarFileUrl =  MavenJarUtil.forAvg(avg).getJarFile().getAbsoluteFile().toURI().toURL();
+                URL jarFileUrl =  MavenJarUtil.forAvg(avg, cache).getJarFile().getAbsoluteFile().toURI().toURL();
                 jarFiles.add(jarFileUrl);
                 JobWithJars.checkJarFile(jarFileUrl);
             } catch (MalformedURLException e) {

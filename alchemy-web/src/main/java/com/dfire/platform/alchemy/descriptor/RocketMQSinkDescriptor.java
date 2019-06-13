@@ -1,11 +1,10 @@
 package com.dfire.platform.alchemy.descriptor;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.util.Assert;
-
 import com.dfire.platform.alchemy.common.Constants;
 import com.dfire.platform.alchemy.connectors.rocketmq.RocketMQProducerProperties;
 import com.dfire.platform.alchemy.connectors.rocketmq.RocketMQTableSink;
+import org.springframework.beans.BeanUtils;
+import org.springframework.util.Assert;
 
 /**
  * @author congbai

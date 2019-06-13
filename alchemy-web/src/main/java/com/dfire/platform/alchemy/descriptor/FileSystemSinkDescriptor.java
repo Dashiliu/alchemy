@@ -1,12 +1,11 @@
 package com.dfire.platform.alchemy.descriptor;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.util.Assert;
-
 import com.dfire.platform.alchemy.common.Constants;
 import com.dfire.platform.alchemy.connectors.filesystem.FilePropereties;
 import com.dfire.platform.alchemy.connectors.filesystem.FileSystemTableSink;
 import com.dfire.platform.alchemy.connectors.filesystem.Writer;
+import org.springframework.beans.BeanUtils;
+import org.springframework.util.Assert;
 
 /**
  * @author congbai

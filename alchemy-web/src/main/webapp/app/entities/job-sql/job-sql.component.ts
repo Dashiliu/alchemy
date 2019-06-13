@@ -78,4 +78,9 @@ export class JobSqlComponent implements OnInit, OnDestroy {
   protected onError(errorMessage: string) {
     this.jhiAlertService.error(errorMessage, null, null);
   }
+
+  previousState() {
+    window.history.back();
+  }
+
 }

@@ -1,31 +1,30 @@
 package com.dfire.platform.alchemy.client;
 
-import static com.dfire.platform.alchemy.client.request.SqlSubmitFlinkRequest.CONFIG_KEY_DELAY_BETWEEN_ATTEMPTS;
-import static com.dfire.platform.alchemy.client.request.SqlSubmitFlinkRequest.CONFIG_KEY_DELAY_INTERVAL;
-import static com.dfire.platform.alchemy.client.request.SqlSubmitFlinkRequest.CONFIG_KEY_FAILURE_INTERVAL;
-import static com.dfire.platform.alchemy.client.request.SqlSubmitFlinkRequest.CONFIG_KEY_FAILURE_RATE;
-import static com.dfire.platform.alchemy.client.request.SqlSubmitFlinkRequest.CONFIG_KEY_RESTART_ATTEMPTS;
-
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.ServiceLoader;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-
+import com.dfire.platform.alchemy.api.common.Alias;
+import com.dfire.platform.alchemy.api.util.SideParser;
+import com.dfire.platform.alchemy.client.request.*;
+import com.dfire.platform.alchemy.client.response.JobStatusResponse;
+import com.dfire.platform.alchemy.client.response.Response;
+import com.dfire.platform.alchemy.client.response.SavepointResponse;
+import com.dfire.platform.alchemy.client.response.SubmitFlinkResponse;
+import com.dfire.platform.alchemy.common.Constants;
+import com.dfire.platform.alchemy.common.ResultMessage;
+import com.dfire.platform.alchemy.descriptor.SinkDescriptor;
+import com.dfire.platform.alchemy.descriptor.SourceDescriptor;
+import com.dfire.platform.alchemy.domain.enumeration.TableType;
+import com.dfire.platform.alchemy.function.BaseFunction;
+import com.dfire.platform.alchemy.util.AlchemyProperties;
+import com.dfire.platform.alchemy.util.FileUtil;
+import com.dfire.platform.alchemy.util.JarArgUtil;
+import com.dfire.platform.alchemy.util.MavenJarUtil;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.calcite.sql.SqlJoin;
 import org.apache.calcite.sql.SqlKind;
 import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.SqlSelect;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.flink.api.common.JobID;
 import org.apache.flink.api.common.JobSubmissionResult;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
@@ -59,30 +58,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 
-import com.dfire.platform.alchemy.api.common.Alias;
-import com.dfire.platform.alchemy.api.util.SideParser;
-import com.dfire.platform.alchemy.client.request.CancelFlinkRequest;
-import com.dfire.platform.alchemy.client.request.JarSubmitFlinkRequest;
-import com.dfire.platform.alchemy.client.request.JobStatusRequest;
-import com.dfire.platform.alchemy.client.request.RescaleFlinkRequest;
-import com.dfire.platform.alchemy.client.request.SavepointFlinkRequest;
-import com.dfire.platform.alchemy.client.request.SqlSubmitFlinkRequest;
-import com.dfire.platform.alchemy.client.response.JobStatusResponse;
-import com.dfire.platform.alchemy.client.response.Response;
-import com.dfire.platform.alchemy.client.response.SubmitFlinkResponse;
-import com.dfire.platform.alchemy.common.Constants;
-import com.dfire.platform.alchemy.common.ResultMessage;
-import com.dfire.platform.alchemy.descriptor.SinkDescriptor;
-import com.dfire.platform.alchemy.descriptor.SourceDescriptor;
-import com.dfire.platform.alchemy.domain.enumeration.TableType;
-import com.dfire.platform.alchemy.function.BaseFunction;
-import com.dfire.platform.alchemy.service.util.SqlParseUtil;
-import com.dfire.platform.alchemy.util.AlchemyProperties;
-import com.dfire.platform.alchemy.util.FileUtil;
-import com.dfire.platform.alchemy.util.JarArgUtil;
-import com.dfire.platform.alchemy.util.MavenJarUtil;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+
+import static com.dfire.platform.alchemy.client.request.SqlSubmitFlinkRequest.*;
 
 /**
  * @author congbai
@@ -101,18 +85,18 @@ public abstract class AbstractFlinkClient implements FlinkClient {
         this.avgs = avgs;
     }
 
-    public Response cancel(ClusterClient clusterClient, CancelFlinkRequest request) throws Exception {
+    public SavepointResponse cancel(ClusterClient clusterClient, CancelFlinkRequest request) throws Exception {
         if(StringUtils.isEmpty(request.getJobID())){
-            return new Response("the job is not submit yet");
+            return new SavepointResponse("the job is not submit yet");
         }
         boolean savePoint = request.getSavePoint() != null && request.getSavePoint().booleanValue();
         if (savePoint) {
             String path = clusterClient.cancelWithSavepoint(JobID.fromHexString(request.getJobID()),
                 request.getSavepointDirectory());
-            return new Response(true, path);
+            return new SavepointResponse(true, path);
         } else {
             clusterClient.cancel(JobID.fromHexString(request.getJobID()));
-            return new Response(true);
+            return new SavepointResponse(true);
         }
     }
 
@@ -126,13 +110,13 @@ public abstract class AbstractFlinkClient implements FlinkClient {
         return new Response(true);
     }
 
-    public Response savepoint(ClusterClient clusterClient, SavepointFlinkRequest request) throws Exception {
+    public SavepointResponse savepoint(ClusterClient clusterClient, SavepointFlinkRequest request) throws Exception {
         if(StringUtils.isEmpty(request.getJobID())){
-            return new Response("the job is not submit yet");
+            return new SavepointResponse("the job is not submit yet");
         }
         CompletableFuture<String> future
             = clusterClient.triggerSavepoint(JobID.fromHexString(request.getJobID()), request.getSavepointDirectory());
-        return new Response(true, future.get());
+        return new SavepointResponse(true, future.get());
     }
 
     public JobStatusResponse status(ClusterClient clusterClient, JobStatusRequest request) throws Exception {
@@ -171,7 +155,7 @@ public abstract class AbstractFlinkClient implements FlinkClient {
         }
         LOGGER.trace("start submit jar request,entryClass:{}", request.getEntryClass());
         try {
-            File file = MavenJarUtil.forAvg(request.getAvg()).getJarFile();
+            File file = MavenJarUtil.forAvg(request.getAvg(), request.isCache()).getJarFile();
             List<String> programArgs = JarArgUtil.tokenizeArguments(request.getProgramArgs());
             PackagedProgram program = new PackagedProgram(file, request.getEntryClass(),
                 programArgs.toArray(new String[programArgs.size()]));
@@ -222,10 +206,7 @@ public abstract class AbstractFlinkClient implements FlinkClient {
         final StreamExecutionEnvironment execEnv = StreamExecutionEnvironment.createLocalEnvironment();
         StreamTableEnvironment env = StreamTableEnvironment.getTableEnvironment(execEnv);
         List<URL> urls = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(request.getAvgs())) {
-            // 先加入外部依赖，方便发现函数的class
-            urls.addAll(FileUtil.createPath(request.getAvgs()));
-        }
+        addJobAvgs(urls, request.getAvgs());
         Map<String, SourceDescriptor> sideSources = Maps.newHashMap();
         Map<String, TableSource> tableSources = Maps.newHashMap();
         setBaseInfo(execEnv, request);
@@ -254,6 +235,15 @@ public abstract class AbstractFlinkClient implements FlinkClient {
             String term = e.getMessage() == null ? "." : (": " + e.getMessage());
             LOGGER.error(" submit sql request fail", e);
             return new SubmitFlinkResponse(term);
+        }
+    }
+
+    private void addJobAvgs(List<URL> urls, List<String> avgs) throws MalformedURLException {
+        if (CollectionUtils.isEmpty(avgs)) {
+            return;
+        }
+        for(String avg : avgs){
+            loadUrl(avg, true , urls);
         }
     }
 
@@ -329,7 +319,7 @@ public abstract class AbstractFlinkClient implements FlinkClient {
         if (CollectionUtils.isNotEmpty(request.getUdfs())) {
             request.getUdfs().forEach(udfDescriptor -> {
                 try {
-                    loadUrl(udfDescriptor.getAvg(), urls);
+                    loadUrl(udfDescriptor.getAvg(), true , urls);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -465,11 +455,11 @@ public abstract class AbstractFlinkClient implements FlinkClient {
 
     }
 
-    private void loadUrl(String avg, List<URL> urls) throws MalformedURLException {
+    private void loadUrl(String avg, boolean cache,  List<URL> urls) throws MalformedURLException {
         if (org.apache.commons.lang3.StringUtils.isEmpty(avg)) {
             return;
         }
-        URL url = MavenJarUtil.forAvg(avg).getJarFile().getAbsoluteFile().toURI().toURL();
+        URL url = MavenJarUtil.forAvg(avg, cache).getJarFile().getAbsoluteFile().toURI().toURL();
         if (!urls.contains(url)) {
             urls.add(url);
         }
@@ -484,14 +474,14 @@ public abstract class AbstractFlinkClient implements FlinkClient {
             LOGGER.info("{} is not exist  in alchemy properties", name);
             return;
         }
-        URL url = MavenJarUtil.forAvg(avg).getJarFile().getAbsoluteFile().toURI().toURL();
+        URL url = MavenJarUtil.forAvg(avg, true).getJarFile().getAbsoluteFile().toURI().toURL();
         if (!urls.contains(url)) {
             urls.add(url);
         }
     }
 
     private List<URL> createGlobalPath(List<String> avgs) throws MalformedURLException {
-        return FileUtil.createPath(avgs);
+        return FileUtil.createPath(avgs, true);
     }
 
     public List<String> getAvgs() {

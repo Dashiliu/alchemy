@@ -13,7 +13,7 @@
         <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="clear()">
             <fa-icon [icon]="'ban'"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
         </button>
-        <button id="jhi-confirm-submit-job" type="submit" class="btn btn-danger">
+        <button id="jhi-confirm-submit-job" type="submit" class="btn btn-danger" disabled="{{disabled}}">
             <fa-icon [icon]="'times'"></fa-icon>&nbsp;<span jhiTranslate="entity.action.ok">Submit</span>
         </button>
     </div>

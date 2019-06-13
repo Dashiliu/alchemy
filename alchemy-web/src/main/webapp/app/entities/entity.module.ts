@@ -5,10 +5,6 @@ import { RouterModule } from '@angular/router';
   imports: [
     RouterModule.forChild([
       {
-        path: 'business',
-        loadChildren: './business/business.module#AlchemyBusinessModule'
-      },
-      {
         path: 'cluster',
         loadChildren: './cluster/cluster.module#AlchemyClusterModule'
       },

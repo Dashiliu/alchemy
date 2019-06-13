@@ -1,14 +1,13 @@
 package com.dfire.platform.alchemy.descriptor;
 
-import java.util.List;
-
+import com.dfire.platform.alchemy.common.Constants;
+import com.dfire.platform.alchemy.common.Field;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.table.sources.CsvTableSource;
 import org.apache.flink.table.typeutils.TypeStringUtils;
 import org.springframework.util.Assert;
 
-import com.dfire.platform.alchemy.common.Constants;
-import com.dfire.platform.alchemy.common.Field;
+import java.util.List;
 
 /**
  * @author congbai

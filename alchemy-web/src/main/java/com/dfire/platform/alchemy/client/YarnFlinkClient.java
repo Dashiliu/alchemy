@@ -1,16 +1,12 @@
 package com.dfire.platform.alchemy.client;
 
-import org.apache.flink.configuration.Configuration;
-import org.apache.hadoop.yarn.client.api.YarnClient;
-
-import com.dfire.platform.alchemy.client.request.CancelFlinkRequest;
-import com.dfire.platform.alchemy.client.request.JobStatusRequest;
-import com.dfire.platform.alchemy.client.request.RescaleFlinkRequest;
-import com.dfire.platform.alchemy.client.request.SavepointFlinkRequest;
-import com.dfire.platform.alchemy.client.request.SubmitRequest;
+import com.dfire.platform.alchemy.client.request.*;
 import com.dfire.platform.alchemy.client.response.JobStatusResponse;
 import com.dfire.platform.alchemy.client.response.Response;
+import com.dfire.platform.alchemy.client.response.SavepointResponse;
 import com.dfire.platform.alchemy.client.response.SubmitFlinkResponse;
+import org.apache.flink.configuration.Configuration;
+import org.apache.hadoop.yarn.client.api.YarnClient;
 
 /**
  * todo 支持yarn mode
@@ -30,7 +26,7 @@ public class YarnFlinkClient implements FlinkClient {
     }
 
     @Override
-    public Response cancel(CancelFlinkRequest cancelFlinkRequest) {
+    public SavepointResponse cancel(CancelFlinkRequest cancelFlinkRequest) {
         throw new UnsupportedOperationException();
     }
 
@@ -40,7 +36,7 @@ public class YarnFlinkClient implements FlinkClient {
     }
 
     @Override
-    public Response savepoint(SavepointFlinkRequest savepointFlinkRequest) {
+    public SavepointResponse savepoint(SavepointFlinkRequest savepointFlinkRequest) {
         throw new UnsupportedOperationException();
     }
 

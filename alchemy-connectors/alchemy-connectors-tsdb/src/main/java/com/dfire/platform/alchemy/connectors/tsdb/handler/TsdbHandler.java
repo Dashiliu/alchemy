@@ -1,9 +1,8 @@
 package com.dfire.platform.alchemy.connectors.tsdb.handler;
 
 import java.io.IOException;
-import java.io.Serializable;
 
-import com.dfire.platform.alchemy.api.common.TsdbData;
+import com.dfire.platform.alchemy.connectors.tsdb.TsdbData;
 
 /**
  * @author congbai

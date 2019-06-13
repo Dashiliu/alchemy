@@ -10,7 +10,6 @@ import { JhiAlertService, JhiDataUtils } from 'ng-jhipster';
 import { ISink, Sink } from 'app/shared/model/sink.model';
 import { SinkService } from './sink.service';
 import {Business, IBusiness} from 'app/shared/model/business.model';
-import { BusinessService } from 'app/entities/business';
 import 'codemirror/mode/yaml/yaml';
 @Component({
   selector: 'jhi-sink-update',

@@ -1,9 +1,5 @@
 package com.dfire.platform.alchemy.descriptor;
 
-import java.util.List;
-
-import org.springframework.util.Assert;
-
 import com.dfire.platform.alchemy.api.common.Side;
 import com.dfire.platform.alchemy.common.Constants;
 import com.dfire.platform.alchemy.common.Field;
@@ -11,6 +7,9 @@ import com.dfire.platform.alchemy.connectors.common.side.SideTable;
 import com.dfire.platform.alchemy.connectors.mysql.side.MysqlAsyncSideFunction;
 import com.dfire.platform.alchemy.connectors.mysql.side.MysqlSideProperties;
 import com.dfire.platform.alchemy.connectors.mysql.side.MysqlSyncSideFunction;
+import org.springframework.util.Assert;
+
+import java.util.List;
 
 /**
  * @author congbai

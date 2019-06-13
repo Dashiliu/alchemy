@@ -1,10 +1,5 @@
 package com.dfire.platform.alchemy.descriptor;
 
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.util.Assert;
-
 import com.dfire.platform.alchemy.api.common.Side;
 import com.dfire.platform.alchemy.common.Constants;
 import com.dfire.platform.alchemy.common.Field;
@@ -12,6 +7,10 @@ import com.dfire.platform.alchemy.domain.Source;
 import com.dfire.platform.alchemy.domain.enumeration.SourceType;
 import com.dfire.platform.alchemy.domain.enumeration.TableType;
 import com.dfire.platform.alchemy.util.BindPropertiesUtil;
+import org.springframework.util.Assert;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author congbai

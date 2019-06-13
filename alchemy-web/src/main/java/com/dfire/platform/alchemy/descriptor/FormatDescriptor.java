@@ -1,16 +1,15 @@
 package com.dfire.platform.alchemy.descriptor;
 
-import java.util.Map;
-
+import com.dfire.platform.alchemy.common.Constants;
+import com.dfire.platform.alchemy.formats.grok.GrokRowDeserializationSchema;
+import com.dfire.platform.alchemy.formats.hessian.HessianRowDeserializationSchema;
+import com.dfire.platform.alchemy.formats.protostuff.ProtostuffRowDeserializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.formats.json.JsonRowDeserializationSchema;
 import org.apache.flink.types.Row;
 import org.springframework.util.Assert;
 
-import com.dfire.platform.alchemy.common.Constants;
-import com.dfire.platform.alchemy.formats.grok.GrokRowDeserializationSchema;
-import com.dfire.platform.alchemy.formats.hessian.HessianRowDeserializationSchema;
-import com.dfire.platform.alchemy.formats.protostuff.ProtostuffRowDeserializationSchema;
+import java.util.Map;
 
 /**
  * @author congbai
@@ -23,6 +22,10 @@ public class FormatDescriptor implements CoreDescriptor {
     public static final String KEY_REGULAR = "regular";
 
     public static final String KEY_SCHEMA = "schema";
+
+    public static final String KEY_RETAIN = "retain";
+
+    public static final String KEY_FIELD_NAME = "fieldName";
 
     private String type;
 
@@ -81,7 +84,9 @@ public class FormatDescriptor implements CoreDescriptor {
             return (T)new JsonRowDeserializationSchema(type);
         } else if (Constants.TYPE_VALUE_FORMAT_GROK.equalsIgnoreCase(type)) {
             String regular = findRegular();
-            return (T)new GrokRowDeserializationSchema(typeInformation, regular);
+            String retain = findRetain();
+            String fieldName = findFieldName();
+            return (T)new GrokRowDeserializationSchema(typeInformation, regular, retain ==null ? false : Boolean.getBoolean(regular), fieldName);
         }
         throw new UnsupportedOperationException("UnKnow format,type:" + this.type);
     }
@@ -95,4 +100,16 @@ public class FormatDescriptor implements CoreDescriptor {
         Assert.isTrue(((this.properties != null) && this.properties.get(KEY_REGULAR) != null), "正则表达式不能为空");
         return this.properties.get(KEY_REGULAR).toString();
     }
+
+
+    private String findRetain() {
+        Object value = this.properties.get(KEY_RETAIN);
+        return  value== null ? null : value.toString();
+    }
+
+    private String findFieldName() {
+        Object value = this.properties.get(KEY_FIELD_NAME);
+        return value == null ? null : value.toString();
+    }
+
 }

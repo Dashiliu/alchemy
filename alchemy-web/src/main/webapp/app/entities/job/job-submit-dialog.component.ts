@@ -12,17 +12,20 @@ import { JobService } from './job.service';
   templateUrl: './job-submit-dialog.component.html'
 })
 export class JobSubmitDialogComponent {
+  disabled: boolean;
   message: any;
   job: IJob;
 
   constructor(protected jobService: JobService, public activeModal: NgbActiveModal, protected eventManager: JhiEventManager) {}
 
   clear() {
-    this.activeModal.dismiss('cancel');
+    this.activeModal.dismiss('submit');
   }
 
   confirmSubmit(id: number) {
+    this.disabled = true;
     this.jobService.submit(id).subscribe(response => {
+      this.disabled = false;
       if(response && response.body.success){
         this.eventManager.broadcast({
           name: 'jobListModification',

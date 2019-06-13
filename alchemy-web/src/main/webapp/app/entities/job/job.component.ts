@@ -142,4 +142,8 @@ export class JobComponent implements OnInit, OnDestroy {
   collapseNavbar() {
     this.isNavbarCollapsed = true;
   }
+
+  previousState() {
+    window.history.back();
+  }
 }

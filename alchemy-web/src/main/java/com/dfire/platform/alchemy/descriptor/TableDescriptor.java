@@ -1,14 +1,13 @@
 package com.dfire.platform.alchemy.descriptor;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
+import com.dfire.platform.alchemy.common.Constants;
+import com.dfire.platform.alchemy.util.BindPropertiesUtil;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
-import com.dfire.platform.alchemy.common.Constants;
-import com.dfire.platform.alchemy.util.BindPropertiesUtil;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 提交sql job的基本信息

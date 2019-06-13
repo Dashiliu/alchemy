@@ -1,8 +1,8 @@
 package com.dfire.platform.alchemy.descriptor;
 
-import java.util.Collections;
-import java.util.List;
-
+import com.dfire.platform.alchemy.common.*;
+import com.dfire.platform.alchemy.connectors.rocketmq.RocketMQConsumerProperties;
+import com.dfire.platform.alchemy.connectors.rocketmq.RocketMQTableSource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -20,13 +20,8 @@ import org.apache.flink.table.typeutils.TypeStringUtils;
 import org.apache.flink.types.Row;
 import org.springframework.util.Assert;
 
-import com.dfire.platform.alchemy.common.Constants;
-import com.dfire.platform.alchemy.common.Field;
-import com.dfire.platform.alchemy.common.TimeAttribute;
-import com.dfire.platform.alchemy.common.Timestamps;
-import com.dfire.platform.alchemy.common.Watermarks;
-import com.dfire.platform.alchemy.connectors.rocketmq.RocketMQConsumerProperties;
-import com.dfire.platform.alchemy.connectors.rocketmq.RocketMQTableSource;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author congbai

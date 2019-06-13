@@ -2,9 +2,9 @@
   "alchemyApp": {
     "TableType": {
       "null": "",
-      "TABLE": "TABLE",
-      "VIEW": "VIEW",
-      "SIDE": "SIDE"
+      "TABLE": "源表",
+      "VIEW": "视图",
+      "SIDE": "维表"
     }
   }
 }

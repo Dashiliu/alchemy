@@ -59,24 +59,4 @@ public class ConvertRowUtil {
         }
         return row;
     }
-
-    public static Row grokConvertToRow(String message, String[] names, String regular) {
-        final Row row = new Row(names.length);
-        Map<String, Object> grokMap = GrokProxy.getInstance().match(message, regular);
-        for (int i = 0; i < names.length; i++) {
-            try {
-                final String name = names[i];
-                //todo delete?
-                if ("message".equals(name)){
-                    row.setField(i, message);
-                    continue;
-                }
-                Object field = grokMap.get(name);
-                row.setField(i, field);
-            } catch (Exception e) {
-                logger.error("Occur Error when grok convert to Row",e);
-            }
-        }
-        return row;
-    }
 }

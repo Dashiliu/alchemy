@@ -10,7 +10,6 @@ import { JhiAlertService } from 'ng-jhipster';
 import { ICluster, Cluster } from 'app/shared/model/cluster.model';
 import { ClusterService } from './cluster.service';
 import {Business, IBusiness} from 'app/shared/model/business.model';
-import { BusinessService } from 'app/entities/business';
 import 'codemirror/mode/yaml/yaml';
 
 @Component({
@@ -40,7 +39,6 @@ export class ClusterUpdateComponent implements OnInit {
   constructor(
     protected jhiAlertService: JhiAlertService,
     protected clusterService: ClusterService,
-    protected businessService: BusinessService,
     protected activatedRoute: ActivatedRoute,
     private fb: FormBuilder
   ) {}

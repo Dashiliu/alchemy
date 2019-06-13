@@ -12,6 +12,10 @@
     <artifactId>alchemy-formats-grok</artifactId>
     <packaging>jar</packaging>
 
+    <properties>
+        <grok.version>0.1.9</grok.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.dfire.platform</groupId>
@@ -31,6 +35,7 @@
         <dependency>
             <groupId>io.krakens</groupId>
             <artifactId>java-grok</artifactId>
+            <version>${grok.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>

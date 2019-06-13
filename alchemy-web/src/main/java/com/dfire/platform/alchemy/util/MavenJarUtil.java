@@ -6,6 +6,8 @@ import java.net.URLClassLoader;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.repository.internal.MavenRepositorySystemSession;
 import org.codehaus.plexus.DefaultPlexusContainer;
@@ -22,6 +24,7 @@ import org.sonatype.aether.repository.LocalRepository;
 import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.repository.RepositoryPolicy;
 import org.sonatype.aether.resolution.ArtifactResolutionException;
+import org.sonatype.aether.util.StringUtils;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.aether.util.graph.PreorderNodeListGenerator;
 
@@ -38,8 +41,24 @@ import com.google.common.collect.Lists;
  */
 public class MavenJarUtil {
 
+    private static Map<String, MavenLoaderInfo>  caches = new ConcurrentHashMap<>();
+
     public static MavenLoaderInfo forAvg(String avg) {
-        return MavenClassLoader.forGAV(avg, Constants.RELEASE_REPOSITORY_URL, Constants.SNAP_REPOSITORY_URL);
+        return forAvg(avg, false);
+    }
+
+    public static MavenLoaderInfo forAvg(String avg, boolean cache) {
+        if(cache){
+            MavenLoaderInfo mavenLoaderInfo = caches.get(avg);
+            if(mavenLoaderInfo == null){
+                mavenLoaderInfo =  MavenClassLoader.forGAV(avg, Constants.RELEASE_REPOSITORY_URL, Constants.SNAP_REPOSITORY_URL);
+                caches.put(avg, mavenLoaderInfo);
+            }
+            return mavenLoaderInfo;
+        }else{
+            return  MavenClassLoader.forGAV(avg, Constants.RELEASE_REPOSITORY_URL, Constants.SNAP_REPOSITORY_URL);
+        }
+
     }
 
     public static final class MavenClassLoader {

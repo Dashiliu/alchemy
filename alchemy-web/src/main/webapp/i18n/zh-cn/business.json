@@ -2,28 +2,28 @@
   "alchemyApp": {
     "business": {
       "home": {
-        "title": "Businesses",
-        "createLabel": "创建新 Business",
-        "createOrEditLabel": "创建或编辑 Business"
+        "title": "业务",
+        "createLabel": "创建新 业务",
+        "createOrEditLabel": "创建或编辑 业务"
       },
-      "created": "Business {{ param }} 创建成功",
-      "updated": "Business {{ param }} 更新成功",
-      "deleted": "Business {{ param }} 删除成功",
+      "created": "业务 {{ param }} 创建成功",
+      "updated": "业务 {{ param }} 更新成功",
+      "deleted": "业务 {{ param }} 删除成功",
       "delete": {
-        "question": "你确定要删除 Business {{ id }} 吗？"
+        "question": "你确定要删除 业务 {{ id }} 吗？"
       },
       "detail": {
-        "title": "Business"
+        "title": "业务"
       },
-      "name": "Name",
-      "remark": "Remark",
-      "createdBy": "Created By",
-      "createdDate": "Created Date",
-      "job": "Job",
-      "cluster": "Cluster",
-      "source": "Source",
-      "sink": "Sink",
-      "udf": "Udf"
+      "name": "名称",
+      "remark": "备注",
+      "createdBy": "创建者",
+      "createdDate": "创建时间",
+      "job": "任务",
+      "cluster": "集群",
+      "source": "数据源",
+      "sink": "数据写入",
+      "udf": "用户函数"
     }
   }
 }

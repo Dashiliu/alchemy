@@ -1,13 +1,12 @@
 package com.dfire.platform.alchemy.descriptor;
 
-import java.util.List;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.util.Assert;
-
 import com.dfire.platform.alchemy.common.Constants;
 import com.dfire.platform.alchemy.connectors.tsdb.TsdbProperties;
 import com.dfire.platform.alchemy.connectors.tsdb.TsdbTableSink;
+import org.springframework.beans.BeanUtils;
+import org.springframework.util.Assert;
+
+import java.util.List;
 
 /**
  * @author congbai

@@ -1,9 +1,8 @@
 package com.dfire.platform.alchemy.descriptor;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.dfire.platform.alchemy.common.*;
+import com.dfire.platform.alchemy.connectors.kafka.AlchemyKafkaTableSource;
+import com.dfire.platform.alchemy.util.PropertiesUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
@@ -24,13 +23,9 @@ import org.apache.flink.types.Row;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.springframework.util.Assert;
 
-import com.dfire.platform.alchemy.common.Constants;
-import com.dfire.platform.alchemy.common.Field;
-import com.dfire.platform.alchemy.common.TimeAttribute;
-import com.dfire.platform.alchemy.common.Timestamps;
-import com.dfire.platform.alchemy.common.Watermarks;
-import com.dfire.platform.alchemy.connectors.kafka.AlchemyKafkaTableSource;
-import com.dfire.platform.alchemy.util.PropertiesUtil;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * todo 事件事件、处理时间 --> 水位

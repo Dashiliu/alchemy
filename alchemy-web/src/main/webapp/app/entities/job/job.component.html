@@ -1,6 +1,13 @@
 <div>
     <h2 id="page-heading">
         <span jhiTranslate="alchemyApp.job.home.title">Jobs</span>
+    </h2>
+    <h2>
+        <button type="submit"
+                (click)="previousState()"
+                class="btn btn-info">
+            <fa-icon [icon]="'arrow-left'"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back"> Back</span>
+        </button>
         <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-job" [routerLink]="['/job', business.id ,'new']">
             <fa-icon [icon]="'plus'"></fa-icon>
             <span  jhiTranslate="alchemyApp.job.home.createLabel">
@@ -105,13 +112,13 @@
                                                 <span jhiTranslate="global.menu.job.cancelWithSavepoint">CancelWithSavepoint</span>
                                             </a>
                                         </li>
-                                        <li>
-                                            <a class="dropdown-item"  [routerLink]="['/', 'job', { outlets: { popup: job.id + '/rescale'} }]" replaceUrl="true"
-                                               queryParamsHandling="merge"  routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">
-                                                <fa-icon icon="asterisk" fixedWidth="true"></fa-icon>
-                                                <span jhiTranslate="global.menu.job.rescale">Rescale</span>
-                                            </a>
-                                        </li>
+<!--                                        <li>-->
+<!--                                            <a class="dropdown-item"  [routerLink]="['/', 'job', { outlets: { popup: job.id + '/rescale'} }]" replaceUrl="true"-->
+<!--                                               queryParamsHandling="merge"  routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">-->
+<!--                                                <fa-icon icon="asterisk" fixedWidth="true"></fa-icon>-->
+<!--                                                <span jhiTranslate="global.menu.job.rescale">Rescale</span>-->
+<!--                                            </a>-->
+<!--                                        </li>-->
                                         <li>
                                             <a class="dropdown-item"  [routerLink]="['/', 'job', { outlets: { popup: job.id + '/savepoint'} }]" replaceUrl="true"
                                                queryParamsHandling="merge"  routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="collapseNavbar()">

@@ -12,7 +12,6 @@ import org.apache.flink.util.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dfire.platform.alchemy.api.common.TsdbData;
 import com.dfire.platform.alchemy.connectors.tsdb.handler.HitsdbHandler;
 import com.dfire.platform.alchemy.connectors.tsdb.handler.TsdbHandler;
 

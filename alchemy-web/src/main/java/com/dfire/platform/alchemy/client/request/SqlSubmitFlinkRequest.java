@@ -1,14 +1,13 @@
 package com.dfire.platform.alchemy.client.request;
 
-import java.util.List;
-import java.util.Map;
-
-import org.apache.flink.streaming.api.environment.CheckpointConfig;
-import org.springframework.util.Assert;
-
 import com.dfire.platform.alchemy.descriptor.SinkDescriptor;
 import com.dfire.platform.alchemy.descriptor.SourceDescriptor;
 import com.dfire.platform.alchemy.descriptor.UdfDescriptor;
+import org.apache.flink.streaming.api.environment.CheckpointConfig;
+import org.springframework.util.Assert;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author congbai

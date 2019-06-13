@@ -1,12 +1,7 @@
 package com.dfire.platform.alchemy.descriptor;
 
-import com.dfire.platform.alchemy.common.Constants;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.springframework.beans.BeanUtils;
-import org.springframework.util.Assert;
-
 import com.dfire.platform.alchemy.api.util.GroovyCompiler;
+import com.dfire.platform.alchemy.common.Constants;
 import com.dfire.platform.alchemy.domain.Udf;
 import com.dfire.platform.alchemy.domain.enumeration.UdfType;
 import com.dfire.platform.alchemy.function.StreamAggregateFunction;
@@ -15,6 +10,10 @@ import com.dfire.platform.alchemy.function.StreamTableFunction;
 import com.dfire.platform.alchemy.function.aggregate.FlinkAllAggregateFunction;
 import com.dfire.platform.alchemy.function.scalar.FlinkAllScalarFunction;
 import com.dfire.platform.alchemy.function.table.FlinkAllTableFunction;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.typeutils.TypeExtractor;
+import org.springframework.beans.BeanUtils;
+import org.springframework.util.Assert;
 
 /**
  * 描述用户自定义函数

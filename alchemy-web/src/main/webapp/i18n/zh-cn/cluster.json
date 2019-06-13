@@ -2,29 +2,29 @@
   "alchemyApp": {
     "cluster": {
       "home": {
-        "title": "Clusters",
-        "createLabel": "创建新 Cluster",
-        "createOrEditLabel": "创建或编辑 Cluster"
+        "title": "集群",
+        "createLabel": "创建新 集群",
+        "createOrEditLabel": "创建或编辑 集群"
       },
-      "created": "Cluster {{ param }} 创建成功",
-      "updated": "Cluster {{ param }} 更新成功",
-      "deleted": "Cluster {{ param }} 删除成功",
+      "created": "集群 {{ param }} 创建成功",
+      "updated": "集群 {{ param }} 更新成功",
+      "deleted": "集群 {{ param }} 删除成功",
       "delete": {
-        "question": "你确定要删除 Cluster {{ id }} 吗？"
+        "question": "你确定要删除 集群 {{ id }} 吗？"
       },
       "detail": {
-        "title": "Cluster"
+        "title": "集群"
       },
-      "name": "Name",
-      "type": "Type",
-      "config": "Config",
-      "remark": "Remark",
-      "createdBy": "Created By",
-      "createdDate": "Created Date",
-      "lastModifiedBy": "Last Modified By",
-      "lastModifiedDate": "Last Modified Date",
-      "business": "Business",
-      "job": "Job"
+      "name": "名称",
+      "type": "类型",
+      "config": "配置",
+      "remark": "备注",
+      "createdBy": "创建者",
+      "createdDate": "创建时间",
+      "lastModifiedBy": "修改者",
+      "lastModifiedDate": "修改时间",
+      "business": "业务",
+      "job": "任务"
     }
   }
 }

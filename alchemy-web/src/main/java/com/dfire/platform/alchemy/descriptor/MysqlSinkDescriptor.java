@@ -1,12 +1,11 @@
 package com.dfire.platform.alchemy.descriptor;
 
+import com.dfire.platform.alchemy.common.Constants;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.io.jdbc.JDBCAppendTableSink;
 import org.apache.flink.api.java.io.jdbc.JDBCAppendTableSinkBuilder;
 import org.apache.flink.table.typeutils.TypeStringUtils;
 import org.springframework.util.Assert;
-
-import com.dfire.platform.alchemy.common.Constants;
 
 /**
  * @author congbai

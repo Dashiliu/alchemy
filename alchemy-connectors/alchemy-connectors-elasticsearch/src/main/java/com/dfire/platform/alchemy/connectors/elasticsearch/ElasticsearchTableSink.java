@@ -11,6 +11,9 @@ import java.util.Map;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.connectors.elasticsearch.ActionRequestFailureHandler;
+import org.apache.flink.streaming.connectors.elasticsearch.util.NoOpFailureHandler;
+import org.apache.flink.streaming.connectors.elasticsearch.util.RetryRejectedExecutionFailureHandler;
 import org.apache.flink.streaming.connectors.elasticsearch5.ElasticsearchSink;
 import org.apache.flink.table.sinks.AppendStreamTableSink;
 import org.apache.flink.table.sinks.TableSink;
@@ -68,8 +71,30 @@ public class ElasticsearchTableSink implements AppendStreamTableSink<Row> {
         Map<String, String> userConfig = createUserConfig();
         List<InetSocketAddress> transports = new ArrayList<>();
         addTransportAddress(transports, this.elasticsearchProperties.getTransports());
+        ActionRequestFailureHandler actionRequestFailureHandler = createFailureHandler(this.elasticsearchProperties.getFailureHandler());
         return new ElasticsearchSink<>(userConfig, transports,
-            new ElasticsearchTableFunction(this.elasticsearchProperties.getIndex(), this.elasticsearchProperties.getFieldIndex(), this.elasticsearchProperties.getDateFormat(), this.jsonRowSchema));
+            new ElasticsearchTableFunction(this.elasticsearchProperties.getIndex(), this.elasticsearchProperties.getIndexField(), this.elasticsearchProperties.getDateFormat(), this.jsonRowSchema, this.fieldNames),
+                actionRequestFailureHandler);
+    }
+
+    private ActionRequestFailureHandler createFailureHandler(String failureHandler) {
+        if(failureHandler == null || failureHandler.trim().length() == 0){
+            return new NoOpFailureHandler();
+        }
+        FailureHandler handler = FailureHandler.valueOf(failureHandler.toUpperCase());
+        if(handler == null){
+            return new NoOpFailureHandler();
+        }
+        switch (handler){
+            case NOOP:
+                return new NoOpFailureHandler();
+            case IGNORE:
+                return new IgnoreFailureHandler();
+            case RETRYREJECTED:
+                return new RetryRejectedExecutionFailureHandler();
+            default:
+                return new NoOpFailureHandler();
+        }
     }
 
     private Map<String, String> createUserConfig() {

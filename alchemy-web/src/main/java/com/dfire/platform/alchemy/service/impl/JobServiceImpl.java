@@ -153,6 +153,7 @@ public class JobServiceImpl implements JobService {
         }
         SubmitFlinkResponse response =client.submit(submitRequest);
         if (response.isSuccess()) {
+            job.setStatus(JobStatus.SUBMIT);
             job.setClusterJobId(response.getJobId());
         } else {
             job.setStatus(JobStatus.FAILED);

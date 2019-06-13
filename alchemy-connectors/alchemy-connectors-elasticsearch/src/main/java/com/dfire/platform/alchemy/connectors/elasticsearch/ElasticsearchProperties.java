@@ -17,9 +17,11 @@ public class ElasticsearchProperties implements Serializable {
 
     private  String index;
 
-    private  String fieldIndex;
+    private  String indexField;
 
     private  String dateFormat;
+
+    private String failureHandler;
 
     private  Map<String, Object> config;
 
@@ -47,12 +49,20 @@ public class ElasticsearchProperties implements Serializable {
         this.index = index;
     }
 
-    public String getFieldIndex() {
-        return fieldIndex;
+    public String getIndexField() {
+        return indexField;
     }
 
-    public void setFieldIndex(String fieldIndex) {
-        this.fieldIndex = fieldIndex;
+    public void setIndexField(String indexField) {
+        this.indexField = indexField;
+    }
+
+    public String getFailureHandler() {
+        return failureHandler;
+    }
+
+    public void setFailureHandler(String failureHandler) {
+        this.failureHandler = failureHandler;
     }
 
     public String getDateFormat() {

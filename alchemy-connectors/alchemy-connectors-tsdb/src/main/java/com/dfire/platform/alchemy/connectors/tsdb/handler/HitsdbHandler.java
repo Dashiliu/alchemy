@@ -12,7 +12,7 @@ import com.aliyun.hitsdb.client.HiTSDBConfig;
 import com.aliyun.hitsdb.client.callback.BatchPutCallback;
 import com.aliyun.hitsdb.client.value.Result;
 import com.aliyun.hitsdb.client.value.request.Point;
-import com.dfire.platform.alchemy.api.common.TsdbData;
+import com.dfire.platform.alchemy.connectors.tsdb.TsdbData;
 import com.dfire.platform.alchemy.connectors.tsdb.TsdbProperties;
 
 /**

@@ -1,14 +1,13 @@
 package com.dfire.platform.alchemy.descriptor;
 
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.util.Assert;
-
 import com.dfire.platform.alchemy.common.Constants;
 import com.dfire.platform.alchemy.connectors.hbase.HbaseProperties;
 import com.dfire.platform.alchemy.connectors.hbase.HbaseTableSink;
+import org.springframework.beans.BeanUtils;
+import org.springframework.util.Assert;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author congbai

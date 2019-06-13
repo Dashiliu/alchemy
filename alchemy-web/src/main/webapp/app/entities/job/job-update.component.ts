@@ -10,7 +10,6 @@ import { JhiAlertService } from 'ng-jhipster';
 import { IJob, Job } from 'app/shared/model/job.model';
 import { JobService } from './job.service';
 import {Business, IBusiness} from 'app/shared/model/business.model';
-import { BusinessService } from 'app/entities/business';
 import { ICluster } from 'app/shared/model/cluster.model';
 import { ClusterService } from 'app/entities/cluster';
 import 'codemirror/mode/yaml/yaml';

@@ -10,7 +10,6 @@ import { JhiAlertService, JhiDataUtils } from 'ng-jhipster';
 import { IUdf, Udf } from 'app/shared/model/udf.model';
 import { UdfService } from './udf.service';
 import {Business, IBusiness} from 'app/shared/model/business.model';
-import { BusinessService } from 'app/entities/business';
 import 'codemirror/mode/groovy/groovy';
 
 @Component({

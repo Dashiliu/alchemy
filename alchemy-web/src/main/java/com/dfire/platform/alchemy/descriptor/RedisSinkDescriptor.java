@@ -1,17 +1,12 @@
 package com.dfire.platform.alchemy.descriptor;
 
-import java.util.List;
-
+import com.dfire.platform.alchemy.api.common.RedisCommand;
+import com.dfire.platform.alchemy.common.Constants;
+import com.dfire.platform.alchemy.connectors.redis.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.Assert;
 
-import com.dfire.platform.alchemy.api.common.RedisCommand;
-import com.dfire.platform.alchemy.common.Constants;
-import com.dfire.platform.alchemy.connectors.redis.Codis;
-import com.dfire.platform.alchemy.connectors.redis.PoolConfig;
-import com.dfire.platform.alchemy.connectors.redis.RedisProperties;
-import com.dfire.platform.alchemy.connectors.redis.RedisTableSink;
-import com.dfire.platform.alchemy.connectors.redis.Sentinel;
+import java.util.List;
 
 /**
  * @author congbai

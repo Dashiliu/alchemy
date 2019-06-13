@@ -8,6 +8,8 @@ import org.springframework.util.Assert;
  */
 public class JarSubmitFlinkRequest extends AbstractSubmitRequest {
 
+    private boolean cache;
+
     private String avg;
 
     private Integer parallelism;
@@ -19,6 +21,14 @@ public class JarSubmitFlinkRequest extends AbstractSubmitRequest {
     private String savepointPath;
 
     private Boolean allowNonRestoredState;
+
+    public boolean isCache() {
+        return cache;
+    }
+
+    public void setCache(boolean cache) {
+        this.cache = cache;
+    }
 
     public String getAvg() {
         return avg;

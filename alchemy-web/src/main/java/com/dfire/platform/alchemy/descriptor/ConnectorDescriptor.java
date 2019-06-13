@@ -1,8 +1,8 @@
 package com.dfire.platform.alchemy.descriptor;
 
-import java.util.List;
-
 import com.dfire.platform.alchemy.common.Field;
+
+import java.util.List;
 
 /**
  * @author congbai

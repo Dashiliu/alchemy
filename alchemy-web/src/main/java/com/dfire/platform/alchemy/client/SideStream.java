@@ -1,11 +1,13 @@
 package com.dfire.platform.alchemy.client;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
+import com.dfire.platform.alchemy.api.common.Alias;
+import com.dfire.platform.alchemy.api.common.Side;
+import com.dfire.platform.alchemy.api.util.SideParser;
+import com.dfire.platform.alchemy.common.Field;
+import com.dfire.platform.alchemy.connectors.common.side.AsyncSideFunction;
+import com.dfire.platform.alchemy.connectors.common.side.SideTable;
+import com.dfire.platform.alchemy.connectors.common.side.SyncSideFunction;
+import com.dfire.platform.alchemy.descriptor.SourceDescriptor;
 import org.apache.calcite.sql.JoinType;
 import org.apache.calcite.sql.SqlJoin;
 import org.apache.calcite.sql.SqlNodeList;
@@ -20,14 +22,11 @@ import org.apache.flink.table.api.java.StreamTableEnvironment;
 import org.apache.flink.table.typeutils.TypeStringUtils;
 import org.apache.flink.types.Row;
 
-import com.dfire.platform.alchemy.api.common.Alias;
-import com.dfire.platform.alchemy.api.common.Side;
-import com.dfire.platform.alchemy.api.util.SideParser;
-import com.dfire.platform.alchemy.common.Field;
-import com.dfire.platform.alchemy.connectors.common.side.AsyncSideFunction;
-import com.dfire.platform.alchemy.connectors.common.side.SideTable;
-import com.dfire.platform.alchemy.connectors.common.side.SyncSideFunction;
-import com.dfire.platform.alchemy.descriptor.SourceDescriptor;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author congbai

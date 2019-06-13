@@ -34,7 +34,6 @@
         <fastjson.versoiin>1.2.46</fastjson.versoiin>
         <commons-io.version>2.6</commons-io.version>
         <groovy.version>2.4.11</groovy.version>
-        <grok.version>0.1.9</grok.version>
         <slf4j-api.version>1.7.7</slf4j-api.version>
         <lettuce.version>5.0.5.RELEASE</lettuce.version>
     </properties>
@@ -140,11 +139,6 @@
                 <groupId>org.codehaus.groovy</groupId>
                 <artifactId>groovy-all</artifactId>
                 <version>${groovy.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.krakens</groupId>
-                <artifactId>java-grok</artifactId>
-                <version>${grok.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

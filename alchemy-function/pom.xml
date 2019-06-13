@@ -15,6 +15,5 @@
 
     <modules>
         <module>alchemy-function-common</module>
-        <module>alchemy-function-logstash</module>
     </modules>
 </project>

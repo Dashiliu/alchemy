@@ -1,12 +1,11 @@
 package com.dfire.platform.alchemy.descriptor;
 
-import java.util.Map;
-
+import com.dfire.platform.alchemy.common.Constants;
+import com.dfire.platform.alchemy.util.PropertiesUtil;
 import org.apache.flink.streaming.connectors.kafka.Kafka010JsonTableSink;
 import org.springframework.util.Assert;
 
-import com.dfire.platform.alchemy.common.Constants;
-import com.dfire.platform.alchemy.util.PropertiesUtil;
+import java.util.Map;
 
 /**
  * @author congbai

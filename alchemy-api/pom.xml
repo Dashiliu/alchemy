@@ -37,10 +37,5 @@
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
         </dependency>
-        <dependency>
-            <groupId>io.krakens</groupId>
-            <artifactId>java-grok</artifactId>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
 </project>

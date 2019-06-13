@@ -2,28 +2,28 @@
   "alchemyApp": {
     "sink": {
       "home": {
-        "title": "Sinks",
-        "createLabel": "创建新 Sink",
-        "createOrEditLabel": "创建或编辑 Sink"
+        "title": "数据写入端",
+        "createLabel": "创建新 数据写入端",
+        "createOrEditLabel": "创建或编辑 数据写入端"
       },
-      "created": "Sink {{ param }} 创建成功",
-      "updated": "Sink {{ param }} 更新成功",
-      "deleted": "Sink {{ param }} 删除成功",
+      "created": "数据写入端 {{ param }} 创建成功",
+      "updated": "数据写入端 {{ param }} 更新成功",
+      "deleted": "数据写入端 {{ param }} 删除成功",
       "delete": {
-        "question": "你确定要删除 Sink {{ id }} 吗？"
+        "question": "你确定要删除 数据写入端 {{ id }} 吗？"
       },
       "detail": {
-        "title": "Sink"
+        "title": "数据写入端"
       },
-      "name": "Name",
-      "type": "Type",
-      "config": "Config",
-      "remark": "Remark",
-      "createdBy": "Created By",
-      "createdDate": "Created Date",
-      "lastModifiedBy": "Last Modified By",
-      "lastModifiedDate": "Last Modified Date",
-      "business": "Business"
+      "name": "名称",
+      "type": "类型",
+      "config": "配置",
+      "remark": "备注",
+      "createdBy": "创建者",
+      "createdDate": "创建时间",
+      "lastModifiedBy": "修改者",
+      "lastModifiedDate": "修改时间",
+      "business": "业务"
     }
   }
 }
