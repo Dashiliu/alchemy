@@ -8,6 +8,9 @@ import org.springframework.util.Assert;
  */
 public class JarSubmitFlinkRequest extends AbstractSubmitRequest {
 
+    /**
+     *  是否需要cache 下载好的jar包
+     */
     private boolean cache;
 
     private String avg;

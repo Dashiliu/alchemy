@@ -40,10 +40,10 @@ import java.util.List;
  */
 public class SideParser {
 
-    private static final SqlParser.Config config = SqlParser.configBuilder().setLex(Lex.MYSQL).build();
+    private static final SqlParser.Config CONFIG = SqlParser.configBuilder().setLex(Lex.MYSQL).build();
 
     public static Deque<SqlNode> parse(String sql) throws SqlParseException {
-        SqlParser sqlParser = SqlParser.create(sql, config);
+        SqlParser sqlParser = SqlParser.create(sql, CONFIG);
         SqlNode sqlNode = sqlParser.parseStmt();
         Deque<SqlNode> deque = new ArrayDeque<>();
         parse(sqlNode, deque);

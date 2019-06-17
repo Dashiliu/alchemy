@@ -1,29 +1,29 @@
 package com.dfire.platform.alchemy.connectors.tsdb;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.dfire.platform.alchemy.connectors.common.MetricFunction;
+import com.dfire.platform.alchemy.connectors.tsdb.handler.HitsdbHandler;
+import com.dfire.platform.alchemy.connectors.tsdb.handler.TsdbHandler;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.configuration.Configuration;
+import org.apache.flink.metrics.Counter;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
 import org.apache.flink.types.Row;
-import org.apache.flink.util.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dfire.platform.alchemy.connectors.tsdb.handler.HitsdbHandler;
-import com.dfire.platform.alchemy.connectors.tsdb.handler.TsdbHandler;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author congbai
  * @date 2018/7/10
  */
-public class TsdbSinkFunction extends RichSinkFunction<Row> {
+public class TsdbSinkFunction extends RichSinkFunction<Row> implements MetricFunction {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(TsdbSinkFunction.class);
+    private static final String TSDB_METRICS_GROUP = "Tsdb";
 
     private final TsdbProperties tsdbProperties;
 
@@ -33,23 +33,17 @@ public class TsdbSinkFunction extends RichSinkFunction<Row> {
 
     private final Map<String, Integer> fieldIndexs;
 
+    private  Counter numRecordsOut;
+
     private transient TsdbHandler tsdbHandler;
 
     public TsdbSinkFunction(TsdbProperties tsdbProperties, String[] fieldNames, TypeInformation[] fieldTypes) {
-        check(tsdbProperties);
         this.tsdbProperties = tsdbProperties;
         this.fieldNames = fieldNames;
+
         this.fieldTypes = fieldTypes;
         this.fieldIndexs = initFieldIndexs();
     }
-
-    private void check(TsdbProperties tsdbProperties) {
-        Preconditions.checkNotNull(tsdbProperties.getUrl(), "tsdb url must not be null.");
-        Preconditions.checkNotNull(tsdbProperties.getMetrics(), "tsdb metrics must not be null.");
-        Preconditions.checkNotNull(tsdbProperties.getTags(), "tsdb tags must not be null.");
-
-    }
-
     private HashMap<String, Integer> initFieldIndexs() {
         HashMap<String, Integer> fieldIndexs = new HashMap<>(this.fieldNames.length);
         for (int i=0; i<fieldNames.length; i++){
@@ -77,6 +71,8 @@ public class TsdbSinkFunction extends RichSinkFunction<Row> {
         }
         TsdbData tsdbData = createDate(value, context);
         this.tsdbHandler.execute(tsdbData);
+        numRecordsOut = createOrGet(numRecordsOut, getRuntimeContext());
+        numRecordsOut.inc();
     }
 
     private TsdbData createDate(Row value, Context context) {
@@ -107,5 +103,10 @@ public class TsdbSinkFunction extends RichSinkFunction<Row> {
             returnValue.put(metric.trim(), (Number)input.getField(index));
         }
         return returnValue;
+    }
+
+    @Override
+    public String metricGroupName() {
+        return TSDB_METRICS_GROUP;
     }
 }

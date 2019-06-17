@@ -19,20 +19,14 @@
 
     <modules>
         <module>alchemy-connectors-common</module>
-        <module>alchemy-connectors-elasticsearch</module>
+        <module>alchemy-connectors-elasticsearch5</module>
         <module>alchemy-connectors-hbase</module>
-        <module>alchemy-connectors-kafka</module>
+        <module>alchemy-connectors-kafka-0.10</module>
         <module>alchemy-connectors-redis</module>
         <module>alchemy-connectors-rocketmq</module>
         <module>alchemy-connectors-tsdb</module>
         <module>alchemy-connectors-mysql</module>
         <module>alchemy-connectors-filesystem</module>
+        <module>alchemy-connectors-dubbo</module>
     </modules>
-    <reporting>
-        <plugins>
-            <plugin>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </reporting>
 </project>

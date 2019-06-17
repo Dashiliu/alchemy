@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>alchemy-connectors-tsdb</artifactId>
+    <artifactId>alchemy-connectors-opentsdb</artifactId>
     <packaging>jar</packaging>
 
 
@@ -29,6 +29,11 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
             <version>${httpcore.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.dfire.platform</groupId>
+            <artifactId>alchemy-connectors-common</artifactId>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>com.dfire.platform</groupId>

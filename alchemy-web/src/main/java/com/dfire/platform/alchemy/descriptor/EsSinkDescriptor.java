@@ -21,11 +21,19 @@ public class EsSinkDescriptor extends SinkDescriptor {
 
     private String clusterName;
 
+    /**
+     * 指定索引名称
+     */
     private String index;
 
-    private String fieldIndex;
+    /**
+     * 指定索引在row中的的字段，动态从row中获取索引
+     */
+    private String indexField;
 
     private String dateFormat;
+
+    private String failureHandler;
 
     private Map<String, Object> config;
 
@@ -62,12 +70,12 @@ public class EsSinkDescriptor extends SinkDescriptor {
         this.index = index;
     }
 
-    public String getFieldIndex() {
-        return fieldIndex;
+    public String getIndexField() {
+        return indexField;
     }
 
-    public void setFieldIndex(String fieldIndex) {
-        this.fieldIndex = fieldIndex;
+    public void setIndexField(String indexField) {
+        this.indexField = indexField;
     }
 
     public String getDateFormat() {
@@ -86,6 +94,14 @@ public class EsSinkDescriptor extends SinkDescriptor {
         this.config = config;
     }
 
+    public String getFailureHandler() {
+        return failureHandler;
+    }
+
+    public void setFailureHandler(String failureHandler) {
+        this.failureHandler = failureHandler;
+    }
+
     @Override
     public <T> T transform() throws Exception {
         ElasticsearchProperties properties = new ElasticsearchProperties();
@@ -97,7 +113,7 @@ public class EsSinkDescriptor extends SinkDescriptor {
     public void validate() throws Exception {
         Assert.notNull(transports, "地址不能为空");
         Assert.notNull(clusterName, "clusterName不能为空");
-        Assert.isTrue(StringUtils.isBlank(index) && StringUtils.isBlank(fieldIndex), "索引不能为空");
+        Assert.isTrue(StringUtils.isBlank(index) && StringUtils.isBlank(indexField), "索引不能为空");
     }
 
     @Override

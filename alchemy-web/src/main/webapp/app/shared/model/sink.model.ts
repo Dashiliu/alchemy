@@ -2,12 +2,12 @@ import { Moment } from 'moment';
 
 export const enum SinkType {
   REDIS = 'REDIS',
-  KAFKA = 'KAFKA',
+  KAFKA = 'KAFKA010',
   MYSQL = 'MYSQL',
   HBASE = 'HBASE',
   TSDB = 'TSDB',
   FILE = 'FILE',
-  ELASTICSEARCH = 'ELASTICSEARCH',
+  ELASTICSEARCH5 = 'ELASTICSEARCH5',
   PRINT = 'PRINT'
 }
 

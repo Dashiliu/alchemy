@@ -90,9 +90,9 @@ public class ConvertObjectUtil {
 
     private static Double getDoubleVal(Object obj) {
         if (obj instanceof String) {
-            return Double.valueOf(obj.toString());
+            return Double.parseDouble(obj.toString());
         } else if (obj instanceof Float) {
-            return (Double) obj;
+            return Double.parseDouble(obj.toString());
         } else if (obj instanceof BigDecimal) {
             return ((BigDecimal) obj).doubleValue();
         }

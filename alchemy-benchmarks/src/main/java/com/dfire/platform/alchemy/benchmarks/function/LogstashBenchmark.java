@@ -37,12 +37,4 @@ public class LogstashBenchmark {
         String userAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/7.0.4(0x17000428) NetType/4G Language/zh_CN";
         UserAgentUtil.parse(userAgent);
     }
-
-    @Benchmark
-    public void geoIp() throws Exception {
-        String ip = "117.136.8.65";
-        DatabaseReader reader = GeoIpDatabase.parse();
-        InetAddress ipAddress = InetAddress.getByName(ip);
-    }
-
 }

@@ -21,8 +21,16 @@ public class TsdbTableSink implements AppendStreamTableSink<Row> {
 
     private TypeInformation[] fieldTypes;
 
-    public TsdbTableSink(TsdbProperties opentsdbProperties) {
-        this.opentsdbProperties = Preconditions.checkNotNull(opentsdbProperties, "opentsdbProperties");;
+    public TsdbTableSink(TsdbProperties tsdbProperties) {
+        check(tsdbProperties);
+        this.opentsdbProperties = Preconditions.checkNotNull(tsdbProperties, "opentsdbProperties");;
+    }
+
+    private void check(TsdbProperties tsdbProperties) {
+        Preconditions.checkNotNull(tsdbProperties.getUrl(), "tsdb url must not be null.");
+        Preconditions.checkNotNull(tsdbProperties.getMetrics(), "tsdb metrics must not be null.");
+        Preconditions.checkNotNull(tsdbProperties.getTags(), "tsdb tags must not be null.");
+
     }
 
     @Override

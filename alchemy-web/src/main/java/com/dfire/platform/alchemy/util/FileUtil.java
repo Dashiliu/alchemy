@@ -1,48 +1,20 @@
 package com.dfire.platform.alchemy.util;
 
+import org.apache.flink.client.program.JobWithJars;
+import org.springframework.util.CollectionUtils;
+
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.flink.client.program.JobWithJars;
-import org.springframework.util.CollectionUtils;
-
 /**
  * @author congbai
  * @date 2018/7/1
  */
 public class FileUtil {
-
-    public static File uploadFile(byte[] file, String filePath, String fileName) {
-        File target = new File(filePath);
-        if (!target.exists()) {
-            target.mkdirs();
-        }
-        File result = new File(filePath + fileName);
-        FileOutputStream out = null;
-        try {
-            out = new FileOutputStream(result);
-            out.write(file);
-            out.flush();
-            return result;
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        return result;
-    }
 
     public static List<URL> createPath(File file) {
         List<URL> jarFiles = new ArrayList<>(1);

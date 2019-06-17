@@ -50,7 +50,7 @@ public class SourceResourceIT {
     private static final TableType DEFAULT_TABLE_TYPE = TableType.TABLE;
     private static final TableType UPDATED_TABLE_TYPE = TableType.VIEW;
 
-    private static final SourceType DEFAULT_SOURCE_TYPE = SourceType.KAFKA;
+    private static final SourceType DEFAULT_SOURCE_TYPE = SourceType.KAFKA010;
     private static final SourceType UPDATED_SOURCE_TYPE = SourceType.MYSQL;
 
     private static final String DEFAULT_CONFIG = "AAAAAAAAAA";

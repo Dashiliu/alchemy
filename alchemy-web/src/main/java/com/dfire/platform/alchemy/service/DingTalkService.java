@@ -13,7 +13,7 @@ public class DingTalkService {
 
     private RestTemplate restTemplate = new RestTemplate();
 
-    @Value("${jhipster.dingtalk.webhook}")
+    @Value("${dingtalk.webhook}")
     private String webhook;
 
     /**
@@ -83,7 +83,7 @@ public class DingTalkService {
         }
     }
 
-    public class Markdown {
+    public static class Markdown {
 
         private String title;
 
@@ -112,7 +112,7 @@ public class DingTalkService {
 
     }
 
-    public class At {
+    public static class At {
 
         private String[] atMobiles;
         private boolean isAtAll;

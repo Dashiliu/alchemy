@@ -26,12 +26,12 @@ import com.google.common.collect.Lists;
  */
 public class SqlParseUtil {
 
-    private static final SqlParser.Config config = SqlParser.configBuilder().setLex(Lex.MYSQL).build();
+    private static final SqlParser.Config CONFIG = SqlParser.configBuilder().setLex(Lex.MYSQL).build();
 
     public static void parse(List<String> sqls, List<String> sources, List<String> udfs, List<String> sinks)
         throws SqlParseException {
         for (String sql : sqls) {
-            SqlParser sqlParser = SqlParser.create(sql, config);
+            SqlParser sqlParser = SqlParser.create(sql, CONFIG);
             SqlNode sqlNode = sqlParser.parseStmt();
             if (sqlNode.getKind() != SqlKind.INSERT) {
                 throw new IllegalArgumentException("It must be an insert SQL, sql:" + sql);
@@ -50,7 +50,7 @@ public class SqlParseUtil {
         throws SqlParseException {
         List<String> newSqls = new ArrayList<>(sqls.size());
         for (String sql : sqls) {
-            SqlParser sqlParser = SqlParser.create(sql, config);
+            SqlParser sqlParser = SqlParser.create(sql, CONFIG);
             SqlNode sqlNode = sqlParser.parseStmt();
             if (sqlNode.getKind() != SqlKind.INSERT) {
                 throw new IllegalArgumentException("It must be an insert SQL, sql:" + sql);
@@ -170,7 +170,7 @@ public class SqlParseUtil {
     }
 
     public static String parseSinkName(String sql) throws SqlParseException {
-        SqlParser sqlParser = SqlParser.create(sql, config);
+        SqlParser sqlParser = SqlParser.create(sql, CONFIG);
         SqlNode sqlNode = sqlParser.parseStmt();
         SqlKind sqlKind = sqlNode.getKind();
         if (sqlKind != SqlKind.INSERT) {
@@ -187,15 +187,5 @@ public class SqlParseUtil {
         }
         SqlIdentifier identifier = (SqlIdentifier)target;
         return identifier.getSimple();
-    }
-
-    public static void main(String[] args) throws SqlParseException {
-        String sql1 = "insert into first_sink select * from ngx_log";
-        String sql2
-            = "insert into test select CASE WHEN 1>0 THEN H.vv ELSE '' END ,h.id, h.age, FLOOR(h.age), TF(h.xxx) AS tf , t.height as he, (select * from fsdkdf f where f.id in(1,2,3)) from hah h join tets t on t.id = h.id where h.age > 10 ";
-        List<String> sourcs = Lists.newArrayList();
-        List<String> udfs = Lists.newArrayList();
-        List<String> sinks = Lists.newArrayList();
-        parse(Lists.newArrayList(sql1, sql2), sourcs, udfs, sinks);
     }
 }

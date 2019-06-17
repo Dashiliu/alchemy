@@ -47,7 +47,7 @@ public class SinkResourceIT {
     private static final String UPDATED_NAME = "BBBBBBBBBB";
 
     private static final SinkType DEFAULT_TYPE = SinkType.REDIS;
-    private static final SinkType UPDATED_TYPE = SinkType.KAFKA;
+    private static final SinkType UPDATED_TYPE = SinkType.KAFKA010;
 
     private static final String DEFAULT_CONFIG = "AAAAAAAAAA";
     private static final String UPDATED_CONFIG = "BBBBBBBBBB";

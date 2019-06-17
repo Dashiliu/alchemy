@@ -424,20 +424,20 @@ public abstract class AbstractFlinkClient implements FlinkClient {
                     execEnv.setRestartStrategy(RestartStrategies.noRestart());
                     break;
                 case FIXED:
-                    Integer restartAttempts = restartParams == null ? Constants.RESTART_ATTEMPTS
-                        : Integer.valueOf(restartParams.get(CONFIG_KEY_RESTART_ATTEMPTS).toString());
-                    Long delayBetweenAttempts = restartParams == null ? Constants.DELAY_BETWEEN_ATTEMPTS
-                        : Long.valueOf(restartParams.get(CONFIG_KEY_DELAY_BETWEEN_ATTEMPTS).toString());
+                    int restartAttempts = restartParams == null ? Constants.RESTART_ATTEMPTS
+                        : Integer.parseInt(restartParams.get(CONFIG_KEY_RESTART_ATTEMPTS).toString());
+                    long delayBetweenAttempts = restartParams == null ? Constants.DELAY_BETWEEN_ATTEMPTS
+                        : Long.parseLong(restartParams.get(CONFIG_KEY_DELAY_BETWEEN_ATTEMPTS).toString());
                     execEnv
                         .setRestartStrategy(RestartStrategies.fixedDelayRestart(restartAttempts, delayBetweenAttempts));
                     break;
                 case FAILURE:
-                    Integer failureRate = restartParams == null ? Constants.FAILURE_RATE
-                        : Integer.valueOf(restartParams.get(CONFIG_KEY_FAILURE_RATE).toString());
-                    Long failureInterval = restartParams == null ? Constants.FAILURE_INTERVAL
-                        : Long.valueOf(restartParams.get(CONFIG_KEY_FAILURE_INTERVAL).toString());
-                    Long delayInterval = restartParams == null ? Constants.DELAY_INTERVAL
-                        : Long.valueOf(restartParams.get(CONFIG_KEY_DELAY_INTERVAL).toString());
+                    int failureRate = restartParams == null ? Constants.FAILURE_RATE
+                        : Integer.parseInt(restartParams.get(CONFIG_KEY_FAILURE_RATE).toString());
+                    long failureInterval = restartParams == null ? Constants.FAILURE_INTERVAL
+                        : Long.parseLong(restartParams.get(CONFIG_KEY_FAILURE_INTERVAL).toString());
+                    long delayInterval = restartParams == null ? Constants.DELAY_INTERVAL
+                        : Long.parseLong(restartParams.get(CONFIG_KEY_DELAY_INTERVAL).toString());
                     execEnv.setRestartStrategy(RestartStrategies.failureRateRestart(failureRate,
                         Time.of(failureInterval, TimeUnit.MILLISECONDS),
                         Time.of(delayInterval, TimeUnit.MILLISECONDS)));

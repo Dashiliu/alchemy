@@ -22,7 +22,8 @@ public class ClusterClientFactory {
         ClusterType clusterType = cluster.getType();
         switch (clusterType) {
             case STANDALONE:
-                return createRestClient(cluster);
+                StandaloneClusterInfo clusterInfo = BindPropertiesUtil.bindProperties(cluster.getConfig(), StandaloneClusterInfo.class);
+                return createRestClient(clusterInfo);
             case YARN:
                 // todo 支持yarn client
             default:
@@ -30,8 +31,7 @@ public class ClusterClientFactory {
         }
     }
 
-    private static FlinkClient createRestClient(Cluster cluster) throws Exception {
-        StandaloneClusterInfo clusterInfo = BindPropertiesUtil.bindProperties(cluster.getConfig(), StandaloneClusterInfo.class);
+    public static FlinkClient createRestClient(StandaloneClusterInfo clusterInfo) throws Exception {
         Configuration configuration = new Configuration();
         configuration.setString(HighAvailabilityOptions.HA_MODE, clusterInfo.getMode());
         if (StringUtils.isNotEmpty(clusterInfo.getClusterId())){

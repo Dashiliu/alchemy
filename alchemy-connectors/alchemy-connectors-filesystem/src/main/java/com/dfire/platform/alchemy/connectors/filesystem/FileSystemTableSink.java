@@ -62,13 +62,13 @@ public class FileSystemTableSink implements AppendStreamTableSink<Row> {
 
     @Override
     public void emitDataStream(DataStream<Row> dataStream) {
-        RichSinkFunction richSinkFunction = createTsdbRich();
+        RichSinkFunction richSinkFunction = createFileRich();
         dataStream.addSink(richSinkFunction);
     }
 
-    private RichSinkFunction createTsdbRich() {
+    private RichSinkFunction createFileRich() {
         final  FilePropereties filePropereties = this.filePropereties;
-        BucketingSink sink = new BucketingSink(filePropereties.getBasePath());
+        BucketingSink sink = new FileSink(filePropereties.getBasePath());
         if (!StringUtils.isNullOrWhitespaceOnly(filePropereties.getDateFormat())){
             sink.setBucketer(new DateTimeBucketer<String>(filePropereties.getDateFormat()));
         }

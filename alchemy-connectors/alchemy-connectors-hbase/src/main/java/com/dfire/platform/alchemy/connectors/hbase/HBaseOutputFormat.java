@@ -1,17 +1,10 @@
 package com.dfire.platform.alchemy.connectors.hbase;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.flink.api.common.io.OutputFormat;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
+import org.apache.flink.metrics.Counter;
 import org.apache.flink.table.shaded.org.apache.commons.lang3.StringUtils;
 import org.apache.flink.types.Row;
 import org.apache.flink.util.Preconditions;
@@ -21,10 +14,14 @@ import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
 /**
  * @author dongbinglin
  */
-public class HBaseOutputFormat implements OutputFormat<Tuple2<Boolean, Row>> {
+public class HBaseOutputFormat implements OutputFormat<Tuple2<Boolean, Row>>{
 
     private static final long serialVersionUID = 1L;
 
@@ -47,6 +44,8 @@ public class HBaseOutputFormat implements OutputFormat<Tuple2<Boolean, Row>> {
     private transient org.apache.hadoop.conf.Configuration conf = null;
 
     private transient HTable table = null;
+
+    private Counter numRecordsOut;
 
     public HBaseOutputFormat(HbaseProperties hbaseProperties, String[] fieldNames, TypeInformation[] fieldTypes) {
         check(hbaseProperties);
@@ -183,5 +182,4 @@ public class HBaseOutputFormat implements OutputFormat<Tuple2<Boolean, Row>> {
         table.flushCommits();
         table.close();
     }
-
 }

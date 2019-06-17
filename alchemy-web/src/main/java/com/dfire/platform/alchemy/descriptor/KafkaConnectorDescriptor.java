@@ -1,6 +1,8 @@
 package com.dfire.platform.alchemy.descriptor;
 
-import com.dfire.platform.alchemy.common.*;
+import com.dfire.platform.alchemy.common.Constants;
+import com.dfire.platform.alchemy.common.Field;
+import com.dfire.platform.alchemy.common.TimeAttribute;
 import com.dfire.platform.alchemy.connectors.kafka.AlchemyKafkaTableSource;
 import com.dfire.platform.alchemy.util.PropertiesUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -11,13 +13,6 @@ import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.streaming.connectors.kafka.internals.KafkaTopicPartition;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.descriptors.KafkaValidator;
-import org.apache.flink.table.sources.tsextractors.ExistingField;
-import org.apache.flink.table.sources.tsextractors.StreamRecordTimestamp;
-import org.apache.flink.table.sources.tsextractors.TimestampExtractor;
-import org.apache.flink.table.sources.wmstrategies.AscendingTimestamps;
-import org.apache.flink.table.sources.wmstrategies.BoundedOutOfOrderTimestamps;
-import org.apache.flink.table.sources.wmstrategies.PreserveWatermarks;
-import org.apache.flink.table.sources.wmstrategies.WatermarkStrategy;
 import org.apache.flink.table.typeutils.TypeStringUtils;
 import org.apache.flink.types.Row;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -135,8 +130,7 @@ public class KafkaConnectorDescriptor implements ConnectorDescriptor {
         }
     }
 
-    private <T> TypeInformation<Row> createSchema(List<Field> schema, AlchemyKafkaTableSource.Builder builder)
-        throws ClassNotFoundException {
+    private <T> TypeInformation<Row> createSchema(List<Field> schema, AlchemyKafkaTableSource.Builder builder) {
         if (CollectionUtils.isEmpty(schema)) {
             return null;
         }
@@ -156,21 +150,10 @@ public class KafkaConnectorDescriptor implements ConnectorDescriptor {
                 if (timeAttribute == null) {
                     continue;
                 }
-                TimestampExtractor timestampExtractor
-                    = Timestamps.Type.FIELD.getType().equals(timeAttribute.getTimestamps().getType())
-                        ? new ExistingField(timeAttribute.getTimestamps().getFrom()) : new StreamRecordTimestamp();
-                if (timeAttribute.getWatermarks() != null) {
-                    WatermarkStrategy watermarkStrategy = null;
-                    if (Watermarks.Type.PERIODIC_ASCENDING.getType().equals(timeAttribute.getWatermarks().getType())) {
-                        watermarkStrategy = new AscendingTimestamps();
-                    } else if (Watermarks.Type.PERIODIC_BOUNDED.getType()
-                        .equals(timeAttribute.getWatermarks().getType())) {
-                        watermarkStrategy = new BoundedOutOfOrderTimestamps(timeAttribute.getWatermarks().getDelay());
-                    } else if (Watermarks.Type.FROM_SOURCE.getType().equals(timeAttribute.getWatermarks().getType())) {
-                        watermarkStrategy = PreserveWatermarks.INSTANCE();
-                    }
-                    builder.withRowtimeAttribute(schema.get(i).getName(), timestampExtractor, watermarkStrategy);
+                if(timeAttribute.getWatermarks() == null || timeAttribute.getTimestamps() == null){
+                    throw new IllegalArgumentException("rowTime's timestamps and watermarks must be not null");
                 }
+                builder.withRowtimeAttribute(schema.get(i).getName(), schema.get(i).getRowtime().getTimestamps().get(), schema.get(i).getRowtime().getWatermarks().get());
             }
         }
         TypeInformation<Row> returnType = new RowTypeInfo(columnTypes, columnNames);

@@ -42,7 +42,7 @@ public final class Constants {
 
     public static final String TYPE_VALUE_FORMAT_GROK = "grok";
 
-    public static final String CONNECTOR_TYPE_VALUE_KAFKA = "kafka";
+    public static final String CONNECTOR_TYPE_VALUE_KAFKA = "kafka-0.10";
 
     public static final String CONNECTOR_TYPE_VALUE_MYSQL = "mysql";
 
@@ -52,11 +52,11 @@ public final class Constants {
 
     public static final String SINK_TYPE_VALUE_REDIS = "redis";
 
-    public static final String SINK_TYPE_VALUE_ES = "elasticsearch";
+    public static final String SINK_TYPE_VALUE_ES = "elasticsearch5";
 
     public static final String SINK_TYPE_VALUE_HBASE = "hbase";
 
-    public static final String SINK_TYPE_VALUE_KAFKA = "kafka";
+    public static final String SINK_TYPE_VALUE_KAFKA = "kafka-0.10";
 
     public static final String SINK_TYPE_VALUE_MYSQL = "mysql";
 
@@ -65,6 +65,8 @@ public final class Constants {
     public static final String SINK_TYPE_VALUE_OPENTSDB = "tsdb";
 
     public static final String SINK_TYPE_VALUE_PRINT = "print";
+
+    public static final String SINK_TYPE_VALUE_DUBBO = "dubbo";
 
     public static final String SINK_TYPE_VALUE_FILESYSTEM = "file";
 
@@ -146,8 +148,4 @@ public final class Constants {
     public static final int PAGE_SIZE = 100;
 
     public static final String DEFAULT_FLINK_CLUSTER = "flink_default";
-
-    public static final String RELEASE_REPOSITORY_URL="http://nexus-ci.app.2dfire.com/repository/maven-public/";
-
-    public static final String SNAP_REPOSITORY_URL ="http://nexus-ci.app.2dfire.com/repository/maven-public/";
 }

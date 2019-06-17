@@ -20,10 +20,14 @@ import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.dataformat.yaml.YA
  */
 public class BindPropertiesUtil {
 
-    private static final ObjectMapper objectMapper = new LowerCaseYamlMapper();
+    private static final char IGNORE_CHAR = '.';
+
+    private static final char SPECIAL_CHAR = '-';
+
+    private static final ObjectMapper OBJECT_MAPPER = new LowerCaseYamlMapper();
 
     static {
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        OBJECT_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     public static <T> T bindProperties(Map<String, Object> params, Class<T> beanClass) {
@@ -31,11 +35,11 @@ public class BindPropertiesUtil {
     }
 
     public static <T> T bindProperties(String value, Class<T> clazz) throws Exception {
-        return objectMapper.readValue(value, clazz);
+        return OBJECT_MAPPER.readValue(value, clazz);
     }
 
     public static <T> T bindProperties(File inputFile, Class<T> clazz) throws Exception {
-        return objectMapper.readValue(inputFile.toURL(), clazz);
+        return OBJECT_MAPPER.readValue(inputFile.toURL(), clazz);
     }
 
     public static class LowerCaseYamlMapper extends ObjectMapper {
@@ -103,18 +107,24 @@ public class BindPropertiesUtil {
             } else {
                 StringBuilder result = new StringBuilder(length + (length << 1));
                 int upperCount = 0;
-
+                int ignoreCount = 0 ;
                 for (int i = 0; i < length; ++i) {
                     char ch = input.charAt(i);
+                    if(upperCount > 0 && ignoreCount > 0){
+                        return input;
+                    }
                     if (upperCount > 0) {
                         char uc = Character.toUpperCase(ch);
                         result.append(uc);
                         upperCount = 0;
                         continue;
                     }
-                    if (ch == '-') {
+                    if (ch == SPECIAL_CHAR) {
                         ++upperCount;
-                    } else {
+                    }else if(ch == IGNORE_CHAR){
+                        result.append(ch);
+                        ++ ignoreCount;
+                    }else {
                         result.append(Character.toLowerCase(ch));
                     }
                 }

@@ -38,6 +38,8 @@ public class ActivityService implements ApplicationListener<SessionDisconnectEve
         return activityDTO;
     }
 
+
+
     @Override
     public void onApplicationEvent(SessionDisconnectEvent event) {
         ActivityDTO activityDTO = new ActivityDTO();

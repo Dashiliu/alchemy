@@ -1,5 +1,9 @@
 package com.dfire.platform.alchemy.util;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -9,6 +13,12 @@ import com.dfire.platform.alchemy.common.Pair;
 public class PropertiesUtil {
 
     private PropertiesUtil() {}
+
+    public static Properties create(File file) throws IOException {
+        Properties properties = new Properties();
+        properties.load(new FileInputStream(file));
+        return properties;
+    }
 
     public static Properties getProperties(Map<String, String> prop) {
         Properties p = new Properties();

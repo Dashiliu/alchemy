@@ -1,18 +1,16 @@
 package com.dfire.platform.alchemy.util;
 
-import java.io.File;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
+import com.dfire.platform.alchemy.common.MavenLoaderInfo;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import org.apache.maven.repository.internal.MavenRepositorySystemSession;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.artifact.Artifact;
@@ -24,22 +22,45 @@ import org.sonatype.aether.repository.LocalRepository;
 import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.repository.RepositoryPolicy;
 import org.sonatype.aether.resolution.ArtifactResolutionException;
-import org.sonatype.aether.util.StringUtils;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.aether.util.graph.PreorderNodeListGenerator;
+import org.springframework.util.ResourceUtils;
 
-import com.dfire.platform.alchemy.common.Constants;
-import com.dfire.platform.alchemy.common.MavenLoaderInfo;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author congbai
  * @date 2018/8/10
  */
 public class MavenJarUtil {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AlchemyProperties.class);
+
+    private static final String KEY_RELEASE_REPOSITORY_URL = "release.url";
+
+    private static final String KEY_SNAP_REPOSITORY_URL = "snapshot.url";
+
+    private static  String RELEASE_REPOSITORY_URL;
+
+    private static  String SNAP_REPOSITORY_URL ;
+
+    static {
+        try {
+            File file = ResourceUtils.getFile("classpath:maven.properties");
+            Properties properties = PropertiesUtil.create(file);
+            RELEASE_REPOSITORY_URL = properties.getProperty(KEY_RELEASE_REPOSITORY_URL);
+            SNAP_REPOSITORY_URL = properties.getProperty(KEY_SNAP_REPOSITORY_URL);
+        } catch (IOException e) {
+            LOGGER.error("Exception maven.properties", e);
+        }
+    }
 
     private static Map<String, MavenLoaderInfo>  caches = new ConcurrentHashMap<>();
 
@@ -51,12 +72,12 @@ public class MavenJarUtil {
         if(cache){
             MavenLoaderInfo mavenLoaderInfo = caches.get(avg);
             if(mavenLoaderInfo == null){
-                mavenLoaderInfo =  MavenClassLoader.forGAV(avg, Constants.RELEASE_REPOSITORY_URL, Constants.SNAP_REPOSITORY_URL);
+                mavenLoaderInfo =  MavenClassLoader.forGAV(avg, RELEASE_REPOSITORY_URL, SNAP_REPOSITORY_URL);
                 caches.put(avg, mavenLoaderInfo);
             }
             return mavenLoaderInfo;
         }else{
-            return  MavenClassLoader.forGAV(avg, Constants.RELEASE_REPOSITORY_URL, Constants.SNAP_REPOSITORY_URL);
+            return  MavenClassLoader.forGAV(avg, RELEASE_REPOSITORY_URL, SNAP_REPOSITORY_URL);
         }
 
     }
@@ -107,10 +128,13 @@ public class MavenJarUtil {
                             targetFile = file;
                         }
                     }
-
-                    URLClassLoader urlClassLoader1
-                        = new URLClassLoader((URL[])urls.toArray(new URL[urls.size()]), SHARE_NOTHING);
-                    return new MavenLoaderInfo(urlClassLoader1, targetFile);
+                    URLClassLoader classLoader = AccessController.doPrivileged(new PrivilegedAction<URLClassLoader>() {
+                        @Override
+                        public URLClassLoader run() {
+                            return new URLClassLoader((URL[])urls.toArray(new URL[urls.size()]), SHARE_NOTHING);
+                        }
+                    });
+                    return new MavenLoaderInfo(classLoader, targetFile);
                 } catch (Exception var11) {
                     throw Throwables.propagate(var11);
                 }

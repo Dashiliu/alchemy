@@ -47,13 +47,11 @@ public class ConvertRowUtil {
             final String name = names[i];
             try {
                 Field field = clazz.getDeclaredField(name);
-                if (field == null) {
-                    row.setField(i, null);
-                    continue;
-                }
                 field.setAccessible(true);
                 row.setField(i, field.get(obj));
-            } catch (Exception e) {
+            }catch (NoSuchFieldException exception){
+                row.setField(i, null);
+            }catch (Exception e) {
                 logger.error("Occur Error when convert to Row",e);
             }
         }

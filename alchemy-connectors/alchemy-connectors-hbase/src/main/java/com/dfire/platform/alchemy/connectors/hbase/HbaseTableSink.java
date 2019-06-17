@@ -75,7 +75,7 @@ public class HbaseTableSink implements UpsertStreamTableSink<Row> {
     }
 
     private OutputFormatSinkFunction creatHbaseSink() {
-        return new OutputFormatSinkFunction(
+        return new HbaseOutFormatSinkFunction(
             new HBaseOutputFormat(this.hbaseProperties, this.fieldNames, this.fieldTypes));
     }
 

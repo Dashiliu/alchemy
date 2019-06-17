@@ -9,7 +9,6 @@ import com.dfire.platform.alchemy.domain.Job;
 import com.dfire.platform.alchemy.domain.enumeration.JobStatus;
 import com.dfire.platform.alchemy.repository.BusinessRepository;
 import com.dfire.platform.alchemy.repository.JobRepository;
-import com.dfire.platform.alchemy.repository.UserRepository;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.flink.hadoop.shaded.com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.slf4j.Logger;
@@ -20,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -31,26 +31,23 @@ public class StatuService implements InitializingBean {
 
     private final BusinessRepository businessRepository;
 
-    private final UserRepository userRepository;
-
     private final ClientManager clientManager;
 
     private final DingTalkService dingTalkService;
 
     private final ScheduledExecutorService executorService ;
 
-    public StatuService(JobRepository jobRepository, BusinessRepository businessRepository, UserRepository userRepository, ClientManager clientManager, DingTalkService dingTalkService) {
+    public StatuService(JobRepository jobRepository, BusinessRepository businessRepository, ClientManager clientManager, DingTalkService dingTalkService) {
         this.jobRepository = jobRepository;
         this.businessRepository = businessRepository;
-        this.userRepository = userRepository;
         this.clientManager = clientManager;
         this.dingTalkService = dingTalkService;
-        this.executorService = Executors.newScheduledThreadPool(4, new ThreadFactoryBuilder().setDaemon(true).setNameFormat("job-status-%s").build());
+        this.executorService = new ScheduledThreadPoolExecutor(4, new ThreadFactoryBuilder().setDaemon(true).setNameFormat("job-status-%s").build());
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        this.executorService.scheduleAtFixedRate(new Executor(), 10, 10, TimeUnit.SECONDS);
+        this.executorService.scheduleAtFixedRate(new Executor(), 10, 60, TimeUnit.SECONDS);
     }
 
     public class Executor implements Runnable{
@@ -79,7 +76,7 @@ public class StatuService implements InitializingBean {
                                 job.setStatus(jobStatus);
                                 jobRepository.save(job);
                                 if(JobStatus.FAILED == jobStatus){
-                                    dingTalkService.sendMessage("####任务失败", String.format("####业务：%s \n ##### 任务：%s", business.getName(), job.getName()));
+                                    dingTalkService.sendMessage("####任务失败", String.format("####业务：%s ##### 任务：%s", business.getName(), job.getName()));
                                 }
                             }
                         }else{
@@ -88,7 +85,7 @@ public class StatuService implements InitializingBean {
                     }
                 }
             }catch (Exception e){
-
+                log.warn("update status faild,msg:{}", e.getMessage());
             }
         }
     }

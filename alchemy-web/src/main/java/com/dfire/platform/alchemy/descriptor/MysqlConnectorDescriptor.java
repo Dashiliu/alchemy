@@ -33,7 +33,7 @@ public class MysqlConnectorDescriptor implements ConnectorDescriptor {
     @Override
     public <T, R> T buildSource(List<Field> schema, FormatDescriptor format, R param) throws Exception {
         if (!(param instanceof SideTable)) {
-            throw new IllegalArgumentException("MysqlConnectorDescriptor's param must be SideTableInfo");
+            throw new IllegalArgumentException("MysqlConnectorDescriptor's param must be SideTable");
         }
         SideTable sideTableInfo = (SideTable)param;
         if (sideTableInfo == null) {

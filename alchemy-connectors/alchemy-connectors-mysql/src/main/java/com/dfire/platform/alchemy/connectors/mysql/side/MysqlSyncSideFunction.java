@@ -3,7 +3,7 @@ package com.dfire.platform.alchemy.connectors.mysql.side;
 import java.util.List;
 
 import com.dfire.platform.alchemy.connectors.common.side.SideTable;
-import com.dfire.platform.alchemy.connectors.common.side.SyncSideFunction;
+import com.dfire.platform.alchemy.connectors.common.side.AbstractSyncSideFunction;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.types.Row;
 import org.apache.flink.util.Collector;
@@ -16,7 +16,7 @@ import io.vertx.core.json.JsonObject;
  * @author congbai
  * @date 2019/5/21
  */
-public class MysqlSyncSideFunction extends SyncSideFunction<List<JsonObject>> {
+public class MysqlSyncSideFunction extends AbstractSyncSideFunction<List<JsonObject>> {
 
     private static final Logger LOG = LoggerFactory.getLogger(MysqlAsyncSideFunction.class);
 

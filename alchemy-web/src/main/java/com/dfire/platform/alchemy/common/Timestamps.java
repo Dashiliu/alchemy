@@ -1,5 +1,9 @@
 package com.dfire.platform.alchemy.common;
 
+import org.apache.flink.table.sources.tsextractors.ExistingField;
+import org.apache.flink.table.sources.tsextractors.StreamRecordTimestamp;
+import org.apache.flink.table.sources.tsextractors.TimestampExtractor;
+
 /**
  * @author congbai
  * @date 2018/6/30
@@ -7,6 +11,7 @@ package com.dfire.platform.alchemy.common;
 public class Timestamps {
 
     private String type;
+
     private String from;
 
     public String getType() {
@@ -25,9 +30,21 @@ public class Timestamps {
         this.from = from;
     }
 
-    public static enum Type {
+    public TimestampExtractor get(){
+        if(type == null){
+            return null;
+        }
+        if(type.equals(Type.FIELD.getType())){
+            return new ExistingField(from);
+        }else if(type.equals(Type.SOURCE.getType())){
+            return new StreamRecordTimestamp();
+        }
+        return null;
+    }
 
-        FIELD("from-field");
+    public enum Type {
+
+        FIELD("from-field"), SOURCE("from-source");
 
         private String type;
 

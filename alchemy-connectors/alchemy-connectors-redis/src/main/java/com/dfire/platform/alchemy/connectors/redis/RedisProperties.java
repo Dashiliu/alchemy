@@ -1,9 +1,9 @@
 package com.dfire.platform.alchemy.connectors.redis;
 
+import redis.clients.jedis.JedisPoolConfig;
+
 import java.io.Serializable;
 import java.util.List;
-
-import redis.clients.jedis.JedisPoolConfig;
 
 /**
  * @author congbai

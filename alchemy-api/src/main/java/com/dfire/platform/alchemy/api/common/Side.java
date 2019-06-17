@@ -1,7 +1,6 @@
 package com.dfire.platform.alchemy.api.common;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * @author congbai
@@ -10,8 +9,6 @@ import java.util.List;
 public class Side implements Serializable {
 
     private static final long serialVersionUID = 1;
-
-    private List<String> primaryKeys;
 
     private String cacheType;
 
@@ -41,14 +38,6 @@ public class Side implements Serializable {
 
     public void setCacheType(String cacheType) {
         this.cacheType = cacheType;
-    }
-
-    public List<String> getPrimaryKeys() {
-        return primaryKeys;
-    }
-
-    public void setPrimaryKeys(List<String> primaryKeys) {
-        this.primaryKeys = primaryKeys;
     }
 
     public boolean isAsync() {

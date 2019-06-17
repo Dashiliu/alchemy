@@ -4,9 +4,9 @@ import com.dfire.platform.alchemy.api.common.Alias;
 import com.dfire.platform.alchemy.api.common.Side;
 import com.dfire.platform.alchemy.api.util.SideParser;
 import com.dfire.platform.alchemy.common.Field;
-import com.dfire.platform.alchemy.connectors.common.side.AsyncSideFunction;
+import com.dfire.platform.alchemy.connectors.common.side.AbstractAsyncSideFunction;
 import com.dfire.platform.alchemy.connectors.common.side.SideTable;
-import com.dfire.platform.alchemy.connectors.common.side.SyncSideFunction;
+import com.dfire.platform.alchemy.connectors.common.side.AbstractSyncSideFunction;
 import com.dfire.platform.alchemy.descriptor.SourceDescriptor;
 import org.apache.calcite.sql.JoinType;
 import org.apache.calcite.sql.SqlJoin;
@@ -53,11 +53,11 @@ public class SideStream {
             equalFields, sideAlias, sideSource.getSide());
         DataStream<Row> returnStream;
         if (sideSource.getSide().isAsync()) {
-            AsyncSideFunction reqRow = sideSource.transform(sideTable);
+            AbstractAsyncSideFunction reqRow = sideSource.transform(sideTable);
             returnStream = AsyncDataStream.orderedWait(leftStream, reqRow, sideSource.getSide().getTimeout(),
                 TimeUnit.MILLISECONDS, sideSource.getSide().getCapacity());
         } else {
-            SyncSideFunction syncReqRow = sideSource.transform(sideTable);
+            AbstractSyncSideFunction syncReqRow = sideSource.transform(sideTable);
             returnStream = leftStream.flatMap(syncReqRow);
         }
         returnStream.getTransformation().setOutputType(returnType);

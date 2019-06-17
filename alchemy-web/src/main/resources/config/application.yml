@@ -132,8 +132,6 @@ jhipster:
   #     max-age: 1800
   mail:
     from: alchemy@localhost
-  dingtalk:
-      webhook:
   swagger:
     default-include-pattern: /api/.*
     title: alchemy API

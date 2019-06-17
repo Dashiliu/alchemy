@@ -18,7 +18,7 @@ import io.protostuff.runtime.RuntimeSchema;
  */
 public class ProtostuffRowSerializationSchema implements SerializationSchema<Row> {
 
-    private final static ThreadLocal<LinkedBuffer> bufThreadLocal = new ThreadLocal<LinkedBuffer>() {
+    private final static ThreadLocal<LinkedBuffer> THREAD_LOCAL = new ThreadLocal<LinkedBuffer>() {
 
         @Override
         protected LinkedBuffer initialValue() {
@@ -35,7 +35,7 @@ public class ProtostuffRowSerializationSchema implements SerializationSchema<Row
 
     @Override
     public byte[] serialize(Row row) {
-        LinkedBuffer buf = bufThreadLocal.get();
+        LinkedBuffer buf = THREAD_LOCAL.get();
         try {
             Object object = schema.newMessage();
             ConvertRowUtil.convertFromRow(object, ((RowTypeInfo)typeInfo).getFieldNames(), row);

@@ -144,7 +144,7 @@
         </dependency>
         <dependency>
             <groupId>com.dfire.platform</groupId>
-            <artifactId>alchemy-connectors-elasticsearch</artifactId>
+            <artifactId>alchemy-connectors-elasticsearch5</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
@@ -154,7 +154,7 @@
         </dependency>
         <dependency>
             <groupId>com.dfire.platform</groupId>
-            <artifactId>alchemy-connectors-kafka</artifactId>
+            <artifactId>alchemy-connectors-kafka-0.10</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
@@ -180,6 +180,11 @@
         <dependency>
             <groupId>com.dfire.platform</groupId>
             <artifactId>alchemy-connectors-filesystem</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.dfire.platform</groupId>
+            <artifactId>alchemy-connectors-dubbo</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
 
