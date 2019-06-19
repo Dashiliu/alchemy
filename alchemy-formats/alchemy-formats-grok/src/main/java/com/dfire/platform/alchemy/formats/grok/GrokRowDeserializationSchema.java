@@ -1,5 +1,6 @@
 package com.dfire.platform.alchemy.formats.grok;
 
+import com.dfire.platform.alchemy.api.util.ConvertObjectUtil;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
@@ -8,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -45,10 +47,11 @@ public class GrokRowDeserializationSchema implements DeserializationSchema<Row> 
     @Override
     public Row deserialize(byte[] bytes) throws IOException {
         String message = new String(bytes,"utf-8");
-        return convertToRow(message, ((RowTypeInfo)typeInfo).getFieldNames(),regular);
+        RowTypeInfo rowTypeInfo = (RowTypeInfo) typeInfo;
+        return convertToRow(message, rowTypeInfo.getFieldNames(), rowTypeInfo.getFieldTypes());
     }
 
-    public Row convertToRow(String message, String[] names, String regular) {
+    public Row convertToRow(String message, String[] names, TypeInformation<?>[] typeInformations) {
         final Row row = new Row(names.length);
         Map<String, Object> grokMap = GrokProxy.getInstance().match(message, regular);
         for (int i = 0; i < names.length; i++) {
@@ -58,7 +61,12 @@ public class GrokRowDeserializationSchema implements DeserializationSchema<Row> 
                     row.setField(i, message);
                     continue;
                 }
+                TypeInformation typeInformation = typeInformations[i];
+                Class clazz = typeInformation.getTypeClass();
                 Object field = grokMap.get(name);
+                if(Date.class.isAssignableFrom(clazz)){
+                   field = ConvertObjectUtil.transform(field, typeInformation);
+                }
                 row.setField(i, field);
             } catch (Exception e) {
                 logger.error("Occur Error when grok convert to Row",e);

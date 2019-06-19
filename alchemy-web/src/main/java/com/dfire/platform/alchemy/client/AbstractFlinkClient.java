@@ -24,7 +24,6 @@ import org.apache.calcite.sql.SqlKind;
 import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.SqlSelect;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MapUtils;
 import org.apache.flink.api.common.JobID;
 import org.apache.flink.api.common.JobSubmissionResult;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
@@ -59,6 +58,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -210,8 +210,8 @@ public abstract class AbstractFlinkClient implements FlinkClient {
         Map<String, SourceDescriptor> sideSources = Maps.newHashMap();
         Map<String, TableSource> tableSources = Maps.newHashMap();
         setBaseInfo(execEnv, request);
-        registerSource(env, request, urls, tableSources, sideSources);
         registerFunction(env, request, urls);
+        registerSource(env, request, urls, tableSources, sideSources);
         List<String> sqls = request.getSqls();
         for (int i =0 ; i< sqls.size(); i++) {
             Table table = registerSql(env, sqls.get(i), tableSources, sideSources);
@@ -481,7 +481,22 @@ public abstract class AbstractFlinkClient implements FlinkClient {
     }
 
     private List<URL> createGlobalPath(List<String> avgs) throws MalformedURLException {
-        return FileUtil.createPath(avgs, true);
+        if (org.springframework.util.CollectionUtils.isEmpty(avgs)){
+            return new ArrayList<>(0);
+        }
+        List<URL> jarFiles = new ArrayList<>(avgs.size());
+        for (String avg : avgs){
+            try {
+                URL jarFileUrl =  MavenJarUtil.forAvg(avg, true).getJarFile().getAbsoluteFile().toURI().toURL();
+                jarFiles.add(jarFileUrl);
+                JobWithJars.checkJarFile(jarFileUrl);
+            } catch (MalformedURLException e) {
+                throw new IllegalArgumentException("avg is invalid '" +avg + "'", e);
+            } catch (IOException e) {
+                throw new RuntimeException("Problem with avg " + avg, e);
+            }
+        }
+        return jarFiles;
     }
 
     public List<String> getAvgs() {

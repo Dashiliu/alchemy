@@ -21,8 +21,6 @@ import org.apache.flink.annotation.Internal;
 import org.apache.flink.streaming.connectors.elasticsearch.ActionRequestFailureHandler;
 import org.apache.flink.streaming.connectors.elasticsearch.RequestIndexer;
 import org.elasticsearch.action.ActionRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An {@link ActionRequestFailureHandler} that simply fails the sink on any failures.

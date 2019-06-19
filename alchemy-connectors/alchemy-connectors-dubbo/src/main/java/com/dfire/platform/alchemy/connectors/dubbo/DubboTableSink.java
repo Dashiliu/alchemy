@@ -66,6 +66,6 @@ public class DubboTableSink implements AppendStreamTableSink<Row> {
     }
 
     private RichSinkFunction createDubboRich() {
-        return new DubboSinkFunction(dubboProperties);
+        return new DubboSinkFunction(dubboProperties, fieldNames);
     }
 }

@@ -33,16 +33,20 @@ public class SqlParseUtil {
         for (String sql : sqls) {
             SqlParser sqlParser = SqlParser.create(sql, CONFIG);
             SqlNode sqlNode = sqlParser.parseStmt();
-            if (sqlNode.getKind() != SqlKind.INSERT) {
-                throw new IllegalArgumentException("It must be an insert SQL, sql:" + sql);
+            SqlKind kind = sqlNode.getKind();
+            switch (kind){
+                case INSERT:
+                    SqlInsert sqlInsert = (SqlInsert)sqlNode;
+                    addSink(sinks, findSinkName(sqlInsert));
+                    SqlSelect source = (SqlSelect) sqlInsert.getSource();
+                    parseSource(source, sources, udfs);
+                    break;
+                case SELECT:
+                    parseSource((SqlSelect) sqlNode, sources, udfs);
+                    break;
+                default:
+                    throw new IllegalArgumentException("It must be an insert SQL, sql:" + sql);
             }
-            SqlInsert sqlInsert = (SqlInsert)sqlNode;
-            addSink(sinks, findSinkName(sqlInsert));
-            SqlNode source = sqlInsert.getSource();
-            if (SqlKind.SELECT != source.getKind()) {
-                throw new IllegalArgumentException("invalid insert SQL, sql:" + sql);
-            }
-            parseSource((SqlSelect)source, sources, udfs);
         }
     }
 

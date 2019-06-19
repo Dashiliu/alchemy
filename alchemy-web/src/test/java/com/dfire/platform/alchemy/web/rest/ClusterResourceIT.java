@@ -1,6 +1,7 @@
 package com.dfire.platform.alchemy.web.rest;
 
 import com.dfire.platform.alchemy.AlchemyApp;
+import com.dfire.platform.alchemy.client.ClientManager;
 import com.dfire.platform.alchemy.domain.Cluster;
 import com.dfire.platform.alchemy.domain.Business;
 import com.dfire.platform.alchemy.domain.Job;
@@ -9,7 +10,6 @@ import com.dfire.platform.alchemy.service.ClusterService;
 import com.dfire.platform.alchemy.service.dto.ClusterDTO;
 import com.dfire.platform.alchemy.service.mapper.ClusterMapper;
 import com.dfire.platform.alchemy.web.rest.errors.ExceptionTranslator;
-import com.dfire.platform.alchemy.service.dto.ClusterCriteria;
 import com.dfire.platform.alchemy.service.ClusterQueryService;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +23,6 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Base64Utils;
 import org.springframework.validation.Validator;
 
 import javax.persistence.EntityManager;
@@ -95,6 +94,9 @@ public class ClusterResourceIT {
     @Autowired
     private Validator validator;
 
+    @Autowired
+    private ClientManager clientManager;
+
     private MockMvc restClusterMockMvc;
 
     private Cluster cluster;
@@ -102,7 +104,7 @@ public class ClusterResourceIT {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final ClusterResource clusterResource = new ClusterResource(clusterService, clusterQueryService);
+        final ClusterResource clusterResource = new ClusterResource(clusterService, clusterQueryService, clientManager);
         this.restClusterMockMvc = MockMvcBuilders.standaloneSetup(clusterResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)

@@ -28,6 +28,8 @@ public class StandaloneClusterInfo {
 
     private List<String> avgs;
 
+    private String webInterfaceUrl;
+
     public String getMode() {
         return mode;
     }
@@ -96,5 +98,13 @@ public class StandaloneClusterInfo {
         List<String> avgs = new ArrayList<>(1);
         avgs.add(avg);
         this.avgs = avgs;
+    }
+
+    public String getWebInterfaceUrl() {
+        return webInterfaceUrl;
+    }
+
+    public void setWebInterfaceUrl(String webInterfaceUrl) {
+        this.webInterfaceUrl = webInterfaceUrl;
     }
 }

@@ -1,6 +1,6 @@
 package com.dfire.platform.alchemy.domain;
 
-import com.dfire.platform.alchemy.config.Constants;
+import com.dfire.platform.alchemy.common.Constants;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.StringUtils;

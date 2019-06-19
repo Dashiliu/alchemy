@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>alchemy-connectors-opentsdb</artifactId>
+    <artifactId>alchemy-connectors-tsdb</artifactId>
     <packaging>jar</packaging>
 
 

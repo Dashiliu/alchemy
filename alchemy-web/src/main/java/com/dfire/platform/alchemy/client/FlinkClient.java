@@ -22,4 +22,6 @@ public interface FlinkClient {
 
     SubmitFlinkResponse submit(SubmitRequest request) throws Exception;
 
+    String getWebInterfaceURL();
+
 }

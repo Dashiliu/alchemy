@@ -1,15 +1,9 @@
 package com.dfire.platform.alchemy.connectors.elasticsearch;
 
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
+import org.apache.flink.formats.json.JsonRowSerializationSchema;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.connectors.elasticsearch.ActionRequestFailureHandler;
 import org.apache.flink.streaming.connectors.elasticsearch.util.NoOpFailureHandler;
@@ -19,6 +13,14 @@ import org.apache.flink.table.sinks.AppendStreamTableSink;
 import org.apache.flink.table.sinks.TableSink;
 import org.apache.flink.types.Row;
 import org.apache.flink.util.Preconditions;
+
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author congbai
@@ -32,7 +34,7 @@ public class ElasticsearchTableSink implements AppendStreamTableSink<Row> {
 
     private TypeInformation[] fieldTypes;
 
-    private JsonRowStringSchema jsonRowSchema;
+    private JsonRowSerializationSchema jsonRowSchema;
 
     public ElasticsearchTableSink(ElasticsearchProperties elasticsearchProperties) {
         this.elasticsearchProperties = elasticsearchProperties;
@@ -62,7 +64,7 @@ public class ElasticsearchTableSink implements AppendStreamTableSink<Row> {
             "Number of provided field names and types does not match.");
 
         RowTypeInfo rowSchema = new RowTypeInfo(fieldTypes, fieldNames);
-        copy.jsonRowSchema = new JsonRowStringSchema(rowSchema);
+        copy.jsonRowSchema = new JsonRowSerializationSchema(rowSchema);
 
         return copy;
     }
@@ -72,9 +74,38 @@ public class ElasticsearchTableSink implements AppendStreamTableSink<Row> {
         List<InetSocketAddress> transports = new ArrayList<>();
         addTransportAddress(transports, this.elasticsearchProperties.getTransports());
         ActionRequestFailureHandler actionRequestFailureHandler = createFailureHandler(this.elasticsearchProperties.getFailureHandler());
+        Integer fieldIndex = findIndex(this.elasticsearchProperties.getIndexField(), this.fieldNames);
+        MapFunction<byte[], byte[]> mapFunction = createMapFunction(this.elasticsearchProperties.getMapClazz());
         return new ElasticsearchSink<>(userConfig, transports,
-            new ElasticsearchTableFunction(this.elasticsearchProperties.getIndex(), this.elasticsearchProperties.getIndexField(), this.elasticsearchProperties.getDateFormat(), this.jsonRowSchema, this.fieldNames),
+            new ElasticsearchTableFunction(
+                    this.elasticsearchProperties.getIndex(),
+                    fieldIndex ,
+                    this.elasticsearchProperties.getDateFormat(),
+                    jsonRowSchema,
+                    mapFunction),
                 actionRequestFailureHandler);
+    }
+
+    private MapFunction<byte[], byte[]> createMapFunction(String mapClazz){
+        if(mapClazz == null || mapClazz.trim().length() == 0){
+            return null;
+        }
+        try {
+            Class<MapFunction<byte[], byte[]>> clazz = (Class<MapFunction<byte[], byte[]>>) Class.forName(mapClazz);
+            return clazz.newInstance();
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    private Integer findIndex(String indexField, String[] fieldNames) {
+        for(int i =0 ; i< fieldNames.length ; i ++){
+            if(fieldNames[i].equals(indexField)){
+                return i;
+            }
+        }
+        return null;
     }
 
     private ActionRequestFailureHandler createFailureHandler(String failureHandler) {

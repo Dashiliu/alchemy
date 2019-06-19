@@ -16,7 +16,9 @@ export class JobSubmitDialogComponent {
   message: any;
   job: IJob;
 
-  constructor(protected jobService: JobService, public activeModal: NgbActiveModal, protected eventManager: JhiEventManager) {}
+  constructor(protected jobService: JobService,
+              public activeModal: NgbActiveModal,
+              protected eventManager: JhiEventManager) {}
 
   clear() {
     this.activeModal.dismiss('submit');

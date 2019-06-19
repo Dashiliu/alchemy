@@ -23,6 +23,8 @@ public class ElasticsearchProperties implements Serializable {
 
     private String failureHandler;
 
+    private String mapClazz;
+
     private  Map<String, Object> config;
 
     public String getTransports() {
@@ -79,5 +81,13 @@ public class ElasticsearchProperties implements Serializable {
 
     public void setConfig(Map<String, Object> config) {
         this.config = config;
+    }
+
+    public String getMapClazz() {
+        return mapClazz;
+    }
+
+    public void setMapClazz(String mapClazz) {
+        this.mapClazz = mapClazz;
     }
 }

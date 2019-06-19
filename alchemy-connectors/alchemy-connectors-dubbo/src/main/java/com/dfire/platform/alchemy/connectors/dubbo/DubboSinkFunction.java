@@ -11,8 +11,8 @@ import org.apache.flink.metrics.Counter;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
 import org.apache.flink.types.Row;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * only support Map param
@@ -27,7 +27,9 @@ public class DubboSinkFunction extends RichSinkFunction<Row> implements MetricFu
 
     private final DubboProperties dubboProperties;
 
-    private final String[] parameterTypes;
+    private final String [] fieldNames;
+
+    private final String[] dubboParameterTypes;
 
     private final String method;
 
@@ -35,10 +37,11 @@ public class DubboSinkFunction extends RichSinkFunction<Row> implements MetricFu
 
     private Counter numRecordsOut;
 
-    public DubboSinkFunction(DubboProperties dubboProperties) {
+    public DubboSinkFunction(DubboProperties dubboProperties, String[] fieldNames) {
         this.dubboProperties = dubboProperties;
         this.method = dubboProperties.getMethodName();
-        this.parameterTypes = new String[]{String.class.getName(), List.class.getName()};
+        this.fieldNames = fieldNames;
+        this.dubboParameterTypes = new String[]{String.class.getName(), Map.class.getName()};
     }
 
     private ReferenceConfig<GenericService> referenceConfig(DubboProperties properties) throws Exception {
@@ -52,7 +55,9 @@ public class DubboSinkFunction extends RichSinkFunction<Row> implements MetricFu
         reference.setGeneric(true);
         reference.setCheck(false);
         reference.setInit(true);
-        BeanUtils.copyProperties(reference, properties.getProperties());
+        if(properties.getProperties() != null){
+            BeanUtils.copyProperties(reference, properties.getProperties());
+        }
         return reference;
     }
 
@@ -72,16 +77,21 @@ public class DubboSinkFunction extends RichSinkFunction<Row> implements MetricFu
     @Override
     public void invoke(Row value, Context context) {
         GenericService genericService = reference.get();
-        List<Object> values = createValue(value);
-        genericService.$invoke(method, parameterTypes, new Object[]{dubboProperties.getUniqueName(), values});
+        Map<String, Object> values = createValue(value);
+        genericService.$invoke(method, dubboParameterTypes, new Object[]{dubboProperties.getUniqueName(), values});
         numRecordsOut = createOrGet(numRecordsOut, getRuntimeContext());
         numRecordsOut.inc();
     }
 
-    private List<Object> createValue(Row value) {
-        List<Object> values = new ArrayList<>(value.getArity());
-        for(int i = 0 ; i < value.getArity() ; i++){
-            values.add(value.getField(i));
+    private Map<String, Object> createValue(Row row) {
+        int arity = row.getArity();
+        Map<String, Object> values = new HashMap<>(arity);
+        for(int i = 0 ; i < arity ; i++){
+             Object value = row.getField(i);
+             if(value == null){
+                 continue;
+             }
+             values.put(fieldNames[i], value);
         }
         return values;
     }

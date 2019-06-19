@@ -86,7 +86,7 @@ public class FormatDescriptor implements CoreDescriptor {
             String regular = findRegular();
             String retain = findRetain();
             String fieldName = findFieldName();
-            return (T)new GrokRowDeserializationSchema(typeInformation, regular, retain ==null ? false : Boolean.getBoolean(regular), fieldName);
+            return (T)new GrokRowDeserializationSchema(typeInformation, regular, retain ==null ? false : Boolean.valueOf(retain), fieldName);
         }
         throw new UnsupportedOperationException("UnKnow format,type:" + this.type);
     }

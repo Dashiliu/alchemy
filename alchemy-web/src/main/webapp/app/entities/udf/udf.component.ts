@@ -54,7 +54,7 @@ export class UdfComponent implements OnInit, OnDestroy {
   loadAll() {
     this.udfService
       .query({
-        "businessId.specified": this.business.id,
+        "businessId.equals": this.business.id,
         page: this.page - 1,
         size: this.itemsPerPage,
         sort: this.sort()
@@ -73,7 +73,7 @@ export class UdfComponent implements OnInit, OnDestroy {
   }
 
   transition() {
-    this.router.navigate(['/udf'], {
+    this.router.navigate(['/udf', this.business.id], {
       queryParams: {
         page: this.page,
         size: this.itemsPerPage,

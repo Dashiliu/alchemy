@@ -1,6 +1,7 @@
 package com.dfire.platform.alchemy.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -129,7 +130,11 @@ public class JobServiceImpl implements JobService {
     @Override
     public void delete(Long id) throws Exception {
         log.debug("Request to delete Job : {}", id);
-        cancel(id);
+        Optional<Job> jobOptional = jobRepository.findById(id);
+        Job job = jobOptional.get();
+        if(JobStatus.RUNNING == job.getStatus()){
+            cancel(id);
+        }
         jobRepository.deleteById(id);
     }
 
@@ -137,6 +142,9 @@ public class JobServiceImpl implements JobService {
     public Response submit(Long id) throws Exception {
         Optional<Job> jobOptional = jobRepository.findById(id);
         Job job = jobOptional.get();
+        if(JobStatus.RUNNING.equals(job.getStatus())){
+            return new Response(false, "the job is running ");
+        }
         if (job.getCluster() == null) {
             return new Response(false, "the job's cluster is null ");
         }
@@ -173,6 +181,10 @@ public class JobServiceImpl implements JobService {
         List<String> sinkNames = Lists.newArrayList();
         SqlParseUtil.parse(sqlList, sourceNames, udfNames, sinkNames);
         parseView(job, tableNames, sourceNames, udfNames, sinkNames);
+        /**
+         *  先注册视图中的表
+         */
+        Collections.reverse(sourceNames);
         List<SourceDescriptor> sourceDescriptors = findSources(job, sourceNames);
         List<UdfDescriptor> udfDescriptors = findUdfs(job, udfNames);
         List<SinkDescriptor> sinkDescriptors = findSinks(job, sinkNames);
@@ -186,7 +198,8 @@ public class JobServiceImpl implements JobService {
 
     private void parseView(Job job, List<String> tableNames, List<String> sourceNames, List<String> udfNames,
         List<String> sinkNames) throws Exception {
-        for (String name : sourceNames) {
+        List<String> sources = Lists.newArrayList(sourceNames);
+        for (String name : sources) {
             if (tableNames.contains(name)) {
                 continue;
             }

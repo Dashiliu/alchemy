@@ -24,15 +24,6 @@ import groovy.lang.GroovyObject;
  */
 public class GroovyCompiler {
 
-    public static void main(String[] args) throws IllegalAccessException, InstantiationException {
-
-        String code = "class test { public String hello(){return \"hello\" } } ";
-        Class clazz = GroovyCompiler.compile(code, "test");
-        GroovyObject groovyObject = (GroovyObject)clazz.newInstance();
-        String s = (String)groovyObject.invokeMethod("hello", args);
-        System.out.println(s);
-    }
-
     /**
      * Compiles Groovy code and returns the Class of the compiles code.
      *

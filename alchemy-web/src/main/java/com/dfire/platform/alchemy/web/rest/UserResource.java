@@ -1,6 +1,6 @@
 package com.dfire.platform.alchemy.web.rest;
 
-import com.dfire.platform.alchemy.config.Constants;
+import com.dfire.platform.alchemy.common.Constants;
 import com.dfire.platform.alchemy.domain.User;
 import com.dfire.platform.alchemy.repository.UserRepository;
 import com.dfire.platform.alchemy.security.AuthoritiesConstants;

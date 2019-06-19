@@ -1,6 +1,6 @@
 package com.dfire.platform.alchemy.security;
 
-import com.dfire.platform.alchemy.config.Constants;
+import com.dfire.platform.alchemy.common.Constants;
 
 import java.util.Optional;
 

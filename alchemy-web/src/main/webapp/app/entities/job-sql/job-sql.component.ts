@@ -31,7 +31,11 @@ export class JobSqlComponent implements OnInit, OnDestroy {
 
   loadAll() {
     this.jobSqlService
-      .query()
+      .query(
+        {
+          "jobId.equals": this.job.id,
+        }
+      )
       .pipe(
         filter((res: HttpResponse<IJobSql[]>) => res.ok),
         map((res: HttpResponse<IJobSql[]>) => res.body)

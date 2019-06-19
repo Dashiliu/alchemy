@@ -6,6 +6,7 @@ import com.dfire.platform.alchemy.client.response.Response;
 import com.dfire.platform.alchemy.client.response.SavepointResponse;
 import com.dfire.platform.alchemy.client.response.SubmitFlinkResponse;
 import org.apache.flink.client.program.ClusterClient;
+import org.apache.flink.table.shaded.org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -17,9 +18,12 @@ public class StandaloneClusterFlinkClient extends AbstractFlinkClient {
 
     private final ClusterClient clusterClient;
 
-    public StandaloneClusterFlinkClient(ClusterClient clusterClient, List<String> avgs) {
+    private final String webInterfaceURL;
+
+    public StandaloneClusterFlinkClient(ClusterClient clusterClient, List<String> avgs, String webInterfaceURL) {
         super(avgs);
         this.clusterClient = clusterClient;
+        this.webInterfaceURL = webInterfaceURL;
     }
 
     @Override
@@ -50,5 +54,14 @@ public class StandaloneClusterFlinkClient extends AbstractFlinkClient {
             return submitSql(clusterClient, (SqlSubmitFlinkRequest)request);
         }
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getWebInterfaceURL() {
+        if(StringUtils.isEmpty(this.webInterfaceURL)){
+            return clusterClient.getWebInterfaceURL();
+        }else{
+            return this.webInterfaceURL;
+        }
     }
 }

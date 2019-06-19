@@ -3,4 +3,4 @@ application-name: test_application
 interface-name: com.dfire.test.Example
 method-name: echo
 version: 1.0.0
-registry-addr: zokeeper://localhost:2181
+registry-addr: zookeeper://localhost:2181

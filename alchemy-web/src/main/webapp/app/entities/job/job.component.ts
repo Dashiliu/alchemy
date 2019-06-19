@@ -54,6 +54,7 @@ export class JobComponent implements OnInit, OnDestroy {
   loadAll() {
     this.jobService
       .query({
+        "businessId.equals": this.business.id,
         page: this.page - 1,
         size: this.itemsPerPage,
         sort: this.sort()
@@ -72,7 +73,7 @@ export class JobComponent implements OnInit, OnDestroy {
   }
 
   transition() {
-    this.router.navigate(['/job'], {
+    this.router.navigate(['/job', this.business.id], {
       queryParams: {
         page: this.page,
         size: this.itemsPerPage,

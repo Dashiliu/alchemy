@@ -17,7 +17,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -33,15 +32,15 @@ public class StatuService implements InitializingBean {
 
     private final ClientManager clientManager;
 
-    private final DingTalkService dingTalkService;
+    private final AlarmService alarmService;
 
     private final ScheduledExecutorService executorService ;
 
-    public StatuService(JobRepository jobRepository, BusinessRepository businessRepository, ClientManager clientManager, DingTalkService dingTalkService) {
+    public StatuService(JobRepository jobRepository, BusinessRepository businessRepository, ClientManager clientManager, AlarmService alarmService) {
         this.jobRepository = jobRepository;
         this.businessRepository = businessRepository;
         this.clientManager = clientManager;
-        this.dingTalkService = dingTalkService;
+        this.alarmService = alarmService;
         this.executorService = new ScheduledThreadPoolExecutor(4, new ThreadFactoryBuilder().setDaemon(true).setNameFormat("job-status-%s").build());
     }
 
@@ -68,19 +67,23 @@ public class StatuService implements InitializingBean {
                         if(JobStatus.SUBMIT != job.getStatus() && JobStatus.RUNNING != job.getStatus()){
                             continue;
                         }
-                        FlinkClient client =clientManager.getClient(job.getCluster().getId());
-                        JobStatusResponse jobStatusResponse = client.status(new JobStatusRequest(job.getClusterJobId()));
-                        if(jobStatusResponse.isSuccess()){
-                            JobStatus jobStatus =jobStatusResponse.getStatus();
-                            if(jobStatus != job.getStatus()){
-                                job.setStatus(jobStatus);
-                                jobRepository.save(job);
-                                if(JobStatus.FAILED == jobStatus){
-                                    dingTalkService.sendMessage("####任务失败", String.format("####业务：%s ##### 任务：%s", business.getName(), job.getName()));
+                        try {
+                            FlinkClient client = clientManager.getClient(job.getCluster().getId());
+                            JobStatusResponse jobStatusResponse = client.status(new JobStatusRequest(job.getClusterJobId()));
+                            if (jobStatusResponse.isSuccess()) {
+                                JobStatus jobStatus = jobStatusResponse.getStatus();
+                                if (jobStatus != job.getStatus()) {
+                                    job.setStatus(jobStatus);
+                                    jobRepository.save(job);
+                                    if (JobStatus.FAILED == jobStatus) {
+                                        alarmService.alert(business.getName(), job.getName());
+                                    }
                                 }
+                            } else {
+                                log.warn("request status failed, msg:{}", jobStatusResponse.getMessage());
                             }
-                        }else{
-                            log.warn("request status failed, msg:{}", jobStatusResponse.getMessage());
+                        }catch (Exception e){
+                            log.warn("request status faild,msg:{}", e.getMessage());
                         }
                     }
                 }

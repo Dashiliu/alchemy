@@ -2,7 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { JhiEventManager } from 'ng-jhipster';
+import {JhiAlertService, JhiEventManager} from 'ng-jhipster';
+
 
 import { IJob } from 'app/shared/model/job.model';
 import { JobService } from './job.service';
@@ -13,10 +14,12 @@ import {FormBuilder, Validators} from "@angular/forms";
   templateUrl: './job-cancel-savepoint-dialog.component.html'
 })
 export class JobCancelSavepointDialogComponent {
+  disabled: boolean;
   job: IJob;
   cancelForm = this.fb.group({
     savepointDirectory: [null, [Validators.required]]
   });
+  savepointPath: string;
 
   constructor(protected jobService: JobService,
               public activeModal: NgbActiveModal,
@@ -28,12 +31,12 @@ export class JobCancelSavepointDialogComponent {
   }
 
   confirmcancel(id: number) {
+    this.disabled = false;
     this.jobService.cancelWithSavepoint(id, this.cancelForm.get("savepointDirectory").value).subscribe(response => {
-      this.eventManager.broadcast({
-        name: 'jobListModification',
-        content: 'cancel an job with savepoint'
-      });
-      this.activeModal.dismiss(true);
+      this.disabled= true;
+      if(response && response.body.success){
+        this.savepointPath = response.body.path;
+      }
     });
   }
 }

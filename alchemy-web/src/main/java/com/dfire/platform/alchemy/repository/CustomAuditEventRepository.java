@@ -1,6 +1,6 @@
 package com.dfire.platform.alchemy.repository;
 
-import com.dfire.platform.alchemy.config.Constants;
+import com.dfire.platform.alchemy.common.Constants;
 import com.dfire.platform.alchemy.config.audit.AuditEventConverter;
 import com.dfire.platform.alchemy.domain.PersistentAuditEvent;
 

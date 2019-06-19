@@ -49,4 +49,9 @@ public class YarnFlinkClient implements FlinkClient {
     public SubmitFlinkResponse submit(SubmitRequest submitRequest) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public String getWebInterfaceURL() {
+        throw new UnsupportedOperationException();
+    }
 }

@@ -49,7 +49,7 @@ export class ClusterComponent implements OnInit, OnDestroy {
   loadAll() {
     this.clusterService
       .query({
-        "businessId.specified": this.business.id,
+        "businessId.equals": this.business.id,
         page: this.page,
         size: this.itemsPerPage,
         sort: this.sort()
@@ -116,5 +116,18 @@ export class ClusterComponent implements OnInit, OnDestroy {
 
   previousState() {
     window.history.back();
+  }
+
+  detail(id){
+    this.clusterService.queryUrl(id)
+      .subscribe(response => {
+        console.log(response);
+        if(response.body && response.body.url){
+          window.open(response.body.url, '_blank')
+        }else{
+          this.onError("Please set web-interface-url")
+        }
+      })
+    ;
   }
 }

@@ -38,6 +38,7 @@ public class UdfDescriptor implements CoreDescriptor {
         UdfDescriptor udfDescriptor = new UdfDescriptor();
         BeanUtils.copyProperties(udf, udfDescriptor);
         udfDescriptor.setName(udf.getName());
+        udfDescriptor.setUdfType(udf.getType());
         return udfDescriptor;
     }
 
@@ -68,7 +69,7 @@ public class UdfDescriptor implements CoreDescriptor {
 
     @Override
     public <T> T transform() throws Exception {
-        return transform(null);
+       throw new UnsupportedOperationException();
     }
 
     @Override
@@ -87,18 +88,18 @@ public class UdfDescriptor implements CoreDescriptor {
             Object udf = clazz.newInstance();
             if (udf instanceof StreamScalarFunction) {
                 StreamScalarFunction<?> streamScalarFunction = (StreamScalarFunction<?>)udf;
-                FlinkAllScalarFunction scalarFunction = new FlinkAllScalarFunction(streamScalarFunction);
+                FlinkAllScalarFunction scalarFunction = new FlinkAllScalarFunction(this.getValue(), this.getName());
                 initScalarFuntion(streamScalarFunction, scalarFunction);
                 return (T)scalarFunction;
             } else if (udf instanceof StreamTableFunction<?>) {
                 StreamTableFunction<?> streamTableFunction = (StreamTableFunction)udf;
-                FlinkAllTableFunction tableFunction = new FlinkAllTableFunction(streamTableFunction);
+                FlinkAllTableFunction tableFunction = new FlinkAllTableFunction(this.getValue(), this.getName());
                 initTableFunction(streamTableFunction, tableFunction);
                 return (T)tableFunction;
             } else if (udf instanceof StreamAggregateFunction<?, ?, ?>) {
                 StreamAggregateFunction<?, ?, ?> streamAggregateFunction = (StreamAggregateFunction)udf;
                 FlinkAllAggregateFunction aggregateFunction
-                    = new FlinkAllAggregateFunction((StreamAggregateFunction)udf);
+                    = new FlinkAllAggregateFunction(this.getValue(), this.getName());
                 initAggregateFuntion(streamAggregateFunction, aggregateFunction);
                 return (T)aggregateFunction;
             } else {

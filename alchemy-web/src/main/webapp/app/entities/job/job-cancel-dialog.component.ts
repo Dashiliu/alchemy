@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { JhiEventManager } from 'ng-jhipster';
+import {JhiAlertService, JhiEventManager} from 'ng-jhipster';
 
 import { IJob } from 'app/shared/model/job.model';
 import { JobService } from './job.service';
@@ -14,7 +14,10 @@ import { JobService } from './job.service';
 export class JobCancelDialogComponent {
   job: IJob;
 
-  constructor(protected jobService: JobService, public activeModal: NgbActiveModal, protected eventManager: JhiEventManager) {}
+  constructor(protected jobService: JobService,
+              public activeModal: NgbActiveModal,
+              protected eventManager: JhiEventManager,
+              protected jhiAlertService: JhiAlertService,) {}
 
   clear() {
     this.activeModal.dismiss('cancel');
@@ -22,6 +25,7 @@ export class JobCancelDialogComponent {
 
   confirmcancel(id: number) {
     this.jobService.cancel(id).subscribe(response => {
+
       this.eventManager.broadcast({
         name: 'jobListModification',
         content: 'cancel an job'

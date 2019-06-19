@@ -1,12 +1,13 @@
 package com.dfire.platform.alchemy.web.rest;
 
+import com.dfire.platform.alchemy.client.ClientManager;
+import com.dfire.platform.alchemy.client.FlinkClient;
 import com.dfire.platform.alchemy.security.SecurityUtils;
-import com.dfire.platform.alchemy.service.ClusterService;
-import com.dfire.platform.alchemy.web.rest.errors.BadRequestAlertException;
-import com.dfire.platform.alchemy.service.dto.ClusterDTO;
-import com.dfire.platform.alchemy.service.dto.ClusterCriteria;
 import com.dfire.platform.alchemy.service.ClusterQueryService;
-
+import com.dfire.platform.alchemy.service.ClusterService;
+import com.dfire.platform.alchemy.service.dto.ClusterCriteria;
+import com.dfire.platform.alchemy.service.dto.ClusterDTO;
+import com.dfire.platform.alchemy.web.rest.errors.BadRequestAlertException;
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.PaginationUtil;
 import io.github.jhipster.web.util.ResponseUtil;
@@ -16,18 +17,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
-
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -48,9 +49,12 @@ public class ClusterResource {
 
     private final ClusterQueryService clusterQueryService;
 
-    public ClusterResource(ClusterService clusterService, ClusterQueryService clusterQueryService) {
+    private final ClientManager clientManager;
+
+    public ClusterResource(ClusterService clusterService, ClusterQueryService clusterQueryService, ClientManager clientManager) {
         this.clusterService = clusterService;
         this.clusterQueryService = clusterQueryService;
+        this.clientManager = clientManager;
     }
 
     /**
@@ -145,6 +149,15 @@ public class ClusterResource {
         log.debug("REST request to get Cluster : {}", id);
         Optional<ClusterDTO> clusterDTO = clusterService.findOne(id);
         return ResponseUtil.wrapOrNotFound(clusterDTO);
+    }
+
+    @GetMapping("/clusters/web-url/{id}")
+    public ResponseEntity<Map> getClusterWebUrl(@PathVariable Long id) {
+        log.debug("REST request to get Cluster : {}", id);
+        FlinkClient flinkClient = clientManager.getClient(id);
+        Map<String,Object> result = new HashMap<>(1);
+        result.put("url",  flinkClient.getWebInterfaceURL());
+        return ResponseEntity.ok().body(result);
     }
 
     /**

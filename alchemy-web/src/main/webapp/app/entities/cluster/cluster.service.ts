@@ -49,6 +49,12 @@ export class ClusterService {
     return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
 
+
+  queryUrl(id: number): Observable<HttpResponse<any>>{
+    return this.http
+      .get<any>(`${this.resourceUrl}/web-url/${id}`, { observe: 'response' })
+  }
+
   protected convertDateFromClient(cluster: ICluster): ICluster {
     const copy: ICluster = Object.assign({}, cluster, {
       createdDate: cluster.createdDate != null && cluster.createdDate.isValid() ? cluster.createdDate.toJSON() : null,

@@ -8,7 +8,8 @@ export const enum SinkType {
   TSDB = 'TSDB',
   FILE = 'FILE',
   ELASTICSEARCH5 = 'ELASTICSEARCH5',
-  PRINT = 'PRINT'
+  PRINT = 'PRINT',
+  DUBBO = 'DUBBO'
 }
 
 export interface ISink {

@@ -1,6 +1,6 @@
 package com.dfire.platform.alchemy.service;
 
-import com.dfire.platform.alchemy.config.Constants;
+import com.dfire.platform.alchemy.common.Constants;
 import com.dfire.platform.alchemy.domain.Authority;
 import com.dfire.platform.alchemy.domain.User;
 import com.dfire.platform.alchemy.repository.AuthorityRepository;

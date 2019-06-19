@@ -1,11 +1,12 @@
 package com.dfire.platform.alchemy.util;
 
 import org.apache.flink.client.program.JobWithJars;
-import org.springframework.util.CollectionUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,24 +34,4 @@ public class FileUtil {
         }
         return jarFiles;
     }
-
-    public static List<URL> createPath(List<String> avgs, boolean cache) throws MalformedURLException {
-        if (CollectionUtils.isEmpty(avgs)){
-            return new ArrayList<>(0);
-        }
-        List<URL> jarFiles = new ArrayList<>(avgs.size());
-        for (String avg : avgs){
-            try {
-                URL jarFileUrl =  MavenJarUtil.forAvg(avg, cache).getJarFile().getAbsoluteFile().toURI().toURL();
-                jarFiles.add(jarFileUrl);
-                JobWithJars.checkJarFile(jarFileUrl);
-            } catch (MalformedURLException e) {
-                throw new IllegalArgumentException("avg is invalid '" +avg + "'", e);
-            } catch (IOException e) {
-                throw new RuntimeException("Problem with avg " + avg, e);
-            }
-        }
-        return jarFiles;
-    }
-
 }

@@ -5,12 +5,9 @@ import com.dfire.platform.alchemy.domain.enumeration.ClusterType;
 import com.dfire.platform.alchemy.util.BindPropertiesUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.client.program.StandaloneClusterClient;
-import org.apache.flink.configuration.AkkaOptions;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.configuration.HighAvailabilityOptions;
 import org.apache.flink.configuration.JobManagerOptions;
-
-import java.util.Map;
 
 /**
  * @author congbai
@@ -56,7 +53,7 @@ public class ClusterClientFactory {
             StandaloneClusterClient clusterClient = new StandaloneClusterClient(configuration);
             clusterClient.setPrintStatusDuringExecution(true);
             clusterClient.setDetached(true);
-            return new StandaloneClusterFlinkClient(clusterClient, clusterInfo.getAvgs());
+            return new StandaloneClusterFlinkClient(clusterClient, clusterInfo.getAvgs(), clusterInfo.getWebInterfaceUrl());
         } catch (Exception e) {
             throw new RuntimeException("Cannot establish connection to JobManager: " + e.getMessage(), e);
         }
