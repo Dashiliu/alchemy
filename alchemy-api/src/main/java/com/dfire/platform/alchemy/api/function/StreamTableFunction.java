@@ -11,9 +11,10 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package com.dfire.platform.alchemy.function;
+package com.dfire.platform.alchemy.api.function;
 
-import com.dfire.platform.alchemy.function.table.Collect;
+
+import com.dfire.platform.alchemy.api.function.table.Collect;
 
 /**
  * Base class for a user-defined table function (UDTF) in Stream. A user-defined table functions works on zero, one, or

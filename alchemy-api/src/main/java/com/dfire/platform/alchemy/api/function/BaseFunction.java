@@ -1,4 +1,4 @@
-package com.dfire.platform.alchemy.function;
+package com.dfire.platform.alchemy.api.function;
 
 
 public interface BaseFunction extends Function{

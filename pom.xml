@@ -20,7 +20,6 @@
         <module>alchemy-benchmarks</module>
         <module>alchemy-connectors</module>
         <module>alchemy-formats</module>
-        <module>alchemy-function</module>
         <module>alchemy-web</module>
     </modules>
 

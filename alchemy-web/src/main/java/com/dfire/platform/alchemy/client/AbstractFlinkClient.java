@@ -12,7 +12,7 @@ import com.dfire.platform.alchemy.common.ResultMessage;
 import com.dfire.platform.alchemy.descriptor.SinkDescriptor;
 import com.dfire.platform.alchemy.descriptor.SourceDescriptor;
 import com.dfire.platform.alchemy.domain.enumeration.TableType;
-import com.dfire.platform.alchemy.function.BaseFunction;
+import com.dfire.platform.alchemy.api.function.BaseFunction;
 import com.dfire.platform.alchemy.util.AlchemyProperties;
 import com.dfire.platform.alchemy.util.FileUtil;
 import com.dfire.platform.alchemy.util.JarArgUtil;

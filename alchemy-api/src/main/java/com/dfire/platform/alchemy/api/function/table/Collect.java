@@ -1,4 +1,4 @@
-package com.dfire.platform.alchemy.function.table;
+package com.dfire.platform.alchemy.api.function.table;
 
 /**
  * @author congbai

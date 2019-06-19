@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package com.dfire.platform.alchemy.function;
+package com.dfire.platform.alchemy.api.function;
 
 /**
  * All user-defined functions (UDFs) in Stream needs to inherit from from this class.

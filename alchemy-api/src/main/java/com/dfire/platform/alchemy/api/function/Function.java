@@ -1,4 +1,4 @@
-package com.dfire.platform.alchemy.function;
+package com.dfire.platform.alchemy.api.function;
 
 import java.io.Serializable;
 

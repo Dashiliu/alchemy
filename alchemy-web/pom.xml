@@ -142,11 +142,6 @@
         </dependency>
         <dependency>
             <groupId>com.dfire.platform</groupId>
-            <artifactId>alchemy-function-common</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.dfire.platform</groupId>
             <artifactId>alchemy-connectors-elasticsearch5</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
