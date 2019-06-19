@@ -64,7 +64,7 @@ public class StatuService implements InitializingBean {
                         continue;
                     }
                     for(Job job : jobs){
-                        if(JobStatus.SUBMIT != job.getStatus() && JobStatus.RUNNING != job.getStatus()){
+                        if(JobStatus.SUBMIT != job.getStatus() && JobStatus.RUNNING != job.getStatus() && JobStatus.FAILED != job.getStatus()){
                             continue;
                         }
                         try {
@@ -75,8 +75,10 @@ public class StatuService implements InitializingBean {
                                 if (jobStatus != job.getStatus()) {
                                     job.setStatus(jobStatus);
                                     jobRepository.save(job);
-                                    if (JobStatus.FAILED == jobStatus) {
+                                    if (job.getStatus() != JobStatus.FAILED && JobStatus.FAILED == jobStatus) {
                                         alarmService.alert(business.getName(), job.getName());
+                                    }else if(job.getStatus() == JobStatus.FAILED && jobStatus== JobStatus.RUNNING){
+                                        alarmService.recover(business.getName(), job.getName());
                                     }
                                 }
                             } else {
