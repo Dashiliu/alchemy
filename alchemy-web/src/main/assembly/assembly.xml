@@ -1,0 +1,19 @@
+<assembly>
+    <id>assembly</id>
+    <formats>
+        <format>tar.gz</format>
+    </formats>
+
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <fileSets>
+        <!-- 文件主体jar包 -->
+        <fileSet>
+            <directory>${basedir}/${project.build.directory}/</directory>
+            <includes>
+                <include>${project.build.finalName}.${project.packaging}</include>
+            </includes>
+            <!--请根据执行路径来选择输出目录，最终生成的路径在工程根目录-->
+            <outputDirectory>/</outputDirectory>
+        </fileSet>
+    </fileSets>
+</assembly>

@@ -101,6 +101,7 @@
         <jacoco.itReportFile>${jacoco.reportFolder}/integrationTest.exec</jacoco.itReportFile>
         <junit.utReportFolder>${project.testresult.directory}/test</junit.utReportFolder>
         <junit.itReportFolder>${project.testresult.directory}/integrationTest</junit.itReportFolder>
+        <start-class>com.dfire.platform.alchemy.AlchemyApp</start-class>
         <!-- jhipster-needle-maven-property -->
     </properties>
 
@@ -656,6 +657,26 @@
                 </executions>
             </plugin>
             <!-- jhipster-needle-maven-add-plugin -->
+              <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-assembly-plugin</artifactId>
+                  <version>2.6</version>
+                  <configuration>
+                      <descriptor>src/main/assembly/assembly.xml</descriptor>
+                      <appendAssemblyId>false</appendAssemblyId>
+                      <outputDirectory>../</outputDirectory>
+                      <tarLongFileMode>posix</tarLongFileMode>
+                  </configuration>
+                  <executions>
+                      <execution>
+                          <id>make-assembly</id>
+                          <phase>package</phase>
+                          <goals>
+                              <goal>single</goal>
+                          </goals>
+                      </execution>
+                  </executions>
+              </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
