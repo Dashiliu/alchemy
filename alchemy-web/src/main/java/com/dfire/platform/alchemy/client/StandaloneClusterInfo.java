@@ -4,7 +4,6 @@ import org.apache.flink.runtime.jobmanager.HighAvailabilityMode;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author congbai
@@ -26,7 +25,7 @@ public class StandaloneClusterInfo {
 
     private Integer port;
 
-    private List<String> avgs;
+    private List<String> dependencies;
 
     private String webInterfaceUrl;
 
@@ -86,18 +85,12 @@ public class StandaloneClusterInfo {
         this.port = port;
     }
 
-    public List<String> getAvgs() {
-        return avgs;
+    public List<String> getDependencies() {
+        return dependencies;
     }
 
-    public void setAvgs(List<String> avgs) {
-        this.avgs = avgs;
-    }
-
-    public void setAvg(String avg) {
-        List<String> avgs = new ArrayList<>(1);
-        avgs.add(avg);
-        this.avgs = avgs;
+    public void setDependencies(List<String> dependencies) {
+        this.dependencies = dependencies;
     }
 
     public String getWebInterfaceUrl() {

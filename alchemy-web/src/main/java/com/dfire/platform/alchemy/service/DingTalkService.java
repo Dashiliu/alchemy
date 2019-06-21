@@ -13,7 +13,7 @@ public class DingTalkService {
 
     private RestTemplate restTemplate = new RestTemplate();
 
-    @Value("${dingtalk.webhook}")
+    @Value("${alchemy.dingtalk.webhook}")
     private String webhook;
 
     /**

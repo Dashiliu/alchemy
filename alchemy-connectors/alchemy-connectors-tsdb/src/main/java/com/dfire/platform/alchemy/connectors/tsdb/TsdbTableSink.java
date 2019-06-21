@@ -1,5 +1,6 @@
 package com.dfire.platform.alchemy.connectors.tsdb;
 
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -15,7 +16,7 @@ import org.apache.flink.util.Preconditions;
  */
 public class TsdbTableSink implements AppendStreamTableSink<Row> {
 
-    private final TsdbProperties opentsdbProperties;
+    private final TsdbProperties tsdbProperties;
 
     private String[] fieldNames;
 
@@ -23,7 +24,7 @@ public class TsdbTableSink implements AppendStreamTableSink<Row> {
 
     public TsdbTableSink(TsdbProperties tsdbProperties) {
         check(tsdbProperties);
-        this.opentsdbProperties = Preconditions.checkNotNull(tsdbProperties, "opentsdbProperties");;
+        this.tsdbProperties = Preconditions.checkNotNull(tsdbProperties, "tsdbProperties");;
     }
 
     private void check(TsdbProperties tsdbProperties) {
@@ -50,7 +51,7 @@ public class TsdbTableSink implements AppendStreamTableSink<Row> {
 
     @Override
     public TableSink<Row> configure(String[] fieldNames, TypeInformation<?>[] fieldTypes) {
-        TsdbTableSink copy = new TsdbTableSink(this.opentsdbProperties);
+        TsdbTableSink copy = new TsdbTableSink(this.tsdbProperties);
         copy.fieldNames = Preconditions.checkNotNull(fieldNames, "fieldNames");
         copy.fieldTypes = Preconditions.checkNotNull(fieldTypes, "fieldTypes");
         Preconditions.checkArgument(fieldNames.length == fieldTypes.length,
@@ -65,6 +66,19 @@ public class TsdbTableSink implements AppendStreamTableSink<Row> {
     }
 
     private RichSinkFunction createTsdbRich() {
-        return new TsdbSinkFunction(opentsdbProperties, fieldNames, fieldTypes);
+        MapFunction<String, String> tagMapFunction = createMapFunction(tsdbProperties.getMapClazz());
+        return new TsdbSinkFunction(tsdbProperties, fieldNames, tagMapFunction);
+    }
+
+    private MapFunction<String, String> createMapFunction(String mapClazz) {
+        if(mapClazz == null || mapClazz.trim().length() == 0){
+            return null;
+        }
+        try {
+            Class<MapFunction<String, String>> clazz = (Class<MapFunction<String, String>>) Class.forName(mapClazz);
+            return clazz.newInstance();
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
     }
 }

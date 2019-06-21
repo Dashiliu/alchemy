@@ -2,7 +2,7 @@
   "alchemyApp": {
     "UdfType": {
       "null": "",
-      "AVG": "AVG",
+      "DEPENDENCY": "DEPENDENCY",
       "CODE": "CODE"
     }
   }

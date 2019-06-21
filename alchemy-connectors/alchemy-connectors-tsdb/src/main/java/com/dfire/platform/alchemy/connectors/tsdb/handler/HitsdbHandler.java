@@ -1,11 +1,5 @@
 package com.dfire.platform.alchemy.connectors.tsdb.handler;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.aliyun.hitsdb.client.HiTSDB;
 import com.aliyun.hitsdb.client.HiTSDBClientFactory;
 import com.aliyun.hitsdb.client.HiTSDBConfig;
@@ -14,6 +8,11 @@ import com.aliyun.hitsdb.client.value.Result;
 import com.aliyun.hitsdb.client.value.request.Point;
 import com.dfire.platform.alchemy.connectors.tsdb.TsdbData;
 import com.dfire.platform.alchemy.connectors.tsdb.TsdbProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * @author congbai

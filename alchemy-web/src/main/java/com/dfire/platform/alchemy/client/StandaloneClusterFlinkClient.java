@@ -1,5 +1,6 @@
 package com.dfire.platform.alchemy.client;
 
+import com.dfire.platform.alchemy.client.loader.JarLoader;
 import com.dfire.platform.alchemy.client.request.*;
 import com.dfire.platform.alchemy.client.response.JobStatusResponse;
 import com.dfire.platform.alchemy.client.response.Response;
@@ -20,8 +21,9 @@ public class StandaloneClusterFlinkClient extends AbstractFlinkClient {
 
     private final String webInterfaceURL;
 
-    public StandaloneClusterFlinkClient(ClusterClient clusterClient, List<String> avgs, String webInterfaceURL) {
-        super(avgs);
+    public StandaloneClusterFlinkClient(ClusterClient clusterClient, JarLoader jarLoader,
+                                        List<String> dependencies, String webInterfaceURL) {
+        super(jarLoader, dependencies);
         this.clusterClient = clusterClient;
         this.webInterfaceURL = webInterfaceURL;
     }

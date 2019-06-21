@@ -36,6 +36,7 @@ public class HbaseProperties implements Serializable {
 
     private boolean skipWal;
 
+
     public String getZookeeper() {
         return zookeeper;
     }

@@ -10,8 +10,6 @@ public class SavepointFlinkRequest implements FlinkRequest {
 
     private String savepointDirectory;
 
-    private boolean test;
-
     public SavepointFlinkRequest(String jobID, String savepointDirectory) {
         this.jobID = jobID;
         this.savepointDirectory = savepointDirectory;
@@ -33,12 +31,4 @@ public class SavepointFlinkRequest implements FlinkRequest {
         this.savepointDirectory = savepointDirectory;
     }
 
-    @Override
-    public boolean isTest() {
-        return test;
-    }
-
-    public void setTest(boolean test) {
-        this.test = test;
-    }
 }

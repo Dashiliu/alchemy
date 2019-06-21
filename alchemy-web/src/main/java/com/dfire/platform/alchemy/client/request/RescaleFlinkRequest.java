@@ -10,8 +10,6 @@ public class RescaleFlinkRequest implements FlinkRequest {
 
     private int newParallelism;
 
-    private boolean test;
-
     public RescaleFlinkRequest(String jobID, int newParallelism) {
         this.jobID = jobID;
         this.newParallelism = newParallelism;
@@ -31,14 +29,5 @@ public class RescaleFlinkRequest implements FlinkRequest {
 
     public void setNewParallelism(int newParallelism) {
         this.newParallelism = newParallelism;
-    }
-
-    @Override
-    public boolean isTest() {
-        return test;
-    }
-
-    public void setTest(boolean test) {
-        this.test = test;
     }
 }

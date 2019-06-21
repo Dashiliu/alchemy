@@ -21,7 +21,7 @@
         {
             "fieldName": "type",
             "fieldType": "UdfType",
-            "fieldValues": "AVG,CODE",
+            "fieldValues": "DEPENDENCY,CODE",
             "fieldValidateRules": [
                 "required"
             ]
@@ -35,7 +35,7 @@
             ]
         },
         {
-            "fieldName": "avg",
+            "fieldName": "dependency",
             "fieldType": "String"
         },
         {

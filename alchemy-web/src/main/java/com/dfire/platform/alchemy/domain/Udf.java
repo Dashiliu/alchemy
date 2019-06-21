@@ -8,7 +8,6 @@ import javax.validation.constraints.*;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.Objects;
 
 import com.dfire.platform.alchemy.domain.enumeration.UdfType;
 
@@ -39,8 +38,8 @@ public class Udf implements Serializable {
     @Column(name = "jhi_value", nullable = false)
     private String value;
 
-    @Column(name = "avg")
-    private String avg;
+    @Column(name = "dependency")
+    private String dependency;
 
     @Column(name = "created_by")
     private String createdBy;
@@ -109,17 +108,17 @@ public class Udf implements Serializable {
         this.value = value;
     }
 
-    public String getAvg() {
-        return avg;
+    public String getDependency() {
+        return dependency;
     }
 
-    public Udf avg(String avg) {
-        this.avg = avg;
+    public Udf dependency(String dependency){
+        this.dependency= dependency;
         return this;
     }
 
-    public void setAvg(String avg) {
-        this.avg = avg;
+    public void setDependency(String dependency) {
+        this.dependency = dependency;
     }
 
     public String getCreatedBy() {
@@ -224,7 +223,7 @@ public class Udf implements Serializable {
             ", name='" + getName() + "'" +
             ", type='" + getType() + "'" +
             ", value='" + getValue() + "'" +
-            ", avg='" + getAvg() + "'" +
+            ", dependency='" + getDependency() + "'" +
             ", createdBy='" + getCreatedBy() + "'" +
             ", createdDate='" + getCreatedDate() + "'" +
             ", lastModifiedBy='" + getLastModifiedBy() + "'" +

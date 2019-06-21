@@ -24,7 +24,6 @@
     <!-- jhipster-needle-distribution-management -->
 
     <properties>
-
         <!-- maven download properties -->
         <aetherVersion>1.13.1</aetherVersion>
         <mavenVersion>3.0.4</mavenVersion>
@@ -139,6 +138,11 @@
         <dependency>
             <groupId>com.dfire.platform</groupId>
             <artifactId>alchemy-formats-protostuff</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.dfire.platform</groupId>
+            <artifactId>alchemy-formats-json</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
@@ -519,22 +523,10 @@
             <artifactId>zkclient</artifactId>
             <version>${zkClient.version}</version>
         </dependency>
-        <!-- mysql -->
-        <!--<dependency>-->
-        <!--<groupId>mysql</groupId>-->
-        <!--<artifactId>mysql-connector-java</artifactId>-->
-        <!--<version>${mysql.version}</version>-->
-        <!--</dependency>-->
 
     </dependencies>
 
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
         <defaultGoal>spring-boot:run</defaultGoal>
           <plugins>
             <plugin>
@@ -936,6 +928,7 @@
                                         <filtering>true</filtering>
                                         <includes>
                                             <include>config/*.yml</include>
+                                            <include>META-INF/*.properties</include>
                                         </includes>
                                     </resource>
                                     <resource>

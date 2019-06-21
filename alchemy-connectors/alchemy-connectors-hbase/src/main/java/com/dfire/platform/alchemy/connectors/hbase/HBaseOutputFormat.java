@@ -4,7 +4,6 @@ import org.apache.flink.api.common.io.OutputFormat;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.metrics.Counter;
 import org.apache.flink.table.shaded.org.apache.commons.lang3.StringUtils;
 import org.apache.flink.types.Row;
 import org.apache.flink.util.Preconditions;
@@ -44,8 +43,6 @@ public class HBaseOutputFormat implements OutputFormat<Tuple2<Boolean, Row>>{
     private transient org.apache.hadoop.conf.Configuration conf = null;
 
     private transient HTable table = null;
-
-    private Counter numRecordsOut;
 
     public HBaseOutputFormat(HbaseProperties hbaseProperties, String[] fieldNames, TypeInformation[] fieldTypes) {
         check(hbaseProperties);

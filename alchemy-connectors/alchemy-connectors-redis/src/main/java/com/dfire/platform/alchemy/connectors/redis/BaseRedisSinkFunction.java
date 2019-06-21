@@ -49,8 +49,6 @@ public abstract class BaseRedisSinkFunction extends RichSinkFunction<Tuple2<Bool
         Preconditions.checkNotNull(redisProperties.getName(), "redis name must not be null.");
         Preconditions.checkNotNull(redisProperties.getKeys(), "redis keys must not be null.");
         Preconditions.checkNotNull(redisProperties.getCommand(), "redis command must not be null.");
-        Preconditions.checkArgument((redisProperties.getSentinel() != null) || (redisProperties.getCodis() != null),
-                "redis mode either codis or sentinel");
         if (redisProperties.getMembers() != null) {
             Preconditions.checkNotNull(redisProperties.getScores(), "redis score fields  must not be null.");
             Preconditions.checkArgument(redisProperties.getMembers().size() == redisProperties.getScores().size(),

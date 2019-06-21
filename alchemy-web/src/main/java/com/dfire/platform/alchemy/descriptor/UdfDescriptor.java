@@ -32,7 +32,7 @@ public class UdfDescriptor implements CoreDescriptor {
 
     private UdfType udfType;
 
-    private String avg;
+    private String dependency;
 
     public static UdfDescriptor from(Udf udf) {
         UdfDescriptor udfDescriptor = new UdfDescriptor();
@@ -59,12 +59,12 @@ public class UdfDescriptor implements CoreDescriptor {
         this.udfType = udfType;
     }
 
-    public String getAvg() {
-        return avg;
+    public String getDependency() {
+        return dependency;
     }
 
-    public void setAvg(String avg) {
-        this.avg = avg;
+    public void setDependency(String dependency) {
+        this.dependency = dependency;
     }
 
     @Override

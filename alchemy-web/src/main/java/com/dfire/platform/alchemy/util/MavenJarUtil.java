@@ -9,8 +9,6 @@ import org.apache.maven.repository.internal.MavenRepositorySystemSession;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.artifact.Artifact;
@@ -24,16 +22,15 @@ import org.sonatype.aether.repository.RepositoryPolicy;
 import org.sonatype.aether.resolution.ArtifactResolutionException;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.aether.util.graph.PreorderNodeListGenerator;
-import org.springframework.util.ResourceUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author congbai
@@ -41,45 +38,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class MavenJarUtil {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AlchemyProperties.class);
-
-    private static final String KEY_RELEASE_REPOSITORY_URL = "release.url";
-
-    private static final String KEY_SNAP_REPOSITORY_URL = "snapshot.url";
-
-    private static  String RELEASE_REPOSITORY_URL;
-
-    private static  String SNAP_REPOSITORY_URL ;
-
-    static {
-        try {
-            File file = ResourceUtils.getFile("classpath:maven.properties");
-            Properties properties = PropertiesUtil.create(file);
-            RELEASE_REPOSITORY_URL = properties.getProperty(KEY_RELEASE_REPOSITORY_URL);
-            SNAP_REPOSITORY_URL = properties.getProperty(KEY_SNAP_REPOSITORY_URL);
-        } catch (IOException e) {
-            LOGGER.error("Exception maven.properties", e);
-        }
-    }
-
-    private static Map<String, MavenLoaderInfo>  caches = new ConcurrentHashMap<>();
-
-    public static MavenLoaderInfo forAvg(String avg) {
-        return forAvg(avg, false);
-    }
-
-    public static MavenLoaderInfo forAvg(String avg, boolean cache) {
-        if(cache){
-            MavenLoaderInfo mavenLoaderInfo = caches.get(avg);
-            if(mavenLoaderInfo == null){
-                mavenLoaderInfo =  MavenClassLoader.forGAV(avg, RELEASE_REPOSITORY_URL, SNAP_REPOSITORY_URL);
-                caches.put(avg, mavenLoaderInfo);
-            }
-            return mavenLoaderInfo;
-        }else{
-            return  MavenClassLoader.forGAV(avg, RELEASE_REPOSITORY_URL, SNAP_REPOSITORY_URL);
-        }
-
+    public static MavenLoaderInfo forAvg(String releaseUrl, String snapshotUrl, String avg) {
+        return  MavenClassLoader.forGAV(avg, releaseUrl, snapshotUrl);
     }
 
     public static final class MavenClassLoader {

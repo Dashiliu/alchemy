@@ -8,7 +8,7 @@ public class JobStatusRequest implements StatusRequest {
 
     private String jobID;
 
-    private boolean test;
+
 
     public JobStatusRequest(String jobID) {
         this.jobID = jobID;
@@ -22,12 +22,4 @@ public class JobStatusRequest implements StatusRequest {
         this.jobID = jobID;
     }
 
-    @Override
-    public boolean isTest() {
-        return test;
-    }
-
-    public void setTest(boolean test) {
-        this.test = test;
-    }
 }

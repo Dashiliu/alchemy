@@ -3,13 +3,11 @@ package com.dfire.platform.alchemy.connectors.tsdb;
 import com.dfire.platform.alchemy.connectors.common.MetricFunction;
 import com.dfire.platform.alchemy.connectors.tsdb.handler.HitsdbHandler;
 import com.dfire.platform.alchemy.connectors.tsdb.handler.TsdbHandler;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.metrics.Counter;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
 import org.apache.flink.types.Row;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +27,7 @@ public class TsdbSinkFunction extends RichSinkFunction<Row> implements MetricFun
 
     private final String[] fieldNames;
 
-    private final TypeInformation[] fieldTypes;
+    private final MapFunction<String, String> tagMapFunction;
 
     private final Map<String, Integer> fieldIndexs;
 
@@ -37,11 +35,10 @@ public class TsdbSinkFunction extends RichSinkFunction<Row> implements MetricFun
 
     private transient TsdbHandler tsdbHandler;
 
-    public TsdbSinkFunction(TsdbProperties tsdbProperties, String[] fieldNames, TypeInformation[] fieldTypes) {
+    public TsdbSinkFunction(TsdbProperties tsdbProperties, String[] fieldNames, MapFunction<String, String> tagMapFunction) {
         this.tsdbProperties = tsdbProperties;
         this.fieldNames = fieldNames;
-
-        this.fieldTypes = fieldTypes;
+        this.tagMapFunction = tagMapFunction;
         this.fieldIndexs = initFieldIndexs();
     }
     private HashMap<String, Integer> initFieldIndexs() {
@@ -75,7 +72,7 @@ public class TsdbSinkFunction extends RichSinkFunction<Row> implements MetricFun
         numRecordsOut.inc();
     }
 
-    private TsdbData createDate(Row value, Context context) {
+    private TsdbData createDate(Row value, Context context) throws Exception {
         Map<String, Number> metrics = createMetrics(value);
         Map<String, String>  tags = createTags(value);
         Long timestamp = context.timestamp();
@@ -85,12 +82,18 @@ public class TsdbSinkFunction extends RichSinkFunction<Row> implements MetricFun
         return TsdbData.newBuilder().metricValues(metrics).tags(tags).timestamp(timestamp).build();
     }
 
-    private Map<String, String> createTags(Row input) {
+    private Map<String, String> createTags(Row input) throws Exception {
         List<String> tags = this.tsdbProperties.getTags();
         Map<String, String> returnValue = new HashMap<>(tags.size());
         for (String tag : tags){
             int index = this.fieldIndexs.get(tag);
-            returnValue.put(tag.trim(), input.getField(index).toString());
+            String tagValue = input.getField(index).toString();
+            if(tagMapFunction != null){
+                tagValue = tagMapFunction.map(tagValue);
+            }
+            if(tagValue != null){
+                returnValue.put(tag.trim(), tagValue);
+            }
         }
         return returnValue;
     }

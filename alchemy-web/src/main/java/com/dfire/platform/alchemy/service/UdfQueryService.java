@@ -95,8 +95,8 @@ public class UdfQueryService extends QueryService<Udf> {
             if (criteria.getType() != null) {
                 specification = specification.and(buildSpecification(criteria.getType(), Udf_.type));
             }
-            if (criteria.getAvg() != null) {
-                specification = specification.and(buildStringSpecification(criteria.getAvg(), Udf_.avg));
+            if (criteria.getDependency() != null) {
+                specification = specification.and(buildStringSpecification(criteria.getDependency(), Udf_.dependency));
             }
             if (criteria.getCreatedBy() != null) {
                 specification = specification.and(buildStringSpecification(criteria.getCreatedBy(), Udf_.createdBy));

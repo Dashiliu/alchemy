@@ -18,7 +18,7 @@
       "name": "名称",
       "type": "类型",
       "value": "值",
-      "avg": "Avg",
+      "dependency": "依赖",
       "remark": "备注",
       "createdBy": "创建者",
       "createdDate": "创建时间",

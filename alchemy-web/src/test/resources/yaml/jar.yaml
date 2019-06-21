@@ -1,5 +1,5 @@
 cache: true
-avg: org.apache.flink:flink-sql-client:1.5.4  #just for test
+dependency: org.apache.flink:flink-sql-client:1.5.4  #just for test
 parallelism: 2
 program-args: --sampler 2 --test true
 entry-class: org.apache.flink.table.client.SqlClient  # just for test

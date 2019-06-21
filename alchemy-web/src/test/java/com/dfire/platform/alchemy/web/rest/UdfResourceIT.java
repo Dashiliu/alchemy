@@ -8,7 +8,6 @@ import com.dfire.platform.alchemy.service.UdfService;
 import com.dfire.platform.alchemy.service.dto.UdfDTO;
 import com.dfire.platform.alchemy.service.mapper.UdfMapper;
 import com.dfire.platform.alchemy.web.rest.errors.ExceptionTranslator;
-import com.dfire.platform.alchemy.service.dto.UdfCriteria;
 import com.dfire.platform.alchemy.service.UdfQueryService;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +21,6 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Base64Utils;
 import org.springframework.validation.Validator;
 
 import javax.persistence.EntityManager;
@@ -46,14 +44,14 @@ public class UdfResourceIT {
     private static final String DEFAULT_NAME = "AAAAAAAAAA";
     private static final String UPDATED_NAME = "BBBBBBBBBB";
 
-    private static final UdfType DEFAULT_TYPE = UdfType.AVG;
+    private static final UdfType DEFAULT_TYPE = UdfType.DEPENDENCY;
     private static final UdfType UPDATED_TYPE = UdfType.CODE;
 
     private static final String DEFAULT_VALUE = "AAAAAAAAAA";
     private static final String UPDATED_VALUE = "BBBBBBBBBB";
 
-    private static final String DEFAULT_AVG = "AAAAAAAAAA";
-    private static final String UPDATED_AVG = "BBBBBBBBBB";
+    private static final String DEFAULT_DEPENDENCY = "AAAAAAAAAA";
+    private static final String UPDATED_DEPENDENCY = "BBBBBBBBBB";
 
     private static final String DEFAULT_CREATED_BY = "AAAAAAAAAA";
     private static final String UPDATED_CREATED_BY = "BBBBBBBBBB";
@@ -124,7 +122,7 @@ public class UdfResourceIT {
             .name(DEFAULT_NAME)
             .type(DEFAULT_TYPE)
             .value(DEFAULT_VALUE)
-            .avg(DEFAULT_AVG)
+            .dependency(DEFAULT_DEPENDENCY)
             .createdBy(DEFAULT_CREATED_BY)
             .createdDate(DEFAULT_CREATED_DATE)
             .lastModifiedBy(DEFAULT_LAST_MODIFIED_BY)
@@ -143,7 +141,7 @@ public class UdfResourceIT {
             .name(UPDATED_NAME)
             .type(UPDATED_TYPE)
             .value(UPDATED_VALUE)
-            .avg(UPDATED_AVG)
+            .dependency(UPDATED_DEPENDENCY)
             .createdBy(UPDATED_CREATED_BY)
             .createdDate(UPDATED_CREATED_DATE)
             .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
@@ -176,7 +174,7 @@ public class UdfResourceIT {
         assertThat(testUdf.getName()).isEqualTo(DEFAULT_NAME);
         assertThat(testUdf.getType()).isEqualTo(DEFAULT_TYPE);
         assertThat(testUdf.getValue()).isEqualTo(DEFAULT_VALUE);
-        assertThat(testUdf.getAvg()).isEqualTo(DEFAULT_AVG);
+        assertThat(testUdf.getDependency()).isEqualTo(DEFAULT_DEPENDENCY);
         assertThat(testUdf.getCreatedBy()).isEqualTo(DEFAULT_CREATED_BY);
         assertThat(testUdf.getCreatedDate()).isEqualTo(DEFAULT_CREATED_DATE);
         assertThat(testUdf.getLastModifiedBy()).isEqualTo(DEFAULT_LAST_MODIFIED_BY);
@@ -257,7 +255,7 @@ public class UdfResourceIT {
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
             .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())))
             .andExpect(jsonPath("$.[*].value").value(hasItem(DEFAULT_VALUE.toString())))
-            .andExpect(jsonPath("$.[*].avg").value(hasItem(DEFAULT_AVG.toString())))
+            .andExpect(jsonPath("$.[*].dependency").value(hasItem(DEFAULT_DEPENDENCY.toString())))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY.toString())))
             .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY.toString())))
@@ -279,7 +277,7 @@ public class UdfResourceIT {
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
             .andExpect(jsonPath("$.type").value(DEFAULT_TYPE.toString()))
             .andExpect(jsonPath("$.value").value(DEFAULT_VALUE.toString()))
-            .andExpect(jsonPath("$.avg").value(DEFAULT_AVG.toString()))
+            .andExpect(jsonPath("$.dependency").value(DEFAULT_DEPENDENCY.toString()))
             .andExpect(jsonPath("$.createdBy").value(DEFAULT_CREATED_BY.toString()))
             .andExpect(jsonPath("$.createdDate").value(DEFAULT_CREATED_DATE.toString()))
             .andExpect(jsonPath("$.lastModifiedBy").value(DEFAULT_LAST_MODIFIED_BY.toString()))
@@ -367,41 +365,41 @@ public class UdfResourceIT {
 
     @Test
     @Transactional
-    public void getAllUdfsByAvgIsEqualToSomething() throws Exception {
+    public void getAllUdfsByDependencyIsEqualToSomething() throws Exception {
         // Initialize the database
         udfRepository.saveAndFlush(udf);
 
         // Get all the udfList where avg equals to DEFAULT_AVG
-        defaultUdfShouldBeFound("avg.equals=" + DEFAULT_AVG);
+        defaultUdfShouldBeFound("dependency.equals=" + DEFAULT_DEPENDENCY);
 
         // Get all the udfList where avg equals to UPDATED_AVG
-        defaultUdfShouldNotBeFound("avg.equals=" + UPDATED_AVG);
+        defaultUdfShouldNotBeFound("dependency.equals=" + UPDATED_DEPENDENCY);
     }
 
     @Test
     @Transactional
-    public void getAllUdfsByAvgIsInShouldWork() throws Exception {
+    public void getAllUdfsByDependencyIsInShouldWork() throws Exception {
         // Initialize the database
         udfRepository.saveAndFlush(udf);
 
         // Get all the udfList where avg in DEFAULT_AVG or UPDATED_AVG
-        defaultUdfShouldBeFound("avg.in=" + DEFAULT_AVG + "," + UPDATED_AVG);
+        defaultUdfShouldBeFound("dependency.in=" + DEFAULT_DEPENDENCY + "," + UPDATED_DEPENDENCY);
 
         // Get all the udfList where avg equals to UPDATED_AVG
-        defaultUdfShouldNotBeFound("avg.in=" + UPDATED_AVG);
+        defaultUdfShouldNotBeFound("dependency.in=" + UPDATED_DEPENDENCY);
     }
 
     @Test
     @Transactional
-    public void getAllUdfsByAvgIsNullOrNotNull() throws Exception {
+    public void getAllUdfsByDependencyIsNullOrNotNull() throws Exception {
         // Initialize the database
         udfRepository.saveAndFlush(udf);
 
         // Get all the udfList where avg is not null
-        defaultUdfShouldBeFound("avg.specified=true");
+        defaultUdfShouldBeFound("dependency.specified=true");
 
         // Get all the udfList where avg is null
-        defaultUdfShouldNotBeFound("avg.specified=false");
+        defaultUdfShouldNotBeFound("dependency.specified=false");
     }
 
     @Test
@@ -628,7 +626,7 @@ public class UdfResourceIT {
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())))
             .andExpect(jsonPath("$.[*].value").value(hasItem(DEFAULT_VALUE.toString())))
-            .andExpect(jsonPath("$.[*].avg").value(hasItem(DEFAULT_AVG)))
+            .andExpect(jsonPath("$.[*].avg").value(hasItem(DEFAULT_DEPENDENCY)))
             .andExpect(jsonPath("$.[*].createdBy").value(hasItem(DEFAULT_CREATED_BY)))
             .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
             .andExpect(jsonPath("$.[*].lastModifiedBy").value(hasItem(DEFAULT_LAST_MODIFIED_BY)))
@@ -684,7 +682,7 @@ public class UdfResourceIT {
             .name(UPDATED_NAME)
             .type(UPDATED_TYPE)
             .value(UPDATED_VALUE)
-            .avg(UPDATED_AVG)
+            .dependency(UPDATED_DEPENDENCY)
             .createdBy(UPDATED_CREATED_BY)
             .createdDate(UPDATED_CREATED_DATE)
             .lastModifiedBy(UPDATED_LAST_MODIFIED_BY)
@@ -704,7 +702,7 @@ public class UdfResourceIT {
         assertThat(testUdf.getName()).isEqualTo(UPDATED_NAME);
         assertThat(testUdf.getType()).isEqualTo(UPDATED_TYPE);
         assertThat(testUdf.getValue()).isEqualTo(UPDATED_VALUE);
-        assertThat(testUdf.getAvg()).isEqualTo(UPDATED_AVG);
+        assertThat(testUdf.getDependency()).isEqualTo(UPDATED_DEPENDENCY);
         assertThat(testUdf.getCreatedBy()).isEqualTo(UPDATED_CREATED_BY);
         assertThat(testUdf.getCreatedDate()).isEqualTo(UPDATED_CREATED_DATE);
         assertThat(testUdf.getLastModifiedBy()).isEqualTo(UPDATED_LAST_MODIFIED_BY);

@@ -1,7 +1,7 @@
 import { Moment } from 'moment';
 
 export const enum UdfType {
-  AVG = 'AVG',
+  DEPENDENCY = 'DEPENDENCY',
   CODE = 'CODE'
 }
 
@@ -10,7 +10,7 @@ export interface IUdf {
   name?: string;
   type?: UdfType;
   value?: any;
-  avg?: string;
+  dependency?: string;
   createdBy?: string;
   createdDate?: Moment;
   lastModifiedBy?: string;
@@ -25,7 +25,7 @@ export class Udf implements IUdf {
     public name?: string,
     public type?: UdfType,
     public value?: any,
-    public avg?: string,
+    public dependency?: string,
     public createdBy?: string,
     public createdDate?: Moment,
     public lastModifiedBy?: string,
