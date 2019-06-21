@@ -16,7 +16,7 @@ public class JarRequestTest{
         File file = ResourceUtils.getFile("classpath:yaml/jar.yaml");
         JarSubmitFlinkRequest flinkRequest = BindPropertiesUtil.bindProperties(file, JarSubmitFlinkRequest.class);
         assertThat(flinkRequest.isCache()).isTrue();
-        assertThat(flinkRequest.getAvg()).isNotNull();
+        assertThat(flinkRequest.getDependency()).isNotNull();
         assertThat(flinkRequest.getEntryClass()).isNotNull();
         assertThat(flinkRequest.getAllowNonRestoredState()).isNotNull();
         assertThat(flinkRequest.getParallelism()).isEqualTo(2);

@@ -23,7 +23,7 @@
                 <div class="form-group">
                     <label class="form-control-label" jhiTranslate="alchemyApp.udf.type" for="field_type">Type</label>
                     <select class="form-control" name="type" formControlName="type" id="field_type">
-                        <option value="AVG">{{'alchemyApp.UdfType.AVG' | translate}}</option>
+                        <option value="DEPENDENCY">{{'alchemyApp.UdfType.DEPENDENCY' | translate}}</option>
                         <option value="CODE">{{'alchemyApp.UdfType.CODE' | translate}}</option>
                     </select>
                     <div *ngIf="editForm.get('type').invalid && (editForm.get('type').dirty || editForm.get('type').touched)">
@@ -35,7 +35,7 @@
                 </div>
                 <div class="form-group">
                     <label class="form-control-label" jhiTranslate="alchemyApp.udf.value" for="field_value">Value</label>
-                    <textarea *ngIf="editForm.get('type').value == 'AVG'" class="form-control" name="value" id="field_value"
+                    <textarea *ngIf="editForm.get('type').value == 'DEPENDENCY'" class="form-control" name="value" id="field_value"
                               formControlName="value"></textarea>
                     <codemirror *ngIf="editForm.get('type').value == 'CODE'" formControlName="value" [config]="groovyConfig" id="field_config"></codemirror>
                     <div *ngIf="editForm.get('value').invalid && (editForm.get('value').dirty || editForm.get('value').touched)">
@@ -46,9 +46,9 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="form-control-label" jhiTranslate="alchemyApp.udf.avg" for="field_avg">Avg</label>
-                    <input type="text" class="form-control" name="avg" id="field_avg"
-                           formControlName="avg"/>
+                    <label class="form-control-label" jhiTranslate="alchemyApp.udf.dependency" for="field_dependency">Dependency</label>
+                    <input type="text" class="form-control" name="dependency" id="field_dependency"
+                           formControlName="dependency"/>
                 </div>
                 <div class="form-group">
                     <label class="form-control-label" jhiTranslate="alchemyApp.udf.remark" for="field_remark">Remark</label>

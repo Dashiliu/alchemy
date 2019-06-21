@@ -27,7 +27,18 @@ describe('Service Tests', () => {
       httpMock = injector.get(HttpTestingController);
       currentDate = moment();
 
-      elemDefault = new Udf(0, 'AAAAAAA', UdfType.AVG, 'AAAAAAA', 'AAAAAAA', 'AAAAAAA', currentDate, 'AAAAAAA', currentDate, 'AAAAAAA');
+      elemDefault = new Udf(
+        0,
+        'AAAAAAA',
+        UdfType.DEPENDENCY,
+        'AAAAAAA',
+        'AAAAAAA',
+        'AAAAAAA',
+        currentDate,
+        'AAAAAAA',
+        currentDate,
+        'AAAAAAA'
+      );
     });
 
     describe('Service methods', () => {
@@ -80,7 +91,7 @@ describe('Service Tests', () => {
             name: 'BBBBBB',
             type: 'BBBBBB',
             value: 'BBBBBB',
-            avg: 'BBBBBB',
+            dependency: 'BBBBBB',
             createdBy: 'BBBBBB',
             createdDate: currentDate.format(DATE_TIME_FORMAT),
             lastModifiedBy: 'BBBBBB',
@@ -112,7 +123,7 @@ describe('Service Tests', () => {
             name: 'BBBBBB',
             type: 'BBBBBB',
             value: 'BBBBBB',
-            avg: 'BBBBBB',
+            dependency: 'BBBBBB',
             createdBy: 'BBBBBB',
             createdDate: currentDate.format(DATE_TIME_FORMAT),
             lastModifiedBy: 'BBBBBB',

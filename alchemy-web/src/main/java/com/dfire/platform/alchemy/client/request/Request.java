@@ -8,5 +8,4 @@ package com.dfire.platform.alchemy.client.request;
  */
 public interface Request {
 
-    boolean isTest();
 }

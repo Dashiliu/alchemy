@@ -9,7 +9,7 @@ import { DATE_TIME_FORMAT } from 'app/shared/constants/input.constants';
 import { JhiAlertService, JhiDataUtils } from 'ng-jhipster';
 import { IUdf, Udf } from 'app/shared/model/udf.model';
 import { UdfService } from './udf.service';
-import {Business, IBusiness} from 'app/shared/model/business.model';
+import { Business, IBusiness } from 'app/shared/model/business.model';
 import 'codemirror/mode/groovy/groovy';
 
 @Component({
@@ -28,7 +28,7 @@ export class UdfUpdateComponent implements OnInit {
     type: [null, [Validators.required]],
     remark: [null, [Validators.required]],
     value: [null, [Validators.required]],
-    avg: [],
+    dependency: [],
     createdBy: [],
     createdDate: [],
     lastModifiedBy: [],
@@ -47,13 +47,13 @@ export class UdfUpdateComponent implements OnInit {
   ngOnInit() {
     this.isSaving = false;
     this.activatedRoute.data.subscribe(({ business }) => {
-      if(business){
+      if (business) {
         this.business = business;
-        this.udf = new Udf()
+        this.udf = new Udf();
       }
     });
     this.activatedRoute.data.subscribe(({ udf }) => {
-      if(udf){
+      if (udf) {
         this.updateForm(udf);
         this.udf = udf;
         this.business = new Business();
@@ -68,14 +68,13 @@ export class UdfUpdateComponent implements OnInit {
       name: udf.name,
       type: udf.type,
       value: udf.value,
-      avg: udf.avg,
+      dependency: udf.dependency,
       createdBy: udf.createdBy,
       createdDate: udf.createdDate != null ? udf.createdDate.format(DATE_TIME_FORMAT) : null,
       lastModifiedBy: udf.lastModifiedBy,
       lastModifiedDate: udf.lastModifiedDate != null ? udf.lastModifiedDate.format(DATE_TIME_FORMAT) : null,
       remark: udf.remark,
       businessId: udf.businessId
-
     });
   }
 
@@ -132,7 +131,7 @@ export class UdfUpdateComponent implements OnInit {
       name: this.editForm.get(['name']).value,
       type: this.editForm.get(['type']).value,
       value: this.editForm.get(['value']).value,
-      avg: this.editForm.get(['avg']).value,
+      dependency: this.editForm.get(['dependency']).value,
       createdBy: this.editForm.get(['createdBy']).value,
       createdDate:
         this.editForm.get(['createdDate']).value != null ? moment(this.editForm.get(['createdDate']).value, DATE_TIME_FORMAT) : undefined,

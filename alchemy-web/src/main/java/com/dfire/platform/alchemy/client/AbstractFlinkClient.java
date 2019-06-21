@@ -1,7 +1,9 @@
 package com.dfire.platform.alchemy.client;
 
 import com.dfire.platform.alchemy.api.common.Alias;
+import com.dfire.platform.alchemy.api.function.BaseFunction;
 import com.dfire.platform.alchemy.api.util.SideParser;
+import com.dfire.platform.alchemy.client.loader.JarLoader;
 import com.dfire.platform.alchemy.client.request.*;
 import com.dfire.platform.alchemy.client.response.JobStatusResponse;
 import com.dfire.platform.alchemy.client.response.Response;
@@ -12,11 +14,8 @@ import com.dfire.platform.alchemy.common.ResultMessage;
 import com.dfire.platform.alchemy.descriptor.SinkDescriptor;
 import com.dfire.platform.alchemy.descriptor.SourceDescriptor;
 import com.dfire.platform.alchemy.domain.enumeration.TableType;
-import com.dfire.platform.alchemy.api.function.BaseFunction;
-import com.dfire.platform.alchemy.util.AlchemyProperties;
 import com.dfire.platform.alchemy.util.FileUtil;
 import com.dfire.platform.alchemy.util.JarArgUtil;
-import com.dfire.platform.alchemy.util.MavenJarUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.calcite.sql.SqlJoin;
@@ -79,10 +78,13 @@ public abstract class AbstractFlinkClient implements FlinkClient {
     /**
      * 集群额外依赖的公共包
      */
-    private final List<String> avgs;
+    private final List<String> dependencies;
 
-    public AbstractFlinkClient(List<String> avgs) {
-        this.avgs = avgs;
+    private JarLoader jarLoader;
+
+    public AbstractFlinkClient(JarLoader jarLoader, List<String> dependencies) {
+        this.dependencies = dependencies;
+        this.jarLoader= jarLoader;
     }
 
     public SavepointResponse cancel(ClusterClient clusterClient, CancelFlinkRequest request) throws Exception {
@@ -150,12 +152,9 @@ public abstract class AbstractFlinkClient implements FlinkClient {
     }
 
     public SubmitFlinkResponse submitJar(ClusterClient clusterClient, JarSubmitFlinkRequest request) throws Exception {
-        if (request.isTest()) {
-            throw new UnsupportedOperationException();
-        }
         LOGGER.trace("start submit jar request,entryClass:{}", request.getEntryClass());
         try {
-            File file = MavenJarUtil.forAvg(request.getAvg(), request.isCache()).getJarFile();
+            File file = jarLoader.downLoad(request.getDependency(), request.isCache());
             List<String> programArgs = JarArgUtil.tokenizeArguments(request.getProgramArgs());
             PackagedProgram program = new PackagedProgram(file, request.getEntryClass(),
                 programArgs.toArray(new String[programArgs.size()]));
@@ -206,7 +205,7 @@ public abstract class AbstractFlinkClient implements FlinkClient {
         final StreamExecutionEnvironment execEnv = StreamExecutionEnvironment.createLocalEnvironment();
         StreamTableEnvironment env = StreamTableEnvironment.getTableEnvironment(execEnv);
         List<URL> urls = new ArrayList<>();
-        addJobAvgs(urls, request.getAvgs());
+        addJobDependencies(urls, request.getDependencies());
         Map<String, SourceDescriptor> sideSources = Maps.newHashMap();
         Map<String, TableSource> tableSources = Maps.newHashMap();
         setBaseInfo(execEnv, request);
@@ -217,13 +216,9 @@ public abstract class AbstractFlinkClient implements FlinkClient {
             Table table = registerSql(env, sqls.get(i), tableSources, sideSources);
             registerSink(table, request.getSinks().get(i), urls);
         }
-        if (request.isTest()) {
-            execEnv.execute(request.getJobName());
-            return new SubmitFlinkResponse(true, "");
-        }
         StreamGraph streamGraph = execEnv.getStreamGraph();
         streamGraph.setJobName(request.getJobName());
-        urls.addAll(createGlobalPath(this.getAvgs()));
+        urls.addAll(createGlobalPath(this.getDependencies()));
         ClassLoader usercodeClassLoader
             = JobWithJars.buildUserCodeClassLoader(urls, Collections.emptyList(), getClass().getClassLoader());
         try {
@@ -238,12 +233,12 @@ public abstract class AbstractFlinkClient implements FlinkClient {
         }
     }
 
-    private void addJobAvgs(List<URL> urls, List<String> avgs) throws MalformedURLException {
-        if (CollectionUtils.isEmpty(avgs)) {
+    private void addJobDependencies(List<URL> urls, List<String> dependencies) throws Exception {
+        if (CollectionUtils.isEmpty(dependencies)) {
             return;
         }
-        for(String avg : avgs){
-            loadUrl(avg, true , urls);
+        for(String dependency : dependencies){
+            loadUrl(dependency, true , urls);
         }
     }
 
@@ -319,7 +314,7 @@ public abstract class AbstractFlinkClient implements FlinkClient {
         if (CollectionUtils.isNotEmpty(request.getUdfs())) {
             request.getUdfs().forEach(udfDescriptor -> {
                 try {
-                    loadUrl(udfDescriptor.getAvg(), true , urls);
+                    loadUrl(udfDescriptor.getDependency(), true , urls);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -376,6 +371,7 @@ public abstract class AbstractFlinkClient implements FlinkClient {
                 TableType tableType = consumer.getTableType();
                 switch (tableType) {
                     case SIDE:
+                        addUrl(consumer.getConnectorDescriptor().type(), urls);
                         sideSources.put(consumer.getName(), consumer);
                         break;
                     case VIEW:
@@ -455,51 +451,58 @@ public abstract class AbstractFlinkClient implements FlinkClient {
 
     }
 
-    private void loadUrl(String avg, boolean cache,  List<URL> urls) throws MalformedURLException {
-        if (org.apache.commons.lang3.StringUtils.isEmpty(avg)) {
+    private void loadUrl(String path, boolean cache,  List<URL> urls) throws Exception {
+        if (org.apache.commons.lang3.StringUtils.isEmpty(path)) {
             return;
         }
-        URL url = MavenJarUtil.forAvg(avg, cache).getJarFile().getAbsoluteFile().toURI().toURL();
+        URL url = jarLoader.find(path, cache);
         if (!urls.contains(url)) {
             urls.add(url);
         }
     }
 
-    private void addUrl(String name, List<URL> urls) throws MalformedURLException {
+    private void addUrl(String name, List<URL> urls) throws Exception {
         if (org.apache.commons.lang3.StringUtils.isEmpty(name)) {
             return;
         }
-        String avg = AlchemyProperties.get(name);
-        if (org.apache.commons.lang3.StringUtils.isEmpty(avg)) {
+        URL url = jarLoader.findByName(name);
+        if (url == null) {
             LOGGER.info("{} is not exist  in alchemy properties", name);
             return;
         }
-        URL url = MavenJarUtil.forAvg(avg, true).getJarFile().getAbsoluteFile().toURI().toURL();
         if (!urls.contains(url)) {
             urls.add(url);
         }
     }
 
-    private List<URL> createGlobalPath(List<String> avgs) throws MalformedURLException {
-        if (org.springframework.util.CollectionUtils.isEmpty(avgs)){
+    private List<URL> createGlobalPath(List<String> paths) throws Exception {
+        if (org.springframework.util.CollectionUtils.isEmpty(paths)){
             return new ArrayList<>(0);
         }
-        List<URL> jarFiles = new ArrayList<>(avgs.size());
-        for (String avg : avgs){
+        List<URL> jarFiles = new ArrayList<>(paths.size());
+        for (String path : paths){
             try {
-                URL jarFileUrl =  MavenJarUtil.forAvg(avg, true).getJarFile().getAbsoluteFile().toURI().toURL();
+                URL jarFileUrl =  jarLoader.find(path, true);
                 jarFiles.add(jarFileUrl);
                 JobWithJars.checkJarFile(jarFileUrl);
             } catch (MalformedURLException e) {
-                throw new IllegalArgumentException("avg is invalid '" +avg + "'", e);
+                throw new IllegalArgumentException("dependency is invalid '" +path + "'", e);
             } catch (IOException e) {
-                throw new RuntimeException("Problem with avg " + avg, e);
+                throw new RuntimeException("Problem with dependency " + path, e);
             }
         }
         return jarFiles;
     }
 
-    public List<String> getAvgs() {
-        return avgs;
+    public List<String> getDependencies() {
+        return dependencies;
+    }
+
+    public JarLoader getJarLoader() {
+        return jarLoader;
+    }
+
+    public void setJarLoader(JarLoader jarLoader) {
+        this.jarLoader = jarLoader;
     }
 }

@@ -20,6 +20,6 @@ public class SqlRequestTest {
         assertThat(flinkRequest.getTimeCharacteristic()).isNotNull();
         assertThat(flinkRequest.getRestartParams().get("restartAttempts")).isEqualTo(10);
         assertThat(flinkRequest.getRestartParams().get("delayBetweenAttempts")).isEqualTo(10000);
-        assertThat(flinkRequest.getAvgs().size()).isEqualTo(1);
+        assertThat(flinkRequest.getDependencies().size()).isEqualTo(1);
     }
 }

@@ -1,5 +1,6 @@
 package com.dfire.platform.alchemy.client;
 
+import com.dfire.platform.alchemy.client.loader.JarLoader;
 import com.dfire.platform.alchemy.domain.Cluster;
 import com.dfire.platform.alchemy.domain.enumeration.ClusterType;
 import com.dfire.platform.alchemy.util.BindPropertiesUtil;
@@ -15,12 +16,12 @@ import org.apache.flink.configuration.JobManagerOptions;
  */
 public class ClusterClientFactory {
 
-    public static FlinkClient get(Cluster cluster) throws Exception {
+    public static FlinkClient get(Cluster cluster, JarLoader jarLoader) throws Exception {
         ClusterType clusterType = cluster.getType();
         switch (clusterType) {
             case STANDALONE:
                 StandaloneClusterInfo clusterInfo = BindPropertiesUtil.bindProperties(cluster.getConfig(), StandaloneClusterInfo.class);
-                return createRestClient(clusterInfo);
+                return createRestClient(clusterInfo, jarLoader);
             case YARN:
                 // todo 支持yarn client
             default:
@@ -28,7 +29,7 @@ public class ClusterClientFactory {
         }
     }
 
-    public static FlinkClient createRestClient(StandaloneClusterInfo clusterInfo) throws Exception {
+    public static FlinkClient createRestClient(StandaloneClusterInfo clusterInfo, JarLoader jarLoader) throws Exception {
         Configuration configuration = new Configuration();
         configuration.setString(HighAvailabilityOptions.HA_MODE, clusterInfo.getMode());
         if (StringUtils.isNotEmpty(clusterInfo.getClusterId())){
@@ -53,7 +54,7 @@ public class ClusterClientFactory {
             StandaloneClusterClient clusterClient = new StandaloneClusterClient(configuration);
             clusterClient.setPrintStatusDuringExecution(true);
             clusterClient.setDetached(true);
-            return new StandaloneClusterFlinkClient(clusterClient, clusterInfo.getAvgs(), clusterInfo.getWebInterfaceUrl());
+            return new StandaloneClusterFlinkClient(clusterClient, jarLoader,  clusterInfo.getDependencies(), clusterInfo.getWebInterfaceUrl());
         } catch (Exception e) {
             throw new RuntimeException("Cannot establish connection to JobManager: " + e.getMessage(), e);
         }

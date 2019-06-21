@@ -17,6 +17,8 @@ public class TsdbProperties implements Serializable{
 
     private List<String> tags;
 
+    private String mapClazz;
+
     private Integer ioThreadCount;
 
     private Integer batchPutBufferSize;
@@ -51,6 +53,14 @@ public class TsdbProperties implements Serializable{
 
     public void setTags(List<String> tags) {
         this.tags = tags;
+    }
+
+    public String getMapClazz() {
+        return mapClazz;
+    }
+
+    public void setMapClazz(String mapClazz) {
+        this.mapClazz = mapClazz;
     }
 
     public Integer getIoThreadCount() {

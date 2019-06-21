@@ -43,7 +43,7 @@ public class SinkDescriptorTest {
 
     @Test
     public void buildMysqlSink() throws Exception {
-        File file = ResourceUtils.getFile("classpath:yaml/mysql-sink.yaml");
+        File file = ResourceUtils.getFile("classpath:yaml/mysql-insert-sink.yaml");
         MysqlSinkDescriptor sinkDescriptor = BindPropertiesUtil.bindProperties(file, MysqlSinkDescriptor.class);
         assertThat(sinkDescriptor.getDriverName()).isNotNull();
         assertThat(sinkDescriptor.getUrl()).isNotNull();

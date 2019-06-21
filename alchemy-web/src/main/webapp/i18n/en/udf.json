@@ -18,7 +18,7 @@
       "name": "Name",
       "type": "Type",
       "value": "Value",
-      "avg": "Avg",
+      "dependency": "Dependency",
       "createdBy": "Created By",
       "createdDate": "Created Date",
       "lastModifiedBy": "Last Modified By",

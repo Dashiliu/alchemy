@@ -23,7 +23,7 @@ public class UdfDTO implements Serializable {
     @Lob
     private String value;
 
-    private String avg;
+    private String dependency;
 
     private String createdBy;
 
@@ -70,12 +70,12 @@ public class UdfDTO implements Serializable {
         this.value = value;
     }
 
-    public String getAvg() {
-        return avg;
+    public String getDependency() {
+        return dependency;
     }
 
-    public void setAvg(String avg) {
-        this.avg = avg;
+    public void setDependency(String dependency) {
+        this.dependency = dependency;
     }
 
     public String getCreatedBy() {
@@ -154,7 +154,7 @@ public class UdfDTO implements Serializable {
             ", name='" + getName() + "'" +
             ", type='" + getType() + "'" +
             ", value='" + getValue() + "'" +
-            ", avg='" + getAvg() + "'" +
+            ", dependency='" + getDependency() + "'" +
             ", createdBy='" + getCreatedBy() + "'" +
             ", createdDate='" + getCreatedDate() + "'" +
             ", lastModifiedBy='" + getLastModifiedBy() + "'" +

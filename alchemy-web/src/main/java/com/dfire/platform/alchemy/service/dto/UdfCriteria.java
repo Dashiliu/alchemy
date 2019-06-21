@@ -4,11 +4,7 @@ import java.io.Serializable;
 import java.util.Objects;
 import io.github.jhipster.service.Criteria;
 import com.dfire.platform.alchemy.domain.enumeration.UdfType;
-import io.github.jhipster.service.filter.BooleanFilter;
-import io.github.jhipster.service.filter.DoubleFilter;
 import io.github.jhipster.service.filter.Filter;
-import io.github.jhipster.service.filter.FloatFilter;
-import io.github.jhipster.service.filter.IntegerFilter;
 import io.github.jhipster.service.filter.LongFilter;
 import io.github.jhipster.service.filter.StringFilter;
 import io.github.jhipster.service.filter.InstantFilter;
@@ -50,7 +46,7 @@ public class UdfCriteria implements Serializable, Criteria {
 
     private UdfTypeFilter type;
 
-    private StringFilter avg;
+    private StringFilter dependency;
 
     private StringFilter createdBy;
 
@@ -71,7 +67,7 @@ public class UdfCriteria implements Serializable, Criteria {
         this.id = other.id == null ? null : other.id.copy();
         this.name = other.name == null ? null : other.name.copy();
         this.type = other.type == null ? null : other.type.copy();
-        this.avg = other.avg == null ? null : other.avg.copy();
+        this.dependency = other.dependency == null ? null : other.dependency.copy();
         this.createdBy = other.createdBy == null ? null : other.createdBy.copy();
         this.createdDate = other.createdDate == null ? null : other.createdDate.copy();
         this.lastModifiedBy = other.lastModifiedBy == null ? null : other.lastModifiedBy.copy();
@@ -109,12 +105,12 @@ public class UdfCriteria implements Serializable, Criteria {
         this.type = type;
     }
 
-    public StringFilter getAvg() {
-        return avg;
+    public StringFilter getDependency() {
+        return dependency;
     }
 
-    public void setAvg(StringFilter avg) {
-        this.avg = avg;
+    public void setDependency(StringFilter dependency) {
+        this.dependency = dependency;
     }
 
     public StringFilter getCreatedBy() {
@@ -179,7 +175,7 @@ public class UdfCriteria implements Serializable, Criteria {
             Objects.equals(id, that.id) &&
             Objects.equals(name, that.name) &&
             Objects.equals(type, that.type) &&
-            Objects.equals(avg, that.avg) &&
+            Objects.equals(dependency, that.dependency) &&
             Objects.equals(createdBy, that.createdBy) &&
             Objects.equals(createdDate, that.createdDate) &&
             Objects.equals(lastModifiedBy, that.lastModifiedBy) &&
@@ -194,7 +190,7 @@ public class UdfCriteria implements Serializable, Criteria {
         id,
         name,
         type,
-        avg,
+            dependency,
         createdBy,
         createdDate,
         lastModifiedBy,
@@ -210,7 +206,7 @@ public class UdfCriteria implements Serializable, Criteria {
                 (id != null ? "id=" + id + ", " : "") +
                 (name != null ? "name=" + name + ", " : "") +
                 (type != null ? "type=" + type + ", " : "") +
-                (avg != null ? "avg=" + avg + ", " : "") +
+                (dependency != null ? "dependency=" + dependency + ", " : "") +
                 (createdBy != null ? "createdBy=" + createdBy + ", " : "") +
                 (createdDate != null ? "createdDate=" + createdDate + ", " : "") +
                 (lastModifiedBy != null ? "lastModifiedBy=" + lastModifiedBy + ", " : "") +

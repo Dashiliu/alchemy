@@ -259,6 +259,11 @@ public class MysqlSideFunction implements ISideFunction<List<JsonObject>> {
         return rowList;
     }
 
+    @Override
+    public void close()  throws Exception{
+        sqlClient.close();
+    }
+
     private Row fillRecord(Row input, JsonObject value) {
         RowTypeInfo sideTable = this.sideTableInfo.getSideType();
         int sideSize = sideTable.getArity();

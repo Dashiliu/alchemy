@@ -25,7 +25,7 @@ public class SqlSubmitFlinkRequest extends AbstractSubmitRequest {
     public List<SourceDescriptor> sources;
     public List<UdfDescriptor> udfs;
     public List<SinkDescriptor> sinks;
-    private List<String> avgs;
+    private List<String> dependencies;
     private int parallelism = DEFAULT_PARALLELISM;
     private Integer maxParallelism;
     private String timeCharacteristic;
@@ -35,12 +35,12 @@ public class SqlSubmitFlinkRequest extends AbstractSubmitRequest {
     private CheckpointConfig checkpointCfg;
     private List<String> sqls;
 
-    public List<String> getAvgs() {
-        return avgs;
+    public List<String> getDependencies() {
+        return dependencies;
     }
 
-    public void setAvgs(List<String> avgs) {
-        this.avgs = avgs;
+    public void setDependencies(List<String> dependencies) {
+        this.dependencies = dependencies;
     }
 
     public int getParallelism() {

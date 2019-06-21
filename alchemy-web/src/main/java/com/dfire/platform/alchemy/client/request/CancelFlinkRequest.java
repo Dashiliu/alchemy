@@ -12,8 +12,6 @@ public class CancelFlinkRequest implements FlinkRequest {
 
     private String savepointDirectory;
 
-    private boolean test;
-
     public CancelFlinkRequest(String jobID) {
         this.jobID = jobID;
     }
@@ -48,12 +46,4 @@ public class CancelFlinkRequest implements FlinkRequest {
         this.savepointDirectory = savepointDirectory;
     }
 
-    @Override
-    public boolean isTest() {
-        return test;
-    }
-
-    public void setTest(boolean test) {
-        this.test = test;
-    }
 }

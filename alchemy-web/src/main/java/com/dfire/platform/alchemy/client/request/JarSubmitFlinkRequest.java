@@ -13,7 +13,7 @@ public class JarSubmitFlinkRequest extends AbstractSubmitRequest {
      */
     private boolean cache;
 
-    private String avg;
+    private String dependency;
 
     private Integer parallelism;
 
@@ -33,12 +33,12 @@ public class JarSubmitFlinkRequest extends AbstractSubmitRequest {
         this.cache = cache;
     }
 
-    public String getAvg() {
-        return avg;
+    public String getDependency() {
+        return dependency;
     }
 
-    public void setAvg(String avg) {
-        this.avg = avg;
+    public void setDependency(String dependency) {
+        this.dependency = dependency;
     }
 
     public Integer getParallelism() {
@@ -83,7 +83,7 @@ public class JarSubmitFlinkRequest extends AbstractSubmitRequest {
 
     @Override
     public void validate() throws Exception {
-        Assert.notNull(avg, "maven包不能为空");
+        Assert.notNull(dependency, "依赖包不能为空");
         Assert.notNull(parallelism, "并发数不能为空");
         Assert.notNull(entryClass, "main函数不能为空");
     }

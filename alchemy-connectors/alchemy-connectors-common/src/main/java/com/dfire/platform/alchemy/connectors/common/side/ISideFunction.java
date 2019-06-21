@@ -44,4 +44,7 @@ public interface ISideFunction<T> {
     }
 
     List<Row> fillRecord(Row input, T value);
+
+
+    void close() throws Exception;
 }

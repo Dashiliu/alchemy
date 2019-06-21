@@ -8,7 +8,7 @@ schema:
     - name: last
       type: VARCHAR
 connector:
-    path: /Users/dongbinglin/Code/platform/alchemy/alchemy-web/src/test/resources/source.csv
+    path: /Users/dongbinglin/Code/platform/alchemy-copy/alchemy-web/src/test/resources/source.csv
     field-delim: '#'
     row-delim: '$'
     ignore-first-line: true
