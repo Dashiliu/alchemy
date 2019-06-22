@@ -1110,6 +1110,19 @@
             </properties>
         </profile>
         <profile>
+            <id>daily</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-undertow</artifactId>
+                </dependency>
+            </dependencies>
+            <properties>
+                <!-- default Spring profiles -->
+                <spring.profiles.active>daily${profile.tls}${profile.no-liquibase}</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
             <id>prod</id>
             <dependencies>
                 <dependency>
