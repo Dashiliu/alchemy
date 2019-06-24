@@ -5,6 +5,7 @@ import com.dfire.platform.alchemy.common.Field;
 import com.dfire.platform.alchemy.common.TimeAttribute;
 import com.dfire.platform.alchemy.connectors.kafka.AlchemyKafkaTableSource;
 import com.dfire.platform.alchemy.util.PropertiesUtil;
+import com.dfire.platform.alchemy.util.TypeUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
@@ -13,7 +14,6 @@ import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.streaming.connectors.kafka.internals.KafkaTopicPartition;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.descriptors.KafkaValidator;
-import org.apache.flink.table.typeutils.TypeStringUtils;
 import org.apache.flink.types.Row;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.springframework.util.Assert;
@@ -138,7 +138,7 @@ public class KafkaConnectorDescriptor implements ConnectorDescriptor {
         TypeInformation[] columnTypes = new TypeInformation[schema.size()];
         for (int i = 0; i < schema.size(); i++) {
             columnNames[i] = schema.get(i).getName();
-            TypeInformation typeInformation = TypeStringUtils.readTypeInfo(schema.get(i).getType());
+            TypeInformation typeInformation = TypeUtils.readTypeInfo(schema.get(i).getType());
             if (typeInformation == null) {
                 throw new UnsupportedOperationException("Unsupported type:" + schema.get(i).getType());
             }

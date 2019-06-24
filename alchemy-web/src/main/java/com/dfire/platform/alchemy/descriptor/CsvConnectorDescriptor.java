@@ -2,9 +2,9 @@ package com.dfire.platform.alchemy.descriptor;
 
 import com.dfire.platform.alchemy.common.Constants;
 import com.dfire.platform.alchemy.common.Field;
+import com.dfire.platform.alchemy.util.TypeUtils;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.table.sources.CsvTableSource;
-import org.apache.flink.table.typeutils.TypeStringUtils;
 import org.springframework.util.Assert;
 
 import java.util.List;
@@ -39,7 +39,7 @@ public class CsvConnectorDescriptor implements ConnectorDescriptor {
         TypeInformation[] columnTypes = new TypeInformation[schema.size()];
         for (int i = 0; i < schema.size(); i++) {
             columnNames[i] = schema.get(i).getName();
-            TypeInformation typeInformation = TypeStringUtils.readTypeInfo(schema.get(i).getType());
+            TypeInformation typeInformation = TypeUtils.readTypeInfo(schema.get(i).getType());
             if (typeInformation == null) {
                 throw new UnsupportedOperationException("Unsupported type:" + schema.get(i).getType());
             }

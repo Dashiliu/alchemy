@@ -8,7 +8,6 @@ import org.apache.flink.formats.json.JsonRowSerializationSchema;
 import org.apache.flink.metrics.Counter;
 import org.apache.flink.streaming.connectors.elasticsearch.ElasticsearchSinkFunction;
 import org.apache.flink.streaming.connectors.elasticsearch.RequestIndexer;
-import org.apache.flink.table.shaded.org.apache.commons.lang3.StringUtils;
 import org.apache.flink.types.Row;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Requests;
@@ -16,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 
 public class ElasticsearchTableFunction implements MetricFunction,  ElasticsearchSinkFunction<Row>, Serializable {
 
@@ -26,11 +24,9 @@ public class ElasticsearchTableFunction implements MetricFunction,  Elasticsearc
 
     private static final String ELASTICSEARCH_METRICS_GROUP = "Elasticsearch";
 
-    private final SimpleDateFormat dateFormat;
-
-    private static final String SPLIT = "-";
-
     private final String index;
+
+    private final String type;
 
     private final Integer fieldIndex;
 
@@ -43,17 +39,18 @@ public class ElasticsearchTableFunction implements MetricFunction,  Elasticsearc
 
     public ElasticsearchTableFunction(String index,
                                       Integer fieldIndex,
-                                      String formatDate,
+                                      String type,
                                       JsonRowSerializationSchema jsonRowSchema,
                                       MapFunction<byte[], byte[]> mapFunction) {
+        if(type == null){
+            this.type = "*";
+        }else{
+            this.type = type;
+        }
+
         this.index = index;
         this.jsonRowSchema = jsonRowSchema;
         this.fieldIndex = fieldIndex;
-        if (StringUtils.isNotBlank(formatDate)){
-            this.dateFormat = new SimpleDateFormat(formatDate);
-        }else {
-            this.dateFormat = new SimpleDateFormat("yyyy.MM.dd");
-        }
         this.mapFunction = mapFunction;
     }
 
@@ -63,12 +60,12 @@ public class ElasticsearchTableFunction implements MetricFunction,  Elasticsearc
         if (row == null ) {
             return;
         }
-        requestIndexer.add(createIndexRequest(row));
+        requestIndexer.add(createIndexRequest(row, runtimeContext));
         numRecordsOut = createOrGet(numRecordsOut, runtimeContext);
         numRecordsOut.inc();
     }
 
-    private IndexRequest createIndexRequest(Row row) {
+    private IndexRequest createIndexRequest(Row row, RuntimeContext  runtimeContext) {
         byte[] source = this.jsonRowSchema.serialize(row);
         if(mapFunction != null){
             try {
@@ -77,8 +74,8 @@ public class ElasticsearchTableFunction implements MetricFunction,  Elasticsearc
                 logger.error("Map Failed", e);
             }
         }
-        return Requests.indexRequest().index(getIndex(row) + SPLIT + dateFormat.format(System.currentTimeMillis()))
-                .id(RandomUtils.uuid()).type("*").source(source);
+        return Requests.indexRequest().index(getIndex(row))
+                .id(RandomUtils.uuid()).type(type).source(source);
     }
 
 

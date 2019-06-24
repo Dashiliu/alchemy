@@ -5,9 +5,10 @@ import com.dfire.platform.alchemy.api.common.Side;
 import com.dfire.platform.alchemy.api.util.SideParser;
 import com.dfire.platform.alchemy.common.Field;
 import com.dfire.platform.alchemy.connectors.common.side.AbstractAsyncSideFunction;
-import com.dfire.platform.alchemy.connectors.common.side.SideTable;
 import com.dfire.platform.alchemy.connectors.common.side.AbstractSyncSideFunction;
+import com.dfire.platform.alchemy.connectors.common.side.SideTable;
 import com.dfire.platform.alchemy.descriptor.SourceDescriptor;
+import com.dfire.platform.alchemy.util.TypeUtils;
 import org.apache.calcite.sql.JoinType;
 import org.apache.calcite.sql.SqlJoin;
 import org.apache.calcite.sql.SqlNodeList;
@@ -19,7 +20,6 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.api.java.StreamTableEnvironment;
-import org.apache.flink.table.typeutils.TypeStringUtils;
 import org.apache.flink.types.Row;
 
 import java.util.ArrayList;
@@ -138,10 +138,10 @@ public class SideStream {
         Map<String, TypeInformation> types = new HashMap<>(size);
         for (int i = 0; i < fields.size(); i++) {
             if (all) {
-                types.put(fields.get(i).getName(), TypeStringUtils.readTypeInfo(fields.get(i).getType()));
+                types.put(fields.get(i).getName(), TypeUtils.readTypeInfo(fields.get(i).getType()));
             } else {
                 if (selectField.contains(fields.get(i).getName())) {
-                    types.put(fields.get(i).getName(), TypeStringUtils.readTypeInfo(fields.get(i).getType()));
+                    types.put(fields.get(i).getName(), TypeUtils.readTypeInfo(fields.get(i).getType()));
                 }
             }
         }

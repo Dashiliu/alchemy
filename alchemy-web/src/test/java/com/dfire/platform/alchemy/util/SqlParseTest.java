@@ -2,7 +2,10 @@ package com.dfire.platform.alchemy.util;
 
 import com.dfire.platform.alchemy.service.util.SqlParseUtil;
 import com.google.common.collect.Lists;
+import org.apache.calcite.config.Lex;
+import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.parser.SqlParseException;
+import org.apache.calcite.sql.parser.SqlParser;
 import org.junit.Test;
 
 import java.util.List;
@@ -10,6 +13,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class SqlParseTest {
+
+    private static final SqlParser.Config CONFIG = SqlParser.configBuilder().setLex(Lex.MYSQL).build();
 
     @Test
     public void parse() throws SqlParseException {
@@ -27,5 +32,12 @@ public class SqlParseTest {
         List<String> querySqls = SqlParseUtil.findQuerySql(sqls);
         assertThat(querySqls.get(0)).startsWith("SELECT");
         assertThat(querySqls.get(1)).startsWith("SELECT");
+    }
+
+
+    public static void main(String[] args) throws SqlParseException {
+        String sql ="insert into satellite_es_sink select k.*, DATE_FORMAT(ss, '%Y.%d.%M') as ff , CONCAT('satellite-collector-', k.appKey , '-') as index from kafka_satellite k where FIND_APPKEY(k.properties) IS NOT NULL";
+        SqlParser sqlParser = SqlParser.create(sql, CONFIG);
+        SqlNode sqlNode = sqlParser.parseStmt();
     }
 }

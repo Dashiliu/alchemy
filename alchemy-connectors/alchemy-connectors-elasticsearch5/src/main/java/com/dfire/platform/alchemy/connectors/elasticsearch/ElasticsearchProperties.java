@@ -11,21 +11,21 @@ public class ElasticsearchProperties implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private  String transports;
+    private String transports;
 
-    private  String clusterName;
+    private String clusterName;
 
-    private  String index;
+    private String indexType;
 
-    private  String indexField;
+    private String index;
 
-    private  String dateFormat;
+    private String indexField;
 
     private String failureHandler;
 
     private String mapClazz;
 
-    private  Map<String, Object> config;
+    private Map<String, Object> config;
 
     public String getTransports() {
         return transports;
@@ -67,14 +67,6 @@ public class ElasticsearchProperties implements Serializable {
         this.failureHandler = failureHandler;
     }
 
-    public String getDateFormat() {
-        return dateFormat;
-    }
-
-    public void setDateFormat(String dateFormat) {
-        this.dateFormat = dateFormat;
-    }
-
     public Map<String, Object> getConfig() {
         return config;
     }
@@ -89,5 +81,13 @@ public class ElasticsearchProperties implements Serializable {
 
     public void setMapClazz(String mapClazz) {
         this.mapClazz = mapClazz;
+    }
+
+    public String getIndexType() {
+        return indexType;
+    }
+
+    public void setIndexType(String indexType) {
+        this.indexType = indexType;
     }
 }
