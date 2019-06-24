@@ -6,6 +6,7 @@ import { JhiEventManager } from 'ng-jhipster';
 
 import { IJob } from 'app/shared/model/job.model';
 import { JobService } from './job.service';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 
 @Component({
   selector: 'jhi-job-submit-dialog',
@@ -16,9 +17,7 @@ export class JobSubmitDialogComponent {
   message: any;
   job: IJob;
 
-  constructor(protected jobService: JobService,
-              public activeModal: NgbActiveModal,
-              protected eventManager: JhiEventManager) {}
+  constructor(protected jobService: JobService, public activeModal: NgbActiveModal, protected eventManager: JhiEventManager) {}
 
   clear() {
     this.activeModal.dismiss('submit');
@@ -26,18 +25,23 @@ export class JobSubmitDialogComponent {
 
   confirmSubmit(id: number) {
     this.disabled = true;
-    this.jobService.submit(id).subscribe(response => {
-      this.disabled = false;
-      if(response && response.body.success){
-        this.eventManager.broadcast({
-          name: 'jobListModification',
-          content: 'submit an job'
-        });
-        this.activeModal.dismiss(true);
-      }else{
-        this.message = response.body;
+    this.jobService.submit(id).subscribe(
+      response => {
+        this.disabled = false;
+        if (response && response.body.success) {
+          this.eventManager.broadcast({
+            name: 'jobListModification',
+            content: 'submit an job'
+          });
+          this.activeModal.dismiss(true);
+        } else {
+          this.message = response.body;
+        }
+      },
+      (res: HttpErrorResponse) => {
+        this.message = res.message;
       }
-    });
+    );
   }
 }
 

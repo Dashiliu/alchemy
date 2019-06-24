@@ -23,7 +23,6 @@
             <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="transition.bind(this)">
             <th jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="name"><span jhiTranslate="alchemyApp.job.name">Name</span> <fa-icon [icon]="'sort'"></fa-icon></th>
-            <th jhiSortBy="businessId"><span jhiTranslate="alchemyApp.job.business">Business</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="clusterId"><span jhiTranslate="alchemyApp.job.cluster">Cluster</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="type"><span jhiTranslate="alchemyApp.job.type">Type</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th jhiSortBy="remark"><span jhiTranslate="alchemyApp.job.remark">Remark</span> <fa-icon [icon]="'sort'"></fa-icon></th>
@@ -40,11 +39,6 @@
             <tr *ngFor="let job of jobs ;trackBy: trackId">
                 <td><a [routerLink]="['/job', job.id, 'view' ]">{{job.id}}</a></td>
                 <td>{{job.name}}</td>
-                <td>
-                    <div *ngIf="job.businessId">
-                        <a [routerLink]="['../business', job.businessId , 'view' ]" >{{job.businessId}}</a>
-                    </div>
-                </td>
                 <td>
                     <div *ngIf="job.clusterId">
                         <a [routerLink]="['../cluster', job.clusterId , 'view' ]" >{{job.clusterId}}</a>
