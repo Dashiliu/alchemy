@@ -15,7 +15,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <HikariCP.versoin>2.6.0</HikariCP.versoin>
+        <HikariCP.versoin>3.2.0</HikariCP.versoin>
         <vertx.version>3.7.0</vertx.version>
         <mysql.version>5.1.44</mysql.version>
     </properties>
