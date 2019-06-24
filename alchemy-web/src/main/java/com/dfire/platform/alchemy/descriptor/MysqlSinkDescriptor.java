@@ -1,10 +1,10 @@
 package com.dfire.platform.alchemy.descriptor;
 
 import com.dfire.platform.alchemy.common.Constants;
+import com.dfire.platform.alchemy.util.TypeUtils;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.io.jdbc.JDBCAppendTableSink;
 import org.apache.flink.api.java.io.jdbc.JDBCAppendTableSinkBuilder;
-import org.apache.flink.table.typeutils.TypeStringUtils;
 import org.springframework.util.Assert;
 
 /**
@@ -122,7 +122,7 @@ public class MysqlSinkDescriptor extends SinkDescriptor {
         }
         TypeInformation[] parameterTypes = new TypeInformation[this.parameterTypes.length];
         for (int i = 0; i < this.parameterTypes.length; i++) {
-            parameterTypes[i] = TypeStringUtils.readTypeInfo(this.parameterTypes[i]);
+            parameterTypes[i] = TypeUtils.readTypeInfo(this.parameterTypes[i]);
         }
         return parameterTypes;
     }

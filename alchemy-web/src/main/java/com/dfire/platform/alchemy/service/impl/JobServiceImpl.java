@@ -268,18 +268,15 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public Response cancel(Long id) throws Exception {
-        Optional<Job> jobOptional = jobRepository.findById(id);
-        Job job = jobOptional.get();
-        if (job.getCluster() == null) {
-            return new Response(false, "the job's cluster is null ");
-        }
-        final FlinkClient client = clientManager.getClient(job.getCluster().getId());
-        CancelFlinkRequest cancelFlinkRequest = new CancelFlinkRequest(job.getClusterJobId());
-        return client.cancel(cancelFlinkRequest);
+        return cancelWithSavepoint(id, false, null);
     }
 
     @Override
     public Response cancelWithSavepoint(Long id, String savepointDirectory) throws Exception {
+       return cancelWithSavepoint(id, true, savepointDirectory);
+    }
+
+    private Response cancelWithSavepoint(Long id, boolean savepoint,  String savepointDirectory) throws Exception {
         Optional<Job> jobOptional = jobRepository.findById(id);
         Job job = jobOptional.get();
         if (job.getCluster() == null) {
@@ -287,8 +284,13 @@ public class JobServiceImpl implements JobService {
         }
         final FlinkClient client = clientManager.getClient(job.getCluster().getId());
         CancelFlinkRequest cancelFlinkRequest
-            = new CancelFlinkRequest(job.getClusterJobId(), true, savepointDirectory);
-        return client.cancel(cancelFlinkRequest);
+            = new CancelFlinkRequest(job.getClusterJobId(), savepoint, savepointDirectory);
+        Response response = client.cancel(cancelFlinkRequest);
+        if(response.isSuccess()){
+            job.setStatus(JobStatus.CANCELED);
+            jobRepository.save(job);
+        }
+        return response;
     }
 
     @Override

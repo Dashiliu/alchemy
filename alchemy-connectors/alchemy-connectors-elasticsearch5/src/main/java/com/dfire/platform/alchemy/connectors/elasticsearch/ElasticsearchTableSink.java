@@ -80,7 +80,7 @@ public class ElasticsearchTableSink implements AppendStreamTableSink<Row> {
             new ElasticsearchTableFunction(
                     this.elasticsearchProperties.getIndex(),
                     fieldIndex ,
-                    this.elasticsearchProperties.getDateFormat(),
+                    this.elasticsearchProperties.getIndexType(),
                     jsonRowSchema,
                     mapFunction),
                 actionRequestFailureHandler);

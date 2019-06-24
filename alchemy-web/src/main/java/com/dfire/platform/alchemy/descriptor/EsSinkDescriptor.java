@@ -26,12 +26,12 @@ public class EsSinkDescriptor extends SinkDescriptor {
      */
     private String index;
 
+    private String indexType;
+
     /**
      * 指定索引在row中的的字段，动态从row中获取索引
      */
     private String indexField;
-
-    private String dateFormat;
 
     private String failureHandler;
 
@@ -78,14 +78,6 @@ public class EsSinkDescriptor extends SinkDescriptor {
         this.indexField = indexField;
     }
 
-    public String getDateFormat() {
-        return dateFormat;
-    }
-
-    public void setDateFormat(String dateFormat) {
-        this.dateFormat = dateFormat;
-    }
-
     public Map<String, Object> getConfig() {
         return config;
     }
@@ -100,6 +92,14 @@ public class EsSinkDescriptor extends SinkDescriptor {
 
     public void setFailureHandler(String failureHandler) {
         this.failureHandler = failureHandler;
+    }
+
+    public String getIndexType() {
+        return indexType;
+    }
+
+    public void setIndexType(String indexType) {
+        this.indexType = indexType;
     }
 
     @Override

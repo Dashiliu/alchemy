@@ -5,13 +5,13 @@ import com.dfire.platform.alchemy.common.Field;
 import com.dfire.platform.alchemy.common.TimeAttribute;
 import com.dfire.platform.alchemy.connectors.rocketmq.RocketMQConsumerProperties;
 import com.dfire.platform.alchemy.connectors.rocketmq.RocketMQTableSource;
+import com.dfire.platform.alchemy.util.TypeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.sources.RowtimeAttributeDescriptor;
-import org.apache.flink.table.typeutils.TypeStringUtils;
 import org.apache.flink.types.Row;
 import org.springframework.util.Assert;
 
@@ -154,7 +154,7 @@ public class RocketMQConnectorDescriptor implements ConnectorDescriptor {
         RowtimeAttributeDescriptor rowtimeAttributeDescriptor = null;
         for (int i = 0; i < schema.size(); i++) {
             columnNames[i] = schema.get(i).getName();
-            TypeInformation typeInformation = TypeStringUtils.readTypeInfo(schema.get(i).getType());
+            TypeInformation typeInformation = TypeUtils.readTypeInfo(schema.get(i).getType());
             if (typeInformation == null) {
                 throw new UnsupportedOperationException("Unsupported type:" + schema.get(i).getType());
             }
