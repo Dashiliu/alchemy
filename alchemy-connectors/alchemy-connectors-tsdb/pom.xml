@@ -24,6 +24,12 @@
             <groupId>com.aliyun</groupId>
             <artifactId>hitsdb-client</artifactId>
             <version>${hitsdb.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
