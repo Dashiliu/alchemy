@@ -76,7 +76,7 @@ alchemy:
     release: http://nexus-ci.app.2dfire.com/repository/maven-public/
     snapshot: http://nexus-ci.app.2dfire.com/repository/maven-public/
   dingtalk:
-    webhook: https://oapi.dingtalk.com/robot/send?access_token=2f53afd165e81fc80dfef4d08b26a590fef1a9ffd415448aec8fec08574caf93
+  #  webhook: https://oapi.dingtalk.com/robot/send?access_token=2f53afd165e81fc80dfef4d08b26a590fef1a9ffd415448aec8fec08574caf93
 # ===================================================================
 # JHipster specific properties
 #

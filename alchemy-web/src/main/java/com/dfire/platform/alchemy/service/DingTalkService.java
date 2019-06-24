@@ -1,6 +1,7 @@
 package com.dfire.platform.alchemy.service;
 
 
+import org.apache.flink.table.shaded.org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -32,6 +33,9 @@ public class DingTalkService {
      * @param atMobiles   被@人的手机号(在text内容里要有@手机号)
      */
     public void sendMessage(String title,String text,String[] atMobiles){
+        if(StringUtils.isEmpty(webhook)){
+            return;
+        }
         MarkdownMessage markdownMessage=new MarkdownMessage(title,text,atMobiles);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
