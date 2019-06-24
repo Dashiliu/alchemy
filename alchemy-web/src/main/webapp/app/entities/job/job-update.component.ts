@@ -9,7 +9,7 @@ import { DATE_TIME_FORMAT } from 'app/shared/constants/input.constants';
 import { JhiAlertService } from 'ng-jhipster';
 import { IJob, Job } from 'app/shared/model/job.model';
 import { JobService } from './job.service';
-import {Business, IBusiness} from 'app/shared/model/business.model';
+import { Business, IBusiness } from 'app/shared/model/business.model';
 import { ICluster } from 'app/shared/model/cluster.model';
 import { ClusterService } from 'app/entities/cluster';
 import 'codemirror/mode/yaml/yaml';
@@ -23,7 +23,7 @@ export class JobUpdateComponent implements OnInit {
   isSaving: boolean;
   yamlConfig: any = { lineNumbers: true, mode: 'text/x-yaml', theme: 'material' };
 
-  businesse: IBusiness;
+  business: IBusiness;
 
   clusters: ICluster[];
 
@@ -54,22 +54,23 @@ export class JobUpdateComponent implements OnInit {
   ngOnInit() {
     this.isSaving = false;
     this.activatedRoute.data.subscribe(({ business }) => {
-      if(business){
-        this.businesse = business;
+      if (business) {
+        this.business = business;
         this.job = new Job();
       }
     });
     this.activatedRoute.data.subscribe(({ job }) => {
-      if(job){
+      if (job) {
         this.updateForm(job);
         this.job = job;
-        this.businesse = new Business();
-        this.businesse.id = this.job.businessId;
+        this.business = new Business();
+        this.business.id = this.job.businessId;
       }
-
     });
     this.clusterService
-      .query()
+      .query({
+        'businessId.equals': this.business.id
+      })
       .pipe(
         filter((mayBeOk: HttpResponse<ICluster[]>) => mayBeOk.ok),
         map((response: HttpResponse<ICluster[]>) => response.body)
@@ -127,7 +128,7 @@ export class JobUpdateComponent implements OnInit {
         this.editForm.get(['lastModifiedDate']).value != null
           ? moment(this.editForm.get(['lastModifiedDate']).value, DATE_TIME_FORMAT)
           : undefined,
-      businessId: this.businesse.id,
+      businessId: this.business.id,
       clusterId: this.editForm.get(['clusterId']).value
     };
     return entity;

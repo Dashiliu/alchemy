@@ -231,10 +231,13 @@ public class JobServiceImpl implements JobService {
         List<UdfDescriptor> udfDescriptors = new ArrayList<>(udfNames.size());
         for (String name : udfNames) {
             Optional<Udf> udfOptional = udfRepository.findOneByBusinessIdAndName(job.getBusiness().getId(), name);
-            if (!udfOptional.isPresent()) {
-                throw new IllegalArgumentException("table udf：" + name + "doesn't exist");
+            if (udfOptional.isPresent()) {
+                udfDescriptors.add(UdfDescriptor.from(udfOptional.get()));
+            }else{
+                //flink自定义的函数也属于table udf
+                log.warn("table udf：{} doesn't exist in alchemy", name);
             }
-            udfDescriptors.add(UdfDescriptor.from(udfOptional.get()));
+
         }
         return udfDescriptors;
     }
