@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.dfire.platform.alchemy.client.OpenshiftClusterInfo;
 import com.dfire.platform.alchemy.util.JsonUtil;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -70,8 +71,8 @@ public class OpenshiftService {
     private String loadTemplate(String fileName) throws IOException {
         FileInputStream fileInputStream = null;
         try {
-            File file = ResourceUtils.getFile("classpath:templates/openshift/" + fileName);
-            fileInputStream = new FileInputStream(file);
+            ClassPathResource resource = new ClassPathResource("templates/openshift/" + fileName);
+            fileInputStream = new FileInputStream(resource.getFile());
             int size = Integer.parseInt(String.valueOf(fileInputStream.getChannel().size()));
             byte[] data = new byte[size];
             fileInputStream.read(data);
