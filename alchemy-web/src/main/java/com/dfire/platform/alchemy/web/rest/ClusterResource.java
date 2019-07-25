@@ -3,6 +3,7 @@ package com.dfire.platform.alchemy.web.rest;
 import com.dfire.platform.alchemy.client.ClientManager;
 import com.dfire.platform.alchemy.client.FlinkClient;
 import com.dfire.platform.alchemy.client.OpenshiftClusterInfo;
+import com.dfire.platform.alchemy.domain.enumeration.ClusterType;
 import com.dfire.platform.alchemy.security.SecurityUtils;
 import com.dfire.platform.alchemy.service.ClusterQueryService;
 import com.dfire.platform.alchemy.service.ClusterService;
@@ -84,12 +85,15 @@ public class ClusterResource {
         if (clusterDTO.getId() != null) {
             throw new BadRequestAlertException("A new cluster cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        OpenshiftClusterInfo openshiftClusterInfo = BindPropertiesUtil.bindProperties(clusterDTO.getConfig(), OpenshiftClusterInfo.class);
-        openshiftService.create(openshiftClusterInfo);
-        String webUrl = openshiftService.queryWebUrl(openshiftClusterInfo);
-        if(webUrl != null){
-            openshiftClusterInfo.setWebUrl(webUrl);
-            clusterDTO.setConfig(BindPropertiesUtil.write(openshiftClusterInfo));
+        ClusterType clusterType = clusterDTO.getType();
+        if(clusterType == ClusterType.OPENSHIFT){
+            OpenshiftClusterInfo openshiftClusterInfo = BindPropertiesUtil.bindProperties(clusterDTO.getConfig(), OpenshiftClusterInfo.class);
+            openshiftService.create(openshiftClusterInfo);
+            String webUrl = openshiftService.queryWebUrl(openshiftClusterInfo);
+            if(webUrl != null){
+                openshiftClusterInfo.setWebUrl(webUrl);
+                clusterDTO.setConfig(BindPropertiesUtil.write(openshiftClusterInfo));
+            }
         }
         Optional<String> loginUser = SecurityUtils.getCurrentUserLogin();
         if (!loginUser.isPresent()) {
@@ -105,7 +109,7 @@ public class ClusterResource {
                 .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
                 .body(result);
         }catch (Exception e){
-            openshiftService.delete(openshiftClusterInfo);
+            deleteOpenshiftCluster(clusterDTO);
             throw e;
         }
     }
@@ -125,8 +129,11 @@ public class ClusterResource {
         if (clusterDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        OpenshiftClusterInfo openshiftClusterInfo = BindPropertiesUtil.bindProperties(clusterDTO.getConfig(), OpenshiftClusterInfo.class);
-        openshiftService.update(openshiftClusterInfo);
+        ClusterType clusterType = clusterDTO.getType();
+        if(clusterType == ClusterType.OPENSHIFT){
+            OpenshiftClusterInfo openshiftClusterInfo = BindPropertiesUtil.bindProperties(clusterDTO.getConfig(), OpenshiftClusterInfo.class);
+            openshiftService.update(openshiftClusterInfo);
+        }
         Optional<String> loginUser = SecurityUtils.getCurrentUserLogin();
         if (!loginUser.isPresent()) {
             throw new BadRequestAlertException("No user was found for this cluster", ENTITY_NAME, "usernotlogin");
@@ -199,10 +206,17 @@ public class ClusterResource {
         log.debug("REST request to delete Cluster : {}", id);
         Optional<ClusterDTO> clusterDTO = clusterService.findOne(id);
         if (clusterDTO.isPresent()) {
-            OpenshiftClusterInfo openshiftClusterInfo = BindPropertiesUtil.bindProperties(clusterDTO.get().getConfig(), OpenshiftClusterInfo.class);
-            openshiftService.delete(openshiftClusterInfo);
+            deleteOpenshiftCluster(clusterDTO.get());
             clusterService.delete(id);
         }
         return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
+    }
+
+    private void deleteOpenshiftCluster(ClusterDTO clusterDTO) throws Exception {
+        ClusterType clusterType = clusterDTO.getType();
+        if(clusterType == ClusterType.OPENSHIFT){
+            OpenshiftClusterInfo openshiftClusterInfo = BindPropertiesUtil.bindProperties(clusterDTO.getConfig(), OpenshiftClusterInfo.class);
+            openshiftService.delete(openshiftClusterInfo);
+        }
     }
 }
