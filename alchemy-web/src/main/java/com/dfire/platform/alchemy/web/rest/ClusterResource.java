@@ -2,11 +2,14 @@ package com.dfire.platform.alchemy.web.rest;
 
 import com.dfire.platform.alchemy.client.ClientManager;
 import com.dfire.platform.alchemy.client.FlinkClient;
+import com.dfire.platform.alchemy.client.OpenshiftClusterInfo;
 import com.dfire.platform.alchemy.security.SecurityUtils;
 import com.dfire.platform.alchemy.service.ClusterQueryService;
 import com.dfire.platform.alchemy.service.ClusterService;
+import com.dfire.platform.alchemy.service.OpenshiftService;
 import com.dfire.platform.alchemy.service.dto.ClusterCriteria;
 import com.dfire.platform.alchemy.service.dto.ClusterDTO;
+import com.dfire.platform.alchemy.util.BindPropertiesUtil;
 import com.dfire.platform.alchemy.web.rest.errors.BadRequestAlertException;
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.PaginationUtil;
@@ -19,7 +22,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
@@ -51,10 +62,13 @@ public class ClusterResource {
 
     private final ClientManager clientManager;
 
-    public ClusterResource(ClusterService clusterService, ClusterQueryService clusterQueryService, ClientManager clientManager) {
+    private final OpenshiftService openshiftService;
+
+    public ClusterResource(ClusterService clusterService, ClusterQueryService clusterQueryService, ClientManager clientManager, OpenshiftService openshiftService) {
         this.clusterService = clusterService;
         this.clusterQueryService = clusterQueryService;
         this.clientManager = clientManager;
+        this.openshiftService = openshiftService;
     }
 
     /**
@@ -70,18 +84,30 @@ public class ClusterResource {
         if (clusterDTO.getId() != null) {
             throw new BadRequestAlertException("A new cluster cannot already have an ID", ENTITY_NAME, "idexists");
         }
+        OpenshiftClusterInfo openshiftClusterInfo = BindPropertiesUtil.bindProperties(clusterDTO.getConfig(), OpenshiftClusterInfo.class);
+        openshiftService.create(openshiftClusterInfo);
+        String webUrl = openshiftService.queryWebUrl(openshiftClusterInfo);
+        if(webUrl != null){
+            openshiftClusterInfo.setWebUrl(webUrl);
+            clusterDTO.setConfig(BindPropertiesUtil.write(openshiftClusterInfo));
+        }
         Optional<String> loginUser = SecurityUtils.getCurrentUserLogin();
-        if(!loginUser.isPresent()){
+        if (!loginUser.isPresent()) {
             throw new BadRequestAlertException("No user was found for this cluster", ENTITY_NAME, "usernotlogin");
         }
         clusterDTO.setCreatedBy(loginUser.get());
         clusterDTO.setLastModifiedBy(loginUser.get());
         clusterDTO.setCreatedDate(Instant.now());
         clusterDTO.setLastModifiedDate(Instant.now());
-        ClusterDTO result = clusterService.save(clusterDTO);
-        return ResponseEntity.created(new URI("/api/clusters/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        try {
+            ClusterDTO result = clusterService.save(clusterDTO);
+            return ResponseEntity.created(new URI("/api/clusters/" + result.getId()))
+                .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+                .body(result);
+        }catch (Exception e){
+            openshiftService.delete(openshiftClusterInfo);
+            throw e;
+        }
     }
 
     /**
@@ -99,8 +125,10 @@ public class ClusterResource {
         if (clusterDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
+        OpenshiftClusterInfo openshiftClusterInfo = BindPropertiesUtil.bindProperties(clusterDTO.getConfig(), OpenshiftClusterInfo.class);
+        openshiftService.update(openshiftClusterInfo);
         Optional<String> loginUser = SecurityUtils.getCurrentUserLogin();
-        if(!loginUser.isPresent()){
+        if (!loginUser.isPresent()) {
             throw new BadRequestAlertException("No user was found for this cluster", ENTITY_NAME, "usernotlogin");
         }
         clusterDTO.setCreatedDate(Instant.now());
@@ -155,8 +183,8 @@ public class ClusterResource {
     public ResponseEntity<Map> getClusterWebUrl(@PathVariable Long id) {
         log.debug("REST request to get Cluster : {}", id);
         FlinkClient flinkClient = clientManager.getClient(id);
-        Map<String,Object> result = new HashMap<>(1);
-        result.put("url",  flinkClient.getWebInterfaceURL());
+        Map<String, Object> result = new HashMap<>(1);
+        result.put("url", flinkClient.getWebInterfaceURL());
         return ResponseEntity.ok().body(result);
     }
 
@@ -167,9 +195,14 @@ public class ClusterResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/clusters/{id}")
-    public ResponseEntity<Void> deleteCluster(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteCluster(@PathVariable Long id) throws Exception {
         log.debug("REST request to delete Cluster : {}", id);
-        clusterService.delete(id);
+        Optional<ClusterDTO> clusterDTO = clusterService.findOne(id);
+        if (clusterDTO.isPresent()) {
+            OpenshiftClusterInfo openshiftClusterInfo = BindPropertiesUtil.bindProperties(clusterDTO.get().getConfig(), OpenshiftClusterInfo.class);
+            openshiftService.delete(openshiftClusterInfo);
+            clusterService.delete(id);
+        }
         return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
     }
 }

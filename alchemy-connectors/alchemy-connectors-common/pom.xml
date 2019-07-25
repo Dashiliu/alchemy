@@ -22,7 +22,6 @@
             <groupId>com.dfire.platform</groupId>
             <artifactId>alchemy-api</artifactId>
             <version>${project.parent.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
@@ -31,12 +30,17 @@
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-table_${scala.binary.version}</artifactId>
+            <artifactId>flink-table-planner_${scala.binary.version}</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-streaming-java_${scala.binary.version}</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-elasticsearch-base_${scala.binary.version}</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>

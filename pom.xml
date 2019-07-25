@@ -15,6 +15,7 @@
     <artifactId>alchemy</artifactId>
     <packaging>pom</packaging>
     <version>0.1.1-SNAPSHOT</version>
+
     <modules>
         <module>alchemy-api</module>
         <module>alchemy-connectors</module>
@@ -22,14 +23,36 @@
         <module>alchemy-web</module>
     </modules>
 
+    <developers>
+        <developer>
+            <id>congbai</id>
+            <name>dongbinglin</name>
+            <email>congbai@2dfire.com</email>
+            <organizationUrl>https://2dfire.com</organizationUrl>
+        </developer>
+        <developer>
+            <id>yuntun</id>
+            <name>songzhan</name>
+            <email>yuntun@2dfire.com</email>
+            <organizationUrl>https://2dfire.com</organizationUrl>
+        </developer>
+        <developer>
+            <id>lianxu</id>
+            <name>shenglianjun</name>
+            <email>lianxu@2dfire.com</email>
+            <organizationUrl>https://2dfire.com</organizationUrl>
+        </developer>
+    </developers>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <flink.version>1.5.4</flink.version>
+        <hadoop.version>2.4.1</hadoop.version>
+        <flink.version>1.8.0</flink.version>
         <scala.binary.version>2.11</scala.binary.version>
         <scala.version>2.11.11</scala.version>
         <maven.compiler.source>1.7</maven.compiler.source>
         <lombok.version>1.16.18</lombok.version>
-        <fastjson.versoiin>1.2.46</fastjson.versoiin>
+        <fastjson.versoiin>1.2.58</fastjson.versoiin>
         <commons-io.version>2.6</commons-io.version>
         <groovy.version>2.4.11</groovy.version>
         <slf4j-api.version>1.7.7</slf4j-api.version>
@@ -80,7 +103,17 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.flink</groupId>
-                <artifactId>flink-table_${scala.binary.version}</artifactId>
+                <artifactId>flink-connector-kafka-0.11_${scala.binary.version}</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-connector-kafka_${scala.binary.version}</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-table-planner_${scala.binary.version}</artifactId>
                 <version>${flink.version}</version>
             </dependency>
             <dependency>
@@ -95,7 +128,12 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.flink</groupId>
-                <artifactId>flink-jdbc</artifactId>
+                <artifactId>flink-jdbc_${scala.binary.version}</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-connector-elasticsearch-base_${scala.binary.version}</artifactId>
                 <version>${flink.version}</version>
             </dependency>
             <dependency>
@@ -105,12 +143,17 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.flink</groupId>
-                <artifactId>flink-shaded-hadoop2</artifactId>
+                <artifactId>flink-connector-elasticsearch6_${scala.binary.version}</artifactId>
                 <version>${flink.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.flink</groupId>
-                <artifactId>flink-sql-client</artifactId>
+                <artifactId>flink-shaded-hadoop2</artifactId>
+                <version>${hadoop.version}-${flink.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-sql-client_${scala.binary.version}</artifactId>
                 <version>${flink.version}</version>
             </dependency>
             <dependency>
@@ -160,7 +203,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.2</version>
+                <version>3.8.1</version>
                 <inherited>true</inherited>
                 <configuration>
                     <source>1.8</source>

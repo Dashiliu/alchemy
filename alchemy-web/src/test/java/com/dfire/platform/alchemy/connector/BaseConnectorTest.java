@@ -13,11 +13,13 @@ import com.dfire.platform.alchemy.domain.enumeration.SourceType;
 import com.dfire.platform.alchemy.domain.enumeration.TableType;
 import com.dfire.platform.alchemy.util.BindPropertiesUtil;
 import org.junit.Before;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.ResourceUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 public class BaseConnectorTest {
 
@@ -25,9 +27,10 @@ public class BaseConnectorTest {
 
     @Before
     public void before() throws Exception {
+        UrlJarLoader jarLoader = new UrlJarLoader(null);
         File file = ResourceUtils.getFile("classpath:yaml/cluster.yaml");
         StandaloneClusterInfo clusterInfo = BindPropertiesUtil.bindProperties(file, StandaloneClusterInfo.class);
-        client = ClusterClientFactory.createRestClient(clusterInfo, new UrlJarLoader(null));
+        client = ClusterClientFactory.createRestClient(clusterInfo, jarLoader);
     }
 
     protected SourceDescriptor createSource(String name, String yaml, SourceType sourceType, TableType tableType) throws Exception {

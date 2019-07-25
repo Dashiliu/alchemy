@@ -7,8 +7,8 @@ import { JhiEventManager, JhiAlertService, JhiDataUtils } from 'ng-jhipster';
 import { IJobSql } from 'app/shared/model/job-sql.model';
 import { AccountService } from 'app/core';
 import { JobSqlService } from './job-sql.service';
-import {IJob} from "app/shared/model/job.model";
-import {ActivatedRoute} from "@angular/router";
+import { IJob } from 'app/shared/model/job.model';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'jhi-job-sql',
@@ -26,16 +26,14 @@ export class JobSqlComponent implements OnInit, OnDestroy {
     protected dataUtils: JhiDataUtils,
     protected eventManager: JhiEventManager,
     protected accountService: AccountService,
-    protected activatedRoute: ActivatedRoute,
+    protected activatedRoute: ActivatedRoute
   ) {}
 
   loadAll() {
     this.jobSqlService
-      .query(
-        {
-          "jobId.equals": this.job.id,
-        }
-      )
+      .query({
+        'jobId.equals': this.job.id
+      })
       .pipe(
         filter((res: HttpResponse<IJobSql[]>) => res.ok),
         map((res: HttpResponse<IJobSql[]>) => res.body)
@@ -86,5 +84,4 @@ export class JobSqlComponent implements OnInit, OnDestroy {
   previousState() {
     window.history.back();
   }
-
 }

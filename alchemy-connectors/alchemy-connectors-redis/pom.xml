@@ -23,12 +23,6 @@
     <dependencies>
         <dependency>
             <groupId>com.dfire.platform</groupId>
-            <artifactId>alchemy-api</artifactId>
-            <version>${project.parent.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.dfire.platform</groupId>
             <artifactId>alchemy-connectors-common</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
@@ -78,7 +72,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-table_${scala.binary.version}</artifactId>
+            <artifactId>flink-table-planner_${scala.binary.version}</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

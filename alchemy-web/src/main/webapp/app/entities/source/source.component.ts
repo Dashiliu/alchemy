@@ -10,7 +10,7 @@ import { AccountService } from 'app/core';
 
 import { ITEMS_PER_PAGE } from 'app/shared';
 import { SourceService } from './source.service';
-import {IBusiness} from "app/shared/model/business.model";
+import { IBusiness } from 'app/shared/model/business.model';
 
 @Component({
   selector: 'jhi-source',
@@ -54,7 +54,7 @@ export class SourceComponent implements OnInit, OnDestroy {
   loadAll() {
     this.sourceService
       .query({
-        "businessId.equals": this.business.id,
+        'businessId.equals': this.business.id,
         page: this.page - 1,
         size: this.itemsPerPage,
         sort: this.sort()
@@ -142,9 +142,5 @@ export class SourceComponent implements OnInit, OnDestroy {
 
   protected onError(errorMessage: string) {
     this.jhiAlertService.error(errorMessage, null, null);
-  }
-
-  previousState() {
-    window.history.back();
   }
 }

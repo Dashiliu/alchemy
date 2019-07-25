@@ -139,6 +139,15 @@ public class UrlJarLoader implements JarLoader {
             || path.startsWith("file:")
             || path.startsWith("hdfs:"));
     }
+
+
+    public void setReleaseRepositoryUrl(String releaseRepositoryUrl) {
+        this.releaseRepositoryUrl = releaseRepositoryUrl;
+    }
+
+    public void setSnapRepositoryUrl(String snapRepositoryUrl) {
+        this.snapRepositoryUrl = snapRepositoryUrl;
+    }
 }
 
 

@@ -14,10 +14,13 @@ public class Side implements Serializable {
 
     private int cacheSize = 10000;
 
+    /**
+     * lru时缓存的过期时间
+     */
     private long ttl = 60 * 1000;
 
     /**
-     * The given timeout
+     * 异步调用超时时间
      */
     private long timeout = 10000;
 
@@ -26,10 +29,19 @@ public class Side implements Serializable {
      */
     private int capacity = Runtime.getRuntime().availableProcessors() * 2;
 
+    /**
+     * 是否分区
+     */
     private boolean partition;
 
+    /**
+     * 是否异步
+     */
     private boolean async;
 
+    /**
+     * 异步调用超时后，是否只打印日志
+     */
     private boolean logTimeoutOnly;
 
     public String getCacheType() {

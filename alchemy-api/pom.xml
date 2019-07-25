@@ -6,6 +6,7 @@
         <artifactId>alchemy</artifactId>
         <groupId>com.dfire.platform</groupId>
         <version>0.1.1-SNAPSHOT</version>
+
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -25,7 +26,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-table_${scala.binary.version}</artifactId>
+            <artifactId>flink-table-planner_${scala.binary.version}</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

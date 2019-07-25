@@ -10,7 +10,7 @@ import { AccountService } from 'app/core';
 
 import { ITEMS_PER_PAGE } from 'app/shared';
 import { SinkService } from './sink.service';
-import {IBusiness} from "app/shared/model/business.model";
+import { IBusiness } from 'app/shared/model/business.model';
 
 @Component({
   selector: 'jhi-sink',
@@ -54,7 +54,7 @@ export class SinkComponent implements OnInit, OnDestroy {
   loadAll() {
     this.sinkService
       .query({
-        "businessId.equals": this.business.id,
+        'businessId.equals': this.business.id,
         page: this.page - 1,
         size: this.itemsPerPage,
         sort: this.sort()
@@ -142,8 +142,5 @@ export class SinkComponent implements OnInit, OnDestroy {
 
   protected onError(errorMessage: string) {
     this.jhiAlertService.error(errorMessage, null, null);
-  }
-  previousState() {
-    window.history.back();
   }
 }

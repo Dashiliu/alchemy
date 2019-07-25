@@ -10,7 +10,7 @@ import { AccountService } from 'app/core';
 
 import { ITEMS_PER_PAGE } from 'app/shared';
 import { JobService } from './job.service';
-import {IBusiness} from "app/shared/model/business.model";
+import { IBusiness } from 'app/shared/model/business.model';
 
 @Component({
   selector: 'jhi-job',
@@ -54,7 +54,7 @@ export class JobComponent implements OnInit, OnDestroy {
   loadAll() {
     this.jobService
       .query({
-        "businessId.equals": this.business.id,
+        'businessId.equals': this.business.id,
         page: this.page - 1,
         size: this.itemsPerPage,
         sort: this.sort()
@@ -142,9 +142,5 @@ export class JobComponent implements OnInit, OnDestroy {
 
   collapseNavbar() {
     this.isNavbarCollapsed = true;
-  }
-
-  previousState() {
-    window.history.back();
   }
 }

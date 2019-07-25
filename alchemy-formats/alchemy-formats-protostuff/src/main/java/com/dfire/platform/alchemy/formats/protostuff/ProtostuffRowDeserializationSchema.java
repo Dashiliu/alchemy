@@ -1,17 +1,15 @@
 package com.dfire.platform.alchemy.formats.protostuff;
 
-import java.io.IOException;
-
+import com.dfire.platform.alchemy.api.util.ConvertRowUtil;
+import io.protostuff.ProtostuffIOUtil;
+import io.protostuff.Schema;
+import io.protostuff.runtime.RuntimeSchema;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.types.Row;
 
-import com.dfire.platform.alchemy.api.util.ConvertRowUtil;
-
-import io.protostuff.ProtostuffIOUtil;
-import io.protostuff.Schema;
-import io.protostuff.runtime.RuntimeSchema;
+import java.io.IOException;
 
 /**
  * @author congbai
@@ -21,22 +19,27 @@ public class ProtostuffRowDeserializationSchema implements DeserializationSchema
 
     private final TypeInformation<Row> typeInfo;
 
-    private transient final Schema schema;
+    private final Class clazz;
+
+    private transient Schema schema;
 
     public ProtostuffRowDeserializationSchema(TypeInformation<Row> typeInfo,Class clazz) {
-        this.schema = RuntimeSchema.getSchema(clazz);
         this.typeInfo = typeInfo;
+        this.clazz = clazz;
     }
 
     @Override
     public Row deserialize(byte[] bytes) throws IOException {
         try {
+            if(schema == null){
+                this.schema = RuntimeSchema.getSchema(clazz);
+            }
             Object obj = schema.newMessage();
             ProtostuffIOUtil.mergeFrom(bytes, obj, schema);
             // convert to row
             return ConvertRowUtil.convertToRow(obj, ((RowTypeInfo)typeInfo).getFieldNames());
         } catch (Exception e) {
-            return null;
+           throw e;
         }
     }
 

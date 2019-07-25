@@ -71,7 +71,6 @@ connector:
         2: 3000  #only for test
     topic: app-log
     properties:
-        zookeeper.connect: 127.0.0.1:2181/kafka
         bootstrap.servers: 127.0.0.1:9092
         group.id: testGroup
 format:

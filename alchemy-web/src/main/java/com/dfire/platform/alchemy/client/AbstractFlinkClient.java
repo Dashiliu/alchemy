@@ -4,7 +4,12 @@ import com.dfire.platform.alchemy.api.common.Alias;
 import com.dfire.platform.alchemy.api.function.BaseFunction;
 import com.dfire.platform.alchemy.api.util.SideParser;
 import com.dfire.platform.alchemy.client.loader.JarLoader;
-import com.dfire.platform.alchemy.client.request.*;
+import com.dfire.platform.alchemy.client.request.CancelFlinkRequest;
+import com.dfire.platform.alchemy.client.request.JarSubmitFlinkRequest;
+import com.dfire.platform.alchemy.client.request.JobStatusRequest;
+import com.dfire.platform.alchemy.client.request.RescaleFlinkRequest;
+import com.dfire.platform.alchemy.client.request.SavepointFlinkRequest;
+import com.dfire.platform.alchemy.client.request.SqlSubmitFlinkRequest;
 import com.dfire.platform.alchemy.client.response.JobStatusResponse;
 import com.dfire.platform.alchemy.client.response.Response;
 import com.dfire.platform.alchemy.client.response.SavepointResponse;
@@ -16,6 +21,7 @@ import com.dfire.platform.alchemy.descriptor.SourceDescriptor;
 import com.dfire.platform.alchemy.domain.enumeration.TableType;
 import com.dfire.platform.alchemy.util.FileUtil;
 import com.dfire.platform.alchemy.util.JarArgUtil;
+import com.dfire.platform.alchemy.util.ThreadLocalClassLoader;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.calcite.sql.SqlJoin;
@@ -23,6 +29,7 @@ import org.apache.calcite.sql.SqlKind;
 import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.SqlSelect;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.JobID;
 import org.apache.flink.api.common.JobSubmissionResult;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
@@ -48,7 +55,6 @@ import org.apache.flink.table.api.java.StreamTableEnvironment;
 import org.apache.flink.table.functions.AggregateFunction;
 import org.apache.flink.table.functions.ScalarFunction;
 import org.apache.flink.table.functions.TableFunction;
-import org.apache.flink.table.shaded.org.apache.commons.lang3.StringUtils;
 import org.apache.flink.table.sinks.TableSink;
 import org.apache.flink.table.sources.TableSource;
 import org.apache.flink.types.Row;
@@ -60,12 +66,22 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-import static com.dfire.platform.alchemy.client.request.SqlSubmitFlinkRequest.*;
+import static com.dfire.platform.alchemy.client.request.SqlSubmitFlinkRequest.CONFIG_KEY_DELAY_BETWEEN_ATTEMPTS;
+import static com.dfire.platform.alchemy.client.request.SqlSubmitFlinkRequest.CONFIG_KEY_DELAY_INTERVAL;
+import static com.dfire.platform.alchemy.client.request.SqlSubmitFlinkRequest.CONFIG_KEY_FAILURE_INTERVAL;
+import static com.dfire.platform.alchemy.client.request.SqlSubmitFlinkRequest.CONFIG_KEY_FAILURE_RATE;
+import static com.dfire.platform.alchemy.client.request.SqlSubmitFlinkRequest.CONFIG_KEY_RESTART_ATTEMPTS;
 
 /**
  * @author congbai
@@ -204,49 +220,89 @@ public abstract class AbstractFlinkClient implements FlinkClient {
         }
         final StreamExecutionEnvironment execEnv = StreamExecutionEnvironment.createLocalEnvironment();
         StreamTableEnvironment env = StreamTableEnvironment.getTableEnvironment(execEnv);
-        List<URL> urls = new ArrayList<>();
-        addJobDependencies(urls, request.getDependencies());
-        Map<String, SourceDescriptor> sideSources = Maps.newHashMap();
-        Map<String, TableSource> tableSources = Maps.newHashMap();
-        setBaseInfo(execEnv, request);
-        registerFunction(env, request, urls);
-        registerSource(env, request, urls, tableSources, sideSources);
-        List<String> sqls = request.getSqls();
-        for (int i =0 ; i< sqls.size(); i++) {
-            Table table = registerSql(env, sqls.get(i), tableSources, sideSources);
-            registerSink(table, request.getSinks().get(i), urls);
-        }
-        StreamGraph streamGraph = execEnv.getStreamGraph();
-        streamGraph.setJobName(request.getJobName());
-        urls.addAll(createGlobalPath(this.getDependencies()));
+        List<URL> urls = findJobDependencies(request);
         ClassLoader usercodeClassLoader
             = JobWithJars.buildUserCodeClassLoader(urls, Collections.emptyList(), getClass().getClassLoader());
+        ThreadLocalClassLoader.set(usercodeClassLoader);
         try {
-            JobSubmissionResult submissionResult
-                = clusterClient.run(streamGraph, urls, Collections.emptyList(), usercodeClassLoader);
-            LOGGER.trace(" submit sql request success,jobId:{}", submissionResult.getJobID());
-            return new SubmitFlinkResponse(true, submissionResult.getJobID().toString());
-        } catch (Exception e) {
-            String term = e.getMessage() == null ? "." : (": " + e.getMessage());
-            LOGGER.error(" submit sql request fail", e);
-            return new SubmitFlinkResponse(term);
+            Map<String, SourceDescriptor> sideSources = Maps.newHashMap();
+            Map<String, TableSource> tableSources = Maps.newHashMap();
+            setBaseInfo(execEnv, request);
+            registerFunction(env, request);
+            registerSource(env, request, tableSources, sideSources);
+            List<String> sqls = request.getSqls();
+            for (int i =0 ; i< sqls.size(); i++) {
+                Table table = registerSql(env, sqls.get(i), tableSources, sideSources);
+                registerSink(table, request.getSinks().get(i));
+            }
+            StreamGraph streamGraph = execEnv.getStreamGraph();
+            streamGraph.setJobName(request.getJobName());
+            try {
+                JobSubmissionResult submissionResult
+                    = clusterClient.run(streamGraph, urls, Collections.emptyList(), usercodeClassLoader);
+                LOGGER.trace(" submit sql request success,jobId:{}", submissionResult.getJobID());
+                return new SubmitFlinkResponse(true, submissionResult.getJobID().toString());
+            } catch (Exception e) {
+                String term = e.getMessage() == null ? "." : (": " + e.getMessage());
+                LOGGER.error(" submit sql request fail", e);
+                return new SubmitFlinkResponse(term);
+            }
+        }catch (Throwable e){
+            throw e;
+        }finally {
+            ThreadLocalClassLoader.clear();
         }
     }
 
-    private void addJobDependencies(List<URL> urls, List<String> dependencies) throws Exception {
-        if (CollectionUtils.isEmpty(dependencies)) {
-            return;
+    private List<URL> findJobDependencies(SqlSubmitFlinkRequest request) throws Exception {
+        List<URL> urls = Lists.newArrayList();
+        if (!CollectionUtils.isEmpty(request.getDependencies())) {
+            for(String dependency : request.getDependencies()){
+                loadUrl(dependency, true , urls);
+            }
         }
-        for(String dependency : dependencies){
-            loadUrl(dependency, true , urls);
+        if (CollectionUtils.isNotEmpty(request.getUdfs())) {
+            request.getUdfs().forEach(udfDescriptor -> {
+                try {
+                    loadUrl(udfDescriptor.getDependency(), true , urls);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
         }
+        request.getSources().forEach(consumer -> {
+            try {
+                TableType tableType = consumer.getTableType();
+                switch (tableType) {
+                    case SIDE:
+                    case TABLE:
+                        addUrl(consumer.getConnectorDescriptor().type(), urls);
+                        if (consumer.getFormat() != null) {
+                            addUrl(consumer.getFormat().type(), urls);
+                        }
+                        break;
+                    default:
+                        //nothing to do;
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+        request.getSinks().forEach(sinkDescriptor -> {
+            try {
+                addUrl(sinkDescriptor.type(), urls);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+        urls.addAll(createGlobalPath(this.getDependencies()));
+        return urls;
     }
 
-    private void registerSink(Table table, SinkDescriptor sinkDescriptor , List<URL> urls)
+    private void registerSink(Table table, SinkDescriptor sinkDescriptor)
         throws Exception {
-        TableSink tableSink = sinkDescriptor.transform();
+        TableSink tableSink = sinkDescriptor.transform(table.getSchema());
         table.writeToSink(tableSink);
-        addUrl(sinkDescriptor.type(), urls);
     }
 
     private Table registerSql(StreamTableEnvironment env, String sql, Map<String, TableSource> tableSources,
@@ -307,29 +363,16 @@ public abstract class AbstractFlinkClient implements FlinkClient {
         return false;
     }
 
-    private void registerFunction(StreamTableEnvironment env, SqlSubmitFlinkRequest request, List<URL> urls) {
+    private void registerFunction(StreamTableEnvironment env, SqlSubmitFlinkRequest request) {
         // 加载公共function
         List<String> functionNames = Lists.newArrayList();
         loadFunction(env, functionNames, ServiceLoader.load(BaseFunction.class));
-        if (CollectionUtils.isNotEmpty(request.getUdfs())) {
-            request.getUdfs().forEach(udfDescriptor -> {
-                try {
-                    loadUrl(udfDescriptor.getDependency(), true , urls);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            });
-        }
         if (request.getUdfs() == null) {
             return;
         }
-        // 加载自定义函数
-        URLClassLoader urlClassLoader
-            = new URLClassLoader(urls.toArray(new URL[urls.size()]), Thread.currentThread().getContextClassLoader());
         request.getUdfs().forEach(udfDescriptor -> {
             try {
-
-                Object udf = udfDescriptor.transform(urlClassLoader);
+                Object udf = udfDescriptor.transform();
                 register(env, udfDescriptor.getName(), udf);
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -364,14 +407,13 @@ public abstract class AbstractFlinkClient implements FlinkClient {
         }
     }
 
-    private void registerSource(StreamTableEnvironment env, SqlSubmitFlinkRequest request, List<URL> urls,
-        Map<String, TableSource> tableSources, Map<String, SourceDescriptor> sideSources) {
+    private void registerSource(StreamTableEnvironment env, SqlSubmitFlinkRequest request,
+                                Map<String, TableSource> tableSources, Map<String, SourceDescriptor> sideSources) {
         request.getSources().forEach(consumer -> {
             try {
                 TableType tableType = consumer.getTableType();
                 switch (tableType) {
                     case SIDE:
-                        addUrl(consumer.getConnectorDescriptor().type(), urls);
                         sideSources.put(consumer.getName(), consumer);
                         break;
                     case VIEW:
@@ -381,10 +423,6 @@ public abstract class AbstractFlinkClient implements FlinkClient {
                         break;
                     case TABLE:
                         TableSource tableSource = consumer.transform();
-                        addUrl(consumer.getConnectorDescriptor().type(), urls);
-                        if (consumer.getFormat() != null) {
-                            addUrl(consumer.getFormat().type(), urls);
-                        }
                         env.registerTableSource(consumer.getName(), tableSource);
                         tableSources.put(consumer.getName(), tableSource);
                         break;

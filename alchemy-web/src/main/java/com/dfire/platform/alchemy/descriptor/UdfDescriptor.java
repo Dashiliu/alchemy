@@ -1,15 +1,17 @@
 package com.dfire.platform.alchemy.descriptor;
 
-import com.dfire.platform.alchemy.api.util.GroovyCompiler;
-import com.dfire.platform.alchemy.common.Constants;
-import com.dfire.platform.alchemy.domain.Udf;
-import com.dfire.platform.alchemy.domain.enumeration.UdfType;
 import com.dfire.platform.alchemy.api.function.StreamAggregateFunction;
 import com.dfire.platform.alchemy.api.function.StreamScalarFunction;
 import com.dfire.platform.alchemy.api.function.StreamTableFunction;
 import com.dfire.platform.alchemy.api.function.aggregate.FlinkAllAggregateFunction;
 import com.dfire.platform.alchemy.api.function.scalar.FlinkAllScalarFunction;
 import com.dfire.platform.alchemy.api.function.table.FlinkAllTableFunction;
+import com.dfire.platform.alchemy.api.util.GroovyCompiler;
+import com.dfire.platform.alchemy.common.Constants;
+import com.dfire.platform.alchemy.domain.Udf;
+import com.dfire.platform.alchemy.domain.enumeration.UdfType;
+import com.dfire.platform.alchemy.util.ClassUtil;
+import com.dfire.platform.alchemy.util.ThreadLocalClassLoader;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.springframework.beans.BeanUtils;
@@ -21,7 +23,7 @@ import org.springframework.util.Assert;
  * @author congbai
  * @date 01/06/2018
  */
-public class UdfDescriptor implements CoreDescriptor {
+public class UdfDescriptor<R> implements CoreDescriptor<R> {
 
     private String name;
 
@@ -69,20 +71,11 @@ public class UdfDescriptor implements CoreDescriptor {
 
     @Override
     public <T> T transform() throws Exception {
-       throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public <T, R> T transform(R param) throws Exception {
         Class clazz;
         if (UdfType.CODE == udfType) {
             clazz = GroovyCompiler.compile(this.getValue(), this.getName());
         } else {
-            if (param == null || !(param instanceof ClassLoader)) {
-                clazz = Class.forName(value);
-            } else {
-                clazz = Class.forName(value, false, (ClassLoader)param);
-            }
+            clazz = ClassUtil.forName(value);
         }
         try {
             Object udf = clazz.newInstance();

@@ -1,4 +1,5 @@
-com.dfire.platform.alchemy.descriptor.EsSinkDescriptor
+com.dfire.platform.alchemy.descriptor.Es5SinkDescriptor
+com.dfire.platform.alchemy.descriptor.Es6SinkDescriptor
 com.dfire.platform.alchemy.descriptor.FormatDescriptor
 com.dfire.platform.alchemy.descriptor.HbaseSinkDescriptor
 com.dfire.platform.alchemy.descriptor.KafkaConnectorDescriptor
@@ -8,8 +9,6 @@ com.dfire.platform.alchemy.descriptor.SourceDescriptor
 com.dfire.platform.alchemy.descriptor.TableDescriptor
 com.dfire.platform.alchemy.descriptor.TsdbSinkDescriptor
 com.dfire.platform.alchemy.descriptor.UdfDescriptor
-com.dfire.platform.alchemy.descriptor.RocketMQConnectorDescriptor
-com.dfire.platform.alchemy.descriptor.RocketMQSinkDescriptor
 com.dfire.platform.alchemy.descriptor.MysqlConnectorDescriptor
 com.dfire.platform.alchemy.descriptor.MysqlSinkDescriptor
 com.dfire.platform.alchemy.descriptor.PrintSinkDescriptor

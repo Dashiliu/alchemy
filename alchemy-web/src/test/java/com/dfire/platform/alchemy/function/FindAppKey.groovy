@@ -1,6 +1,5 @@
-import com.dfire.platform.alchemy.api.function.StreamScalarFunction;
 
-import java.util.Map;
+import com.dfire.platform.alchemy.api.function.StreamScalarFunction
 
 public class FindAppKey implements StreamScalarFunction<String> {
 

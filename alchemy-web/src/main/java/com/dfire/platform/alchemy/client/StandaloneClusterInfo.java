@@ -1,9 +1,8 @@
 package com.dfire.platform.alchemy.client;
 
-import org.apache.flink.runtime.jobmanager.HighAvailabilityMode;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author congbai
@@ -11,62 +10,34 @@ import java.util.List;
  */
 public class StandaloneClusterInfo {
 
-    private String mode = HighAvailabilityMode.NONE.toString().toLowerCase();
-
-    private String lookupTimeout;
-
-    private String clusterId;
-
-    private String zookeeperQuorum;
-
-    private String storagePath;
-
+    /**
+     * jobManager地址
+     */
     private String address;
 
+    /**
+     * 端口
+     */
     private Integer port;
 
+    private Map<String, Object> properties;
+
+    /**
+     * 集群的外部依赖
+     */
     private List<String> dependencies;
 
+    /**
+     * jobManager的web url
+     */
     private String webInterfaceUrl;
 
-    public String getMode() {
-        return mode;
+    public Map<String, Object> getProperties() {
+        return properties;
     }
 
-    public void setMode(String mode) {
-        this.mode = mode;
-    }
-
-    public String getLookupTimeout() {
-        return lookupTimeout;
-    }
-
-    public void setLookupTimeout(String lookupTimeout) {
-        this.lookupTimeout = lookupTimeout;
-    }
-
-    public String getClusterId() {
-        return clusterId;
-    }
-
-    public void setClusterId(String clusterId) {
-        this.clusterId = clusterId;
-    }
-
-    public String getZookeeperQuorum() {
-        return zookeeperQuorum;
-    }
-
-    public void setZookeeperQuorum(String zookeeperQuorum) {
-        this.zookeeperQuorum = zookeeperQuorum;
-    }
-
-    public String getStoragePath() {
-        return storagePath;
-    }
-
-    public void setStoragePath(String storagePath) {
-        this.storagePath = storagePath;
+    public void setProperties(Map<String, Object> properties) {
+        this.properties = properties;
     }
 
     public String getAddress() {

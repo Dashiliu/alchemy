@@ -26,15 +26,21 @@ public class ProtostuffRowSerializationSchema implements SerializationSchema<Row
         }
     };
     private final TypeInformation<Row> typeInfo;
-    private transient final Schema schema;
+
+    private final Class clazz;
+
+    private transient  Schema schema;
 
     public ProtostuffRowSerializationSchema(Class clazz, TypeInformation<Row> typeInfo) {
-        this.schema = RuntimeSchema.getSchema(clazz);
+        this.clazz =clazz;
         this.typeInfo = typeInfo;
     }
 
     @Override
     public byte[] serialize(Row row) {
+        if(this.schema == null){
+            this.schema = RuntimeSchema.getSchema(clazz);
+        }
         LinkedBuffer buf = THREAD_LOCAL.get();
         try {
             Object object = schema.newMessage();

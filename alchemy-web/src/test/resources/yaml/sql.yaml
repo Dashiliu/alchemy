@@ -1,12 +1,9 @@
 parallelism: 1
 time-characteristic: EventTime
 restart-strategies:  FIXED
-restart-arams:
+restart-params:
     restart-attempts: 10
     delay-between-attempts: 10000
 checkpoint-config:
     checkpoint-timeout: 900000
     checkpoint-interval: 10000
-dependencies:
-    - org.apache.flink:flink-json:1.5.4
-    - /alchemy-api/target/alchemy-api-0.1.0-SNAPSHOT.jar

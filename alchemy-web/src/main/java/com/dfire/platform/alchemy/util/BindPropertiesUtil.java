@@ -1,18 +1,18 @@
 package com.dfire.platform.alchemy.util;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.Map;
-
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.core.JsonToken;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.core.io.IOContext;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.DeserializationFeature;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.dataformat.yaml.YAMLParser;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.Map;
 
 /**
  * @author congbai
@@ -40,6 +40,10 @@ public class BindPropertiesUtil {
 
     public static <T> T bindProperties(File inputFile, Class<T> clazz) throws Exception {
         return OBJECT_MAPPER.readValue(inputFile.toURL(), clazz);
+    }
+
+    public static <T> String write(T value) throws Exception {
+        return OBJECT_MAPPER.writeValueAsString(value);
     }
 
     public static class LowerCaseYamlMapper extends ObjectMapper {
@@ -107,10 +111,10 @@ public class BindPropertiesUtil {
             } else {
                 StringBuilder result = new StringBuilder(length + (length << 1));
                 int upperCount = 0;
-                int ignoreCount = 0 ;
+                int ignoreCount = 0;
                 for (int i = 0; i < length; ++i) {
                     char ch = input.charAt(i);
-                    if(upperCount > 0 && ignoreCount > 0){
+                    if (upperCount > 0 && ignoreCount > 0) {
                         return input;
                     }
                     if (upperCount > 0) {
@@ -121,11 +125,11 @@ public class BindPropertiesUtil {
                     }
                     if (ch == SPECIAL_CHAR) {
                         ++upperCount;
-                    }else if(ch == IGNORE_CHAR){
+                    } else if (ch == IGNORE_CHAR) {
                         result.append(ch);
-                        ++ ignoreCount;
-                    }else {
-                        result.append(Character.toLowerCase(ch));
+                        ++ignoreCount;
+                    } else {
+                        result.append(ch);
                     }
                 }
 

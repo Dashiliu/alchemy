@@ -9,8 +9,8 @@ import { AccountService } from 'app/core';
 
 import { ITEMS_PER_PAGE } from 'app/shared';
 import { ClusterService } from './cluster.service';
-import {IBusiness} from "app/shared/model/business.model";
-import {ActivatedRoute} from "@angular/router";
+import { IBusiness } from 'app/shared/model/business.model';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'jhi-cluster',
@@ -49,7 +49,7 @@ export class ClusterComponent implements OnInit, OnDestroy {
   loadAll() {
     this.clusterService
       .query({
-        "businessId.equals": this.business.id,
+        'businessId.equals': this.business.id,
         page: this.page,
         size: this.itemsPerPage,
         sort: this.sort()
@@ -114,20 +114,14 @@ export class ClusterComponent implements OnInit, OnDestroy {
     this.jhiAlertService.error(errorMessage, null, null);
   }
 
-  previousState() {
-    window.history.back();
-  }
-
-  detail(id){
-    this.clusterService.queryUrl(id)
-      .subscribe(response => {
-        console.log(response);
-        if(response.body && response.body.url){
-          window.open(response.body.url, '_blank')
-        }else{
-          this.onError("Please set web-interface-url")
-        }
-      })
-    ;
+  detail(id) {
+    this.clusterService.queryUrl(id).subscribe(response => {
+      console.log(response);
+      if (response.body && response.body.url) {
+        window.open(response.body.url, '_blank');
+      } else {
+        this.onError('Please set web-interface-url');
+      }
+    });
   }
 }
