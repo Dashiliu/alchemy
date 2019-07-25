@@ -31,7 +31,7 @@
 所有的yaml配置建议以"-"作为分隔符
 
 ##### flink集群模式
-- 目前仅支持[standalone](/docs/static_files/cluster.md)模式
+- 目前仅支持[standalone、openshift](/docs/static_files/cluster.md)模式，在openshift上可以自动创建和管理集群
 
 ##### 源表
 - [kafka010](/docs/static_files/kafka.md)

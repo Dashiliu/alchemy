@@ -12,6 +12,6 @@ zookeeper-quorum: localhost:2181 #high-availability.zookeeper.quorum
 storage-path:  /flink/ha/real # high-availability.storageDir
 port: 6123
 address: 127.0.0.1 
-web-interface-url: http://flink-5-1.2dfire.net  # jobManager web url
+web-interface-url: http://flink-5-1.your.net  # jobManager web url
 ```
 
