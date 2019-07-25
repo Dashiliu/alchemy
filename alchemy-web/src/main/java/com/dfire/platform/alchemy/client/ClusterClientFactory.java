@@ -47,6 +47,7 @@ public class ClusterClientFactory {
         if (clusterInfo.getProperties() != null) {
             setProperties(clusterInfo.getProperties(), configuration);
         }
+
         configuration.setString(JobManagerOptions.ADDRESS, clusterInfo.getAddress());
         configuration.setInteger(JobManagerOptions.PORT, clusterInfo.getPort());
         configuration.setInteger(RestOptions.PORT, clusterInfo.getPort());
