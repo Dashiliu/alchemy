@@ -28,7 +28,7 @@
 #### 支持
 
 ##### yaml配置
-所有的yaml配置以"-"作为分隔符
+所有的yaml配置建议以"-"作为分隔符
 
 ##### flink集群模式
 - 目前仅支持[standalone](/docs/static_files/cluster.md)模式

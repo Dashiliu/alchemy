@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>alchemy-connectors-common</artifactId>
+    <artifactId>alchemy-connectors-elasticsearch6</artifactId>
     <packaging>jar</packaging>
 
 
@@ -20,17 +20,16 @@
     <dependencies>
         <dependency>
             <groupId>com.dfire.platform</groupId>
-            <artifactId>alchemy-api</artifactId>
+            <artifactId>alchemy-connectors-common</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-streaming-scala_${scala.binary.version}</artifactId>
-            <scope>provided</scope>
+            <artifactId>flink-json</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-table-planner_${scala.binary.version}</artifactId>
+            <artifactId>flink-streaming-scala_${scala.binary.version}</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -40,8 +39,12 @@
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-elasticsearch-base_${scala.binary.version}</artifactId>
+            <artifactId>flink-table-planner_${scala.binary.version}</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-elasticsearch6_${scala.binary.version}</artifactId>
         </dependency>
     </dependencies>
 
