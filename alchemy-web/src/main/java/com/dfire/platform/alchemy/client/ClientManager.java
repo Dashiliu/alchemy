@@ -33,6 +33,12 @@ public class ClientManager {
         return clusterClients.get(clusterId);
     }
 
+    public void addClientOnly(ClusterDTO cluster) throws Exception {
+        String url = findWebUrl(cluster);
+        FlinkClient client = ClusterClientFactory.get(cluster, jarLoader, url);
+        clusterClients.put(cluster.getId(), client);
+    }
+
     public void putClient(ClusterDTO cluster) throws Exception {
         addCluster(cluster);
         String url = findWebUrl(cluster);
