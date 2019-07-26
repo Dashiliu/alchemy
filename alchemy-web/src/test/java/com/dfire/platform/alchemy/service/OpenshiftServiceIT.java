@@ -57,6 +57,13 @@ public class OpenshiftServiceIT {
         openshiftService.delete(openshiftClusterInfo);
     }
 
+    @Test
+    public void query(){
+        OpenshiftClusterInfo openshiftClusterInfo = createInfo();
+        String url = openshiftService.queryOpenshift(openshiftClusterInfo);
+        assert url != null;
+    }
+
 
     private OpenshiftClusterInfo createInfo() {
         Map<String, Object> configs = new HashMap<>();

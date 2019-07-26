@@ -39,5 +39,6 @@ public class ApplicationReadyEventListener implements ApplicationListener<Applic
                 LOGGER.error("Init Cluster Exception", e);
             }
         });
+
     }
 }

@@ -147,6 +147,10 @@ public class OpenshiftService {
 
     public String queryWebUrl(ClusterDTO clusterDTO) throws Exception {
         OpenshiftClusterInfo openshiftClusterInfo = BindPropertiesUtil.bindProperties(clusterDTO.getConfig(), OpenshiftClusterInfo.class);
+        return queryOpenshift(openshiftClusterInfo);
+    }
+
+    public String queryOpenshift(OpenshiftClusterInfo openshiftClusterInfo){
         HttpHeaders headers = createHeader(getToken());
         ResponseEntity<JSONObject> routerEntity = restTemplate.exchange(getRouterSpecifyUrl(openshiftClusterInfo), HttpMethod.GET, new HttpEntity<>(null, headers), JSONObject.class);
         if (routerEntity.getStatusCode() == HttpStatus.OK) {
