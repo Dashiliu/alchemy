@@ -66,7 +66,7 @@
                                 <excludes>
                                     <!--<exclude>org.apache.flink:force-shading</exclude>-->
                                     <exclude>com.google.code.findbgs:jsr305</exclude>
-                                    <exclude>>org.yaml:snakeyaml</exclude>
+                                    <exclude>org.yaml:snakeyaml</exclude>
                                     <!--<exclude>org.slf4j:slf4j-api</exclude>-->
                                 </excludes>
                             </artifactSet>
