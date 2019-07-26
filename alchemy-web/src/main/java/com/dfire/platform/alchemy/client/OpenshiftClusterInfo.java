@@ -39,12 +39,7 @@ public class OpenshiftClusterInfo {
     private String jobManagerAddress;
 
     /**
-     *  jobManager 的webUrl， 在router中需要使用
-     */
-    private String webUrl;
-
-    /**
-     *  taskManager的pod数
+     * taskManager的pod数
      */
     private int replicas;
 
@@ -53,7 +48,7 @@ public class OpenshiftClusterInfo {
     private Resources taskManagerResources;
 
     /**
-     *  pod运行的环境变量
+     * pod运行的环境变量
      */
     private Map<String, String> envs;
 
@@ -74,6 +69,7 @@ public class OpenshiftClusterInfo {
     public void setToken(String token) {
         this.token = token;
     }
+
     public String getName() {
         return name;
     }
@@ -163,14 +159,6 @@ public class OpenshiftClusterInfo {
         this.taskManagerResources = taskManagerResources;
     }
 
-    public String getWebUrl() {
-        return webUrl;
-    }
-
-    public void setWebUrl(String webUrl) {
-        this.webUrl = webUrl;
-    }
-
     public Map<String, Object> getConfigs() {
         return configs;
     }
@@ -226,7 +214,7 @@ public class OpenshiftClusterInfo {
         }
     }
 
-    public static class Resources{
+    public static class Resources {
 
         private Resource limits;
 
@@ -257,7 +245,7 @@ public class OpenshiftClusterInfo {
         }
     }
 
-    public static class Resource{
+    public static class Resource {
 
         private String cpu;
 

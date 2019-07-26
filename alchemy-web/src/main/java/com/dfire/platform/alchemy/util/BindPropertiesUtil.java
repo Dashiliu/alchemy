@@ -42,10 +42,6 @@ public class BindPropertiesUtil {
         return OBJECT_MAPPER.readValue(inputFile.toURL(), clazz);
     }
 
-    public static <T> String write(T value) throws Exception {
-        return OBJECT_MAPPER.writeValueAsString(value);
-    }
-
     public static class LowerCaseYamlMapper extends ObjectMapper {
         public LowerCaseYamlMapper() {
             super(new YAMLFactory() {
@@ -114,7 +110,7 @@ public class BindPropertiesUtil {
                 int ignoreCount = 0;
                 for (int i = 0; i < length; ++i) {
                     char ch = input.charAt(i);
-                    if (upperCount > 0 && ignoreCount > 0) {
+                    if (ignoreCount > 0) {
                         return input;
                     }
                     if (upperCount > 0) {

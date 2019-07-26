@@ -1,6 +1,7 @@
 package com.dfire.platform.alchemy.client;
 
 import com.dfire.platform.alchemy.client.loader.JarLoader;
+import com.dfire.platform.alchemy.client.openshift.OpenshiftWebUrlCache;
 import com.dfire.platform.alchemy.domain.Cluster;
 import com.dfire.platform.alchemy.domain.enumeration.ClusterType;
 import com.dfire.platform.alchemy.util.BindPropertiesUtil;
@@ -26,7 +27,7 @@ public class ClusterClientFactory {
                 return createRestClient(clusterInfo, jarLoader);
             case OPENSHIFT:
                 OpenshiftClusterInfo openshiftClusterInfo = BindPropertiesUtil.bindProperties(cluster.getConfig(), OpenshiftClusterInfo.class);
-                return createOpenshiftClusterClient(openshiftClusterInfo, jarLoader);
+                return createOpenshiftClusterClient(openshiftClusterInfo, jarLoader, OpenshiftWebUrlCache.get(cluster.getId()));
             case YARN:
                 // todo 支持yarn client
             default:
@@ -34,11 +35,11 @@ public class ClusterClientFactory {
         }
     }
 
-    private static FlinkClient createOpenshiftClusterClient(OpenshiftClusterInfo openshiftClusterInfo, JarLoader jarLoader) {
+    private static FlinkClient createOpenshiftClusterClient(OpenshiftClusterInfo openshiftClusterInfo, JarLoader jarLoader, String url) {
         Configuration configuration = new Configuration();
         setProperties(openshiftClusterInfo.getConfigs(), configuration);
         configuration.setString(JobManagerOptions.ADDRESS, openshiftClusterInfo.getJobManagerAddress());
-        return createClient(configuration, jarLoader, openshiftClusterInfo.getDependencies(), openshiftClusterInfo.getWebUrl());
+        return createClient(configuration, jarLoader, openshiftClusterInfo.getDependencies(), url);
     }
 
     public static FlinkClient createRestClient(StandaloneClusterInfo clusterInfo, JarLoader jarLoader) throws Exception {

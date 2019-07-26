@@ -130,7 +130,7 @@ public class OpenshiftService {
         HttpHeaders headers = createHeader(openshiftClusterInfo.getToken());
         ResponseEntity<JSONObject> routerEntity = restTemplate.exchange(getRouterSpecifyUrl(openshiftClusterInfo), HttpMethod.GET, new HttpEntity<>(null, headers), JSONObject.class);
         if (routerEntity.getStatusCode() == HttpStatus.OK) {
-            return routerEntity.getBody().getJSONObject("spec").getString("host");
+            return "http://"+routerEntity.getBody().getJSONObject("spec").getString("host");
         }
         return null;
     }
@@ -146,7 +146,6 @@ public class OpenshiftService {
         JSONObject jsonObject = JSON.parseObject(router);
         jsonObject.getJSONObject("metadata").put("name", openshiftClusterInfo.getJobManagerAddress());
         jsonObject.getJSONObject("metadata").put("namespace", openshiftClusterInfo.getNamespace());
-        jsonObject.getJSONObject("spec").put("host", openshiftClusterInfo.getWebUrl());
         jsonObject.getJSONObject("spec").getJSONObject("to").put("name", openshiftClusterInfo.getJobManagerAddress());
         return JsonUtil.toJson(jsonObject);
     }
