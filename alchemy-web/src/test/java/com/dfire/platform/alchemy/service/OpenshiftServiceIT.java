@@ -15,7 +15,7 @@ public class OpenshiftServiceIT {
 
     @Before
     public void before() throws IOException {
-        openshiftService = new OpenshiftService(new RestTemplate(),"https://www.openshift.com");
+        openshiftService = new OpenshiftService(new RestTemplate(),"https://console-openshift-console.apps.us-east-1.online-starter.openshift.com");
     }
 
     @Test
@@ -39,6 +39,12 @@ public class OpenshiftServiceIT {
         openshiftService.delete(openshiftClusterInfo);
     }
 
+    @Test
+    public void queryUrl(){
+        OpenshiftClusterInfo openshiftClusterInfo =createInfo();
+        openshiftService.queryWebUrl(openshiftClusterInfo);
+    }
+
     private OpenshiftClusterInfo createInfo() {
         Map<String, Object> configs = new HashMap<>();
         configs.put("high-availability.jobmanager.port", "6123");
@@ -57,7 +63,7 @@ public class OpenshiftServiceIT {
         openshiftClusterInfo.setServiceAccount("flink");
 
         openshiftClusterInfo.setServiceAccountName("flink");
-        openshiftClusterInfo.setToken("yJ978t6bCWuG6CGE5sd0q2AkzK7qw4uMK5zdK3PYjoA");
+        openshiftClusterInfo.setToken("WA_2aJ9by1i7aADiFq7qSBnq_X_MOu_Lr8BHKg910M4");
         openshiftClusterInfo.setConfigs(configs);
         openshiftClusterInfo.setJobManagerResources(new OpenshiftClusterInfo.Resources(new OpenshiftClusterInfo.Resource("1", "3G"),new OpenshiftClusterInfo.Resource("3", "8G")));
         openshiftClusterInfo.setTaskManagerResources(new OpenshiftClusterInfo.Resources(new OpenshiftClusterInfo.Resource("300m", "2G"),new OpenshiftClusterInfo.Resource("1", "3G")));

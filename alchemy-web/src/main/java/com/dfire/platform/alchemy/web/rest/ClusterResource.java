@@ -3,6 +3,7 @@ package com.dfire.platform.alchemy.web.rest;
 import com.dfire.platform.alchemy.client.ClientManager;
 import com.dfire.platform.alchemy.client.FlinkClient;
 import com.dfire.platform.alchemy.client.OpenshiftClusterInfo;
+import com.dfire.platform.alchemy.client.openshift.OpenshiftWebUrlCache;
 import com.dfire.platform.alchemy.domain.enumeration.ClusterType;
 import com.dfire.platform.alchemy.security.SecurityUtils;
 import com.dfire.platform.alchemy.service.ClusterQueryService;
@@ -86,14 +87,10 @@ public class ClusterResource {
             throw new BadRequestAlertException("A new cluster cannot already have an ID", ENTITY_NAME, "idexists");
         }
         ClusterType clusterType = clusterDTO.getType();
+        OpenshiftClusterInfo openshiftClusterInfo = null;
         if(clusterType == ClusterType.OPENSHIFT){
-            OpenshiftClusterInfo openshiftClusterInfo = BindPropertiesUtil.bindProperties(clusterDTO.getConfig(), OpenshiftClusterInfo.class);
+            openshiftClusterInfo = BindPropertiesUtil.bindProperties(clusterDTO.getConfig(), OpenshiftClusterInfo.class);
             openshiftService.create(openshiftClusterInfo);
-            String webUrl = openshiftService.queryWebUrl(openshiftClusterInfo);
-            if(webUrl != null){
-                openshiftClusterInfo.setWebUrl(webUrl);
-                clusterDTO.setConfig(BindPropertiesUtil.write(openshiftClusterInfo));
-            }
         }
         Optional<String> loginUser = SecurityUtils.getCurrentUserLogin();
         if (!loginUser.isPresent()) {
@@ -105,12 +102,23 @@ public class ClusterResource {
         clusterDTO.setLastModifiedDate(Instant.now());
         try {
             ClusterDTO result = clusterService.save(clusterDTO);
+            addOpenshiftUrl(result.getId(), openshiftClusterInfo);
             return ResponseEntity.created(new URI("/api/clusters/" + result.getId()))
                 .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
                 .body(result);
         }catch (Exception e){
             deleteOpenshiftCluster(clusterDTO);
             throw e;
+        }
+    }
+
+    private void addOpenshiftUrl(Long id, OpenshiftClusterInfo openshiftClusterInfo) {
+        if(openshiftClusterInfo == null){
+            return;
+        }
+        String webUrl = openshiftService.queryWebUrl(openshiftClusterInfo);
+        if(webUrl != null){
+            OpenshiftWebUrlCache.put(id, webUrl);
         }
     }
 
@@ -217,6 +225,7 @@ public class ClusterResource {
         if(clusterType == ClusterType.OPENSHIFT){
             OpenshiftClusterInfo openshiftClusterInfo = BindPropertiesUtil.bindProperties(clusterDTO.getConfig(), OpenshiftClusterInfo.class);
             openshiftService.delete(openshiftClusterInfo);
+            OpenshiftWebUrlCache.delete(clusterDTO.getId());
         }
     }
 }
