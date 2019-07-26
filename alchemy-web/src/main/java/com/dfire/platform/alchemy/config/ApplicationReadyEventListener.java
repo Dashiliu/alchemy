@@ -34,7 +34,7 @@ public class ApplicationReadyEventListener implements ApplicationListener<Applic
         List<Cluster> clusterList = clusterRepository.findAll();
         clusterList.forEach(cluster -> {
             try {
-                clientManager.putClient(clusterMapper.toDto(cluster));
+                clientManager.addClientOnly(clusterMapper.toDto(cluster));
             } catch (Exception e) {
                 LOGGER.error("Init Cluster Exception", e);
             }
