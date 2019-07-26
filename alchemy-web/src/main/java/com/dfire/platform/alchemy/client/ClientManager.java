@@ -60,7 +60,7 @@ public class ClientManager {
 
     private void addCluster(ClusterDTO cluster) throws Exception {
         ClusterType clusterType = cluster.getType();
-        if (clusterType != ClusterType.OPENSHIFT) {
+        if (clusterType == ClusterType.OPENSHIFT) {
             OpenshiftClusterInfo openshiftClusterInfo = bind(cluster);
             try {
                 openshiftService.create(openshiftClusterInfo);
@@ -73,7 +73,7 @@ public class ClientManager {
 
     private void updateCluster(ClusterDTO cluster) throws Exception {
         ClusterType clusterType = cluster.getType();
-        if (clusterType != ClusterType.OPENSHIFT) {
+        if (clusterType == ClusterType.OPENSHIFT) {
             OpenshiftClusterInfo openshiftClusterInfo = bind(cluster);
             openshiftService.update(openshiftClusterInfo);
         }
@@ -81,7 +81,7 @@ public class ClientManager {
 
     private void deleteCluster(ClusterDTO cluster) throws Exception {
         ClusterType clusterType = cluster.getType();
-        if (clusterType != ClusterType.OPENSHIFT) {
+        if (clusterType == ClusterType.OPENSHIFT) {
             OpenshiftClusterInfo openshiftClusterInfo = bind(cluster);
             openshiftService.delete(openshiftClusterInfo);
         }
@@ -89,7 +89,7 @@ public class ClientManager {
 
     private String findWebUrl(ClusterDTO toDto) throws Exception {
         ClusterType clusterType = toDto.getType();
-        if (clusterType != ClusterType.OPENSHIFT) {
+        if (clusterType == ClusterType.OPENSHIFT) {
             return openshiftService.queryWebUrl(toDto);
         }else {
             return null;
