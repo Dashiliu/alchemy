@@ -3,8 +3,16 @@ package com.dfire.platform.alchemy.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dfire.platform.alchemy.client.OpenshiftClusterInfo;
+import com.dfire.platform.alchemy.client.openshift.OpenshiftWebUrlCache;
+import com.dfire.platform.alchemy.config.OpenshiftProperties;
+import com.dfire.platform.alchemy.domain.enumeration.ClusterType;
+import com.dfire.platform.alchemy.service.dto.ClusterDTO;
+import com.dfire.platform.alchemy.util.BindPropertiesUtil;
 import com.dfire.platform.alchemy.util.JsonUtil;
-import org.springframework.beans.factory.annotation.Value;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -17,10 +25,16 @@ import org.springframework.web.client.RestTemplate;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class OpenshiftService {
+
+    private final Logger log = LoggerFactory.getLogger(OpenshiftService.class);
 
     public static final String SELECTOR_APP = "flink";
 
@@ -48,7 +62,7 @@ public class OpenshiftService {
 
     private final RestTemplate restTemplate;
 
-    private final String url;
+    private final OpenshiftProperties openshiftProperties;
 
     private final String jobManager;
 
@@ -58,13 +72,19 @@ public class OpenshiftService {
 
     private final String router;
 
-    public OpenshiftService(RestTemplate restTemplate, @Value("${alchemy.openshift.url}") String openshiftUrl) throws IOException {
+    private final ScheduledExecutorService tokenService;
+
+    private volatile String token;
+
+    public OpenshiftService(RestTemplate restTemplate, OpenshiftProperties openshiftProperties) throws IOException {
         this.restTemplate = restTemplate;
-        this.url = openshiftUrl;
+        this.openshiftProperties = openshiftProperties;
         this.jobManager = loadTemplate("node.json");
         this.taskManager = loadTemplate("node.json");
         this.service = loadTemplate("service.json");
         this.router = loadTemplate("router.json");
+        this.tokenService = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setDaemon(true).setNameFormat("token-service-%d").build());
+        this.tokenService.scheduleAtFixedRate(new TokenTask(), 0, 86300, TimeUnit.SECONDS);
     }
 
     private String loadTemplate(String fileName) throws IOException {
@@ -94,17 +114,16 @@ public class OpenshiftService {
 
     /**
      * 创建jobmanager、taskmanager、service、router
-     *
      * @param openshiftClusterInfo
      * @return 返回router的host，作为jobmanager的weburl
      */
     public void create(OpenshiftClusterInfo openshiftClusterInfo) {
-        HttpHeaders headers = createHeader(openshiftClusterInfo.getToken());
-        String deploymentsUrl = getDeploymentsCreateUrl(openshiftClusterInfo);
+        HttpHeaders headers = createHeader(getToken());
+        String deploymentsUrl = getDeploymentsCreateUrl();
         restTemplate.postForEntity(deploymentsUrl, new HttpEntity<>(createDeployments(openshiftClusterInfo, true), headers), JSONObject.class);
         restTemplate.postForEntity(deploymentsUrl, new HttpEntity<>(createDeployments(openshiftClusterInfo, false), headers), JSONObject.class);
-        restTemplate.postForEntity(getServiceCreateUrl(openshiftClusterInfo), new HttpEntity<>(createService(openshiftClusterInfo), headers), JSONObject.class);
-        restTemplate.postForEntity(getRouterCreateUrl(openshiftClusterInfo), new HttpEntity<>(createRouter(openshiftClusterInfo), headers), JSONObject.class);
+        restTemplate.postForEntity(getServiceCreateUrl(), new HttpEntity<>(createService(openshiftClusterInfo), headers), JSONObject.class);
+        restTemplate.postForEntity(getRouterCreateUrl(), new HttpEntity<>(createRouter(openshiftClusterInfo), headers), JSONObject.class);
     }
 
     /**
@@ -113,24 +132,25 @@ public class OpenshiftService {
      * @param openshiftClusterInfo
      */
     public void update(OpenshiftClusterInfo openshiftClusterInfo) {
-        HttpHeaders headers = createHeader(openshiftClusterInfo.getToken());
+        HttpHeaders headers = createHeader(getToken());
         restTemplate.put(getDeploymentsSpecifyUrl(openshiftClusterInfo, true), new HttpEntity<>(createDeployments(openshiftClusterInfo, true), headers));
         restTemplate.put(getDeploymentsSpecifyUrl(openshiftClusterInfo, false), new HttpEntity<>(createDeployments(openshiftClusterInfo, false), headers));
     }
 
     public void delete(OpenshiftClusterInfo openshiftClusterInfo) {
-        HttpHeaders headers = createHeader(openshiftClusterInfo.getToken());
+        HttpHeaders headers = createHeader(getToken());
         restTemplate.exchange(getDeploymentsSpecifyUrl(openshiftClusterInfo, true), HttpMethod.DELETE, new HttpEntity<>(null, headers), String.class);
         restTemplate.exchange(getDeploymentsSpecifyUrl(openshiftClusterInfo, false), HttpMethod.DELETE, new HttpEntity<>(null, headers), String.class);
         restTemplate.exchange(getServiceSpecifyUrl(openshiftClusterInfo), HttpMethod.DELETE, new HttpEntity<>(null, headers), String.class);
         restTemplate.exchange(getRouterSpecifyUrl(openshiftClusterInfo), HttpMethod.DELETE, new HttpEntity<>(null, headers), String.class);
     }
 
-    public String queryWebUrl(OpenshiftClusterInfo openshiftClusterInfo) {
-        HttpHeaders headers = createHeader(openshiftClusterInfo.getToken());
+    public String queryWebUrl(ClusterDTO clusterDTO) throws Exception {
+        OpenshiftClusterInfo openshiftClusterInfo = BindPropertiesUtil.bindProperties(clusterDTO.getConfig(), OpenshiftClusterInfo.class);
+        HttpHeaders headers = createHeader(getToken());
         ResponseEntity<JSONObject> routerEntity = restTemplate.exchange(getRouterSpecifyUrl(openshiftClusterInfo), HttpMethod.GET, new HttpEntity<>(null, headers), JSONObject.class);
         if (routerEntity.getStatusCode() == HttpStatus.OK) {
-            return "http://"+routerEntity.getBody().getJSONObject("spec").getString("host");
+            return "http://" + routerEntity.getBody().getJSONObject("spec").getString("host");
         }
         return null;
     }
@@ -145,7 +165,7 @@ public class OpenshiftService {
     private String createRouter(OpenshiftClusterInfo openshiftClusterInfo) {
         JSONObject jsonObject = JSON.parseObject(router);
         jsonObject.getJSONObject("metadata").put("name", openshiftClusterInfo.getJobManagerAddress());
-        jsonObject.getJSONObject("metadata").put("namespace", openshiftClusterInfo.getNamespace());
+        jsonObject.getJSONObject("metadata").put("namespace", openshiftProperties.getNamespace());
         jsonObject.getJSONObject("spec").getJSONObject("to").put("name", openshiftClusterInfo.getJobManagerAddress());
         return JsonUtil.toJson(jsonObject);
     }
@@ -153,7 +173,7 @@ public class OpenshiftService {
     private String createService(OpenshiftClusterInfo openshiftClusterInfo) {
         JSONObject jsonObject = JSON.parseObject(service);
         jsonObject.getJSONObject("metadata").put("name", openshiftClusterInfo.getJobManagerAddress());
-        jsonObject.getJSONObject("metadata").put("namespace", openshiftClusterInfo.getNamespace());
+        jsonObject.getJSONObject("metadata").put("namespace", openshiftProperties.getNamespace());
         jsonObject.getJSONObject("spec").put("selector", new OpenshiftClusterInfo.Label(SELECTOR_APP, createJobManagerName(openshiftClusterInfo.getName())));
         return JsonUtil.toJson(jsonObject);
     }
@@ -179,7 +199,7 @@ public class OpenshiftService {
         OpenshiftClusterInfo.Label label = new OpenshiftClusterInfo.Label(SELECTOR_APP, name);
         //name + namespace
         jsonObject.getJSONObject("metadata").put("name", name);
-        jsonObject.getJSONObject("metadata").put("namespace", openshiftClusterInfo.getNamespace());
+        jsonObject.getJSONObject("metadata").put("namespace", openshiftProperties.getNamespace());
         //label
         jsonObject.getJSONObject("metadata").put("labels", label);
         jsonObject.getJSONObject("spec").getJSONObject("selector").put("matchLabels", label);
@@ -191,10 +211,10 @@ public class OpenshiftService {
         jobManagerAddress.put("name", JOB_MANAGER_RPC_ADDRESS);
         jobManagerAddress.put("value", openshiftClusterInfo.getJobManagerAddress());
         jsonObject.getJSONObject("spec").getJSONObject("template").getJSONObject("spec").getJSONArray("containers").getJSONObject(0).getJSONArray("env").add(jobManagerAddress);
-        if (openshiftClusterInfo.getHadoopUserName() != null) {
+        if (openshiftProperties.getHadoopUserName() != null) {
             JSONObject object = new JSONObject();
             object.put("name", HADOOP_USER_NAME);
-            object.put("value", openshiftClusterInfo.getHadoopUserName());
+            object.put("value", openshiftProperties.getHadoopUserName());
             jsonObject.getJSONObject("spec").getJSONObject("template").getJSONObject("spec").getJSONArray("containers").getJSONObject(0).getJSONArray("env").add(object);
         }
         if (openshiftClusterInfo.getConfigs() != null) {
@@ -213,7 +233,7 @@ public class OpenshiftService {
         }
         jsonObject.getJSONObject("spec").getJSONObject("template").getJSONObject("spec").getJSONArray("containers").getJSONObject(0).put("name", name);
         // hadoop path
-        jsonObject.getJSONObject("spec").getJSONObject("template").getJSONObject("spec").getJSONArray("volumes").getJSONObject(0).getJSONObject("configMap").put("name", openshiftClusterInfo.getHadoopVolumeName());
+        jsonObject.getJSONObject("spec").getJSONObject("template").getJSONObject("spec").getJSONArray("volumes").getJSONObject(0).getJSONObject("configMap").put("name", openshiftProperties.getHadoopVolumeName());
         // image
         if (openshiftClusterInfo.getImage() != null) {
             jsonObject.getJSONObject("spec").getJSONObject("template").getJSONObject("spec").getJSONArray("containers").getJSONObject(0).put("image", openshiftClusterInfo.getImage());
@@ -226,11 +246,11 @@ public class OpenshiftService {
             jsonObject.getJSONObject("spec").getJSONObject("template").getJSONObject("spec").getJSONArray("containers").getJSONObject(0).getJSONObject("resources").put("limits", resources.getLimits());
         }
         // account
-        if (openshiftClusterInfo.getServiceAccount() != null) {
-            jsonObject.getJSONObject("spec").getJSONObject("template").getJSONObject("spec").put("serviceAccount", openshiftClusterInfo.getServiceAccount());
+        if (openshiftProperties.getServiceAccount() != null) {
+            jsonObject.getJSONObject("spec").getJSONObject("template").getJSONObject("spec").put("serviceAccount", openshiftProperties.getServiceAccount());
         }
-        if (openshiftClusterInfo.getServiceAccountName() != null) {
-            jsonObject.getJSONObject("spec").getJSONObject("template").getJSONObject("spec").put("serviceAccountName", openshiftClusterInfo.getServiceAccountName());
+        if (openshiftProperties.getServiceAccountName() != null) {
+            jsonObject.getJSONObject("spec").getJSONObject("template").getJSONObject("spec").put("serviceAccountName", openshiftProperties.getServiceAccountName());
         }
         return JsonUtil.toJson(jsonObject);
     }
@@ -251,31 +271,93 @@ public class OpenshiftService {
         return TASK_MANAGER_NAME_PREFIX + name;
     }
 
-    private String getDeploymentsCreateUrl(OpenshiftClusterInfo openshiftClusterInfo) {
-        return String.format(DEPLOYMENTS_CREATE_URL, url, openshiftClusterInfo.getNamespace());
+    private String getDeploymentsCreateUrl() {
+        return String.format(DEPLOYMENTS_CREATE_URL, openshiftProperties.getUrl(), openshiftProperties.getNamespace());
     }
 
     private String getDeploymentsSpecifyUrl(OpenshiftClusterInfo openshiftClusterInfo, boolean jobManager) {
         if (jobManager) {
-            return String.format(DEPLOYMENTS_SPECIFY_URL, url, openshiftClusterInfo.getNamespace(), createJobManagerName(openshiftClusterInfo.getName()));
+            return String.format(DEPLOYMENTS_SPECIFY_URL, openshiftProperties.getUrl(), openshiftProperties.getNamespace(), createJobManagerName(openshiftClusterInfo.getName()));
         } else {
-            return String.format(DEPLOYMENTS_SPECIFY_URL, url, openshiftClusterInfo.getNamespace(), createTaskManagerName(openshiftClusterInfo.getName()));
+            return String.format(DEPLOYMENTS_SPECIFY_URL, openshiftProperties.getUrl(), openshiftProperties.getNamespace(), createTaskManagerName(openshiftClusterInfo.getName()));
         }
     }
 
-    private String getServiceCreateUrl(OpenshiftClusterInfo openshiftClusterInfo) {
-        return String.format(SERVICE_CREATE_URL, url, openshiftClusterInfo.getNamespace());
+    private String getServiceCreateUrl() {
+        return String.format(SERVICE_CREATE_URL, openshiftProperties.getUrl(), openshiftProperties.getNamespace());
     }
 
     private String getServiceSpecifyUrl(OpenshiftClusterInfo openshiftClusterInfo) {
-        return String.format(SERVICE_SPECIFY_URL, url, openshiftClusterInfo.getNamespace(), openshiftClusterInfo.getJobManagerAddress());
+        return String.format(SERVICE_SPECIFY_URL, openshiftProperties.getUrl(), openshiftProperties.getNamespace(), openshiftClusterInfo.getJobManagerAddress());
     }
 
-    private String getRouterCreateUrl(OpenshiftClusterInfo openshiftClusterInfo) {
-        return String.format(ROUTER_CREATE_URL, url, openshiftClusterInfo.getNamespace());
+    private String getRouterCreateUrl() {
+        return String.format(ROUTER_CREATE_URL, openshiftProperties.getUrl(), openshiftProperties.getNamespace());
     }
 
     private String getRouterSpecifyUrl(OpenshiftClusterInfo openshiftClusterInfo) {
-        return String.format(ROUTER_SPECIFY_URL, url, openshiftClusterInfo.getNamespace(), openshiftClusterInfo.getJobManagerAddress());
+        return String.format(ROUTER_SPECIFY_URL, openshiftProperties.getUrl(), openshiftProperties.getNamespace(), openshiftClusterInfo.getJobManagerAddress());
+    }
+
+    public class TokenTask implements Runnable {
+
+        private static final String TOKEN_KEY = "access_token";
+
+        private final HttpHeaders httpHeaders;
+
+        public TokenTask() {
+            this.httpHeaders = create();
+        }
+
+        @Override
+        public void run() {
+            try {
+                URI uri = restTemplate.postForLocation(openshiftProperties.getUrl() + "/oauth/authorize?client_id=openshift-challenging-client&response_type=token", new HttpEntity<>(null, httpHeaders));
+                String token = parseToken(uri);
+                if (token == null) {
+                    log.error("Failed to get token, uri:{},fragment:{} ", uri);
+                } else {
+                    setToken(token);
+                }
+            } catch (Exception e) {
+                log.error("Failed to get token", e);
+            }
+        }
+
+        private HttpHeaders create() {
+            HttpHeaders httpHeaders = new HttpHeaders();
+            String auth = openshiftProperties.getUsername() + ":" + openshiftProperties.getPassword();
+            httpHeaders.set("X-CSRF-Token", "1");
+            httpHeaders.set("Authorization", "Basic " + new String(Base64.encodeBase64(auth.getBytes())));
+            return httpHeaders;
+        }
+
+
+        private String parseToken(URI uri) {
+            if(uri == null){
+                return null;
+            }
+            String fragment = uri.getFragment();
+            if (fragment == null || fragment.length() == 0) {
+                return null;
+            }
+            String[] fragments = fragment.split("&");
+            for (String value : fragments) {
+                String[] params = value.split("=");
+                if (params.length == 2 && TOKEN_KEY.equals(params[0]) ) {
+                    return params[1];
+                }
+            }
+            return null;
+        }
+
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }
