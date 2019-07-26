@@ -4,6 +4,7 @@ import com.dfire.platform.alchemy.client.loader.JarLoader;
 import com.dfire.platform.alchemy.client.openshift.OpenshiftWebUrlCache;
 import com.dfire.platform.alchemy.domain.Cluster;
 import com.dfire.platform.alchemy.domain.enumeration.ClusterType;
+import com.dfire.platform.alchemy.service.dto.ClusterDTO;
 import com.dfire.platform.alchemy.util.BindPropertiesUtil;
 import org.apache.flink.client.program.rest.RestClusterClient;
 import org.apache.flink.configuration.Configuration;
@@ -19,7 +20,7 @@ import java.util.Map;
  */
 public class ClusterClientFactory {
 
-    public static FlinkClient get(Cluster cluster, JarLoader jarLoader) throws Exception {
+    public static FlinkClient get(ClusterDTO cluster, JarLoader jarLoader, String webUrl) throws Exception {
         ClusterType clusterType = cluster.getType();
         switch (clusterType) {
             case STANDALONE:
@@ -27,7 +28,7 @@ public class ClusterClientFactory {
                 return createRestClient(clusterInfo, jarLoader);
             case OPENSHIFT:
                 OpenshiftClusterInfo openshiftClusterInfo = BindPropertiesUtil.bindProperties(cluster.getConfig(), OpenshiftClusterInfo.class);
-                return createOpenshiftClusterClient(openshiftClusterInfo, jarLoader, OpenshiftWebUrlCache.get(cluster.getId()));
+                return createOpenshiftClusterClient(openshiftClusterInfo, jarLoader, webUrl);
             case YARN:
                 // todo 支持yarn client
             default:

@@ -6,35 +6,14 @@ import java.util.Map;
 public class OpenshiftClusterInfo {
 
     /**
-     * openshift token
-     */
-    private String token;
-
-    /**
      * cluster name
      */
     private String name;
 
     /**
-     * openshift namespace
-     */
-    private String namespace;
-
-    /**
      * openshift image
      */
     private String image;
-
-    private String serviceAccount;
-
-    private String serviceAccountName;
-
-    /**
-     * 需要挂载的hadoop相关configMap，需要事先创建好，比如hdfs-site.xml
-     */
-    private String hadoopVolumeName;
-
-    private String hadoopUserName;
 
     private String jobManagerAddress;
 
@@ -62,28 +41,12 @@ public class OpenshiftClusterInfo {
      */
     private List<String> dependencies;
 
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getNamespace() {
-        return namespace;
-    }
-
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
     }
 
     public String getImage() {
@@ -94,38 +57,6 @@ public class OpenshiftClusterInfo {
         this.image = image;
     }
 
-    public String getServiceAccount() {
-        return serviceAccount;
-    }
-
-    public void setServiceAccount(String serviceAccount) {
-        this.serviceAccount = serviceAccount;
-    }
-
-    public String getServiceAccountName() {
-        return serviceAccountName;
-    }
-
-    public void setServiceAccountName(String serviceAccountName) {
-        this.serviceAccountName = serviceAccountName;
-    }
-
-    public String getHadoopVolumeName() {
-        return hadoopVolumeName;
-    }
-
-    public void setHadoopVolumeName(String hadoopVolumeName) {
-        this.hadoopVolumeName = hadoopVolumeName;
-    }
-
-    public String getHadoopUserName() {
-        return hadoopUserName;
-    }
-
-    public void setHadoopUserName(String hadoopUserName) {
-        this.hadoopUserName = hadoopUserName;
-    }
-
     public int getReplicas() {
         return replicas;
     }
@@ -133,7 +64,6 @@ public class OpenshiftClusterInfo {
     public void setReplicas(int replicas) {
         this.replicas = replicas;
     }
-
 
     public Map<String, String> getEnvs() {
         return envs;

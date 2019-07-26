@@ -7,7 +7,6 @@ import com.dfire.platform.alchemy.domain.Business;
 import com.dfire.platform.alchemy.domain.Job;
 import com.dfire.platform.alchemy.repository.ClusterRepository;
 import com.dfire.platform.alchemy.service.ClusterService;
-import com.dfire.platform.alchemy.service.OpenshiftService;
 import com.dfire.platform.alchemy.service.dto.ClusterDTO;
 import com.dfire.platform.alchemy.service.mapper.ClusterMapper;
 import com.dfire.platform.alchemy.web.rest.errors.ExceptionTranslator;
@@ -98,9 +97,6 @@ public class ClusterResourceIT {
     @Autowired
     private ClientManager clientManager;
 
-    @Autowired
-    private OpenshiftService openshiftService;
-
     private MockMvc restClusterMockMvc;
 
     private Cluster cluster;
@@ -108,7 +104,7 @@ public class ClusterResourceIT {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final ClusterResource clusterResource = new ClusterResource(clusterService, clusterQueryService, clientManager, openshiftService);
+        final ClusterResource clusterResource = new ClusterResource(clusterService, clusterQueryService, clientManager);
         this.restClusterMockMvc = MockMvcBuilders.standaloneSetup(clusterResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
