@@ -15,7 +15,7 @@ public class OpenshiftServiceIT {
 
     @Before
     public void before() throws IOException {
-        openshiftService = new OpenshiftService(new RestTemplate(),"https://console-openshift-console.apps.us-east-1.online-starter.openshift.com");
+        openshiftService = new OpenshiftService(new RestTemplate(),"https://cs.2dfire.tech");
     }
 
     @Test
