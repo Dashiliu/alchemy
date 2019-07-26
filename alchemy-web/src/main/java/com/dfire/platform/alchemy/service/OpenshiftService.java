@@ -12,12 +12,11 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 @Service
@@ -69,19 +68,26 @@ public class OpenshiftService {
     }
 
     private String loadTemplate(String fileName) throws IOException {
-        FileInputStream fileInputStream = null;
+        ByteArrayOutputStream out = null;
+        InputStream inputStream = null;
         try {
             ClassPathResource resource = new ClassPathResource("templates/openshift/" + fileName);
-            fileInputStream = new FileInputStream(resource.getFile());
-            int size = Integer.parseInt(String.valueOf(fileInputStream.getChannel().size()));
-            byte[] data = new byte[size];
-            fileInputStream.read(data);
-            return new String(data);
+            out = new ByteArrayOutputStream();
+            inputStream = resource.getInputStream();
+            byte[] buffer = new byte[1024];
+            int len = -1;
+            while ((len = inputStream.read(buffer)) != -1) {
+                out.write(buffer, 0, len);
+            }
+            return out.toString();
         } catch (IOException e) {
             throw e;
         } finally {
-            if (fileInputStream != null) {
-                fileInputStream.close();
+            if (out != null) {
+                out.close();
+            }
+            if (inputStream != null) {
+                inputStream.close();
             }
         }
     }
@@ -120,7 +126,7 @@ public class OpenshiftService {
         restTemplate.exchange(getRouterSpecifyUrl(openshiftClusterInfo), HttpMethod.DELETE, new HttpEntity<>(null, headers), String.class);
     }
 
-    public String queryWebUrl(OpenshiftClusterInfo openshiftClusterInfo){
+    public String queryWebUrl(OpenshiftClusterInfo openshiftClusterInfo) {
         HttpHeaders headers = createHeader(openshiftClusterInfo.getToken());
         ResponseEntity<JSONObject> routerEntity = restTemplate.exchange(getRouterSpecifyUrl(openshiftClusterInfo), HttpMethod.GET, new HttpEntity<>(null, headers), JSONObject.class);
         if (routerEntity.getStatusCode() == HttpStatus.OK) {
@@ -128,6 +134,7 @@ public class OpenshiftService {
         }
         return null;
     }
+
     private HttpHeaders createHeader(String token) {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + token);
