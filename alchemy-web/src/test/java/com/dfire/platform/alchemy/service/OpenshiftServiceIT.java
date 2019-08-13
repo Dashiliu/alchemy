@@ -2,6 +2,7 @@ package com.dfire.platform.alchemy.service;
 
 import com.dfire.platform.alchemy.client.OpenshiftClusterInfo;
 import com.dfire.platform.alchemy.config.OpenshiftProperties;
+import com.dfire.platform.alchemy.service.dto.ClusterDTO;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.web.client.RestTemplate;
@@ -55,13 +56,6 @@ public class OpenshiftServiceIT {
     public void delete() {
         OpenshiftClusterInfo openshiftClusterInfo = createInfo();
         openshiftService.delete(openshiftClusterInfo);
-    }
-
-    @Test
-    public void query(){
-        OpenshiftClusterInfo openshiftClusterInfo = createInfo();
-        String url = openshiftService.queryOpenshift(openshiftClusterInfo);
-        assert url != null;
     }
 
 

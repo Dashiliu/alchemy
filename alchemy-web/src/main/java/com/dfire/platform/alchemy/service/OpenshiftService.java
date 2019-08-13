@@ -11,6 +11,7 @@ import com.dfire.platform.alchemy.util.BindPropertiesUtil;
 import com.dfire.platform.alchemy.util.JsonUtil;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -118,6 +119,7 @@ public class OpenshiftService {
      * @return 返回router的host，作为jobmanager的weburl
      */
     public void create(OpenshiftClusterInfo openshiftClusterInfo) {
+        assertParams(openshiftClusterInfo);
         HttpHeaders headers = createHeader(getToken());
         String deploymentsUrl = getDeploymentsCreateUrl();
         restTemplate.postForEntity(deploymentsUrl, new HttpEntity<>(createDeployments(openshiftClusterInfo, true), headers), JSONObject.class);
@@ -132,6 +134,7 @@ public class OpenshiftService {
      * @param openshiftClusterInfo
      */
     public void update(OpenshiftClusterInfo openshiftClusterInfo) {
+        assertParams(openshiftClusterInfo);
         HttpHeaders headers = createHeader(getToken());
         restTemplate.put(getDeploymentsSpecifyUrl(openshiftClusterInfo, true), new HttpEntity<>(createDeployments(openshiftClusterInfo, true), headers));
         restTemplate.put(getDeploymentsSpecifyUrl(openshiftClusterInfo, false), new HttpEntity<>(createDeployments(openshiftClusterInfo, false), headers));
@@ -145,12 +148,26 @@ public class OpenshiftService {
         restTemplate.exchange(getRouterSpecifyUrl(openshiftClusterInfo), HttpMethod.DELETE, new HttpEntity<>(null, headers), String.class);
     }
 
-    public String queryWebUrl(ClusterDTO clusterDTO) throws Exception {
-        OpenshiftClusterInfo openshiftClusterInfo = BindPropertiesUtil.bindProperties(clusterDTO.getConfig(), OpenshiftClusterInfo.class);
-        return queryOpenshift(openshiftClusterInfo);
+    private void assertParams(OpenshiftClusterInfo openshiftClusterInfo) {
+        if(openshiftClusterInfo == null){
+            throw new IllegalArgumentException("openshift cluster's config is null");
+        }
+        if(StringUtils.isEmpty(openshiftClusterInfo.getName())){
+            throw new IllegalArgumentException("cluster name is null");
+        }
+        if(StringUtils.isEmpty(openshiftClusterInfo.getImage())){
+            throw new IllegalArgumentException("cluster image is null");
+        }
+        if(StringUtils.isEmpty(openshiftClusterInfo.getJobManagerAddress())){
+            throw new IllegalArgumentException("cluster jobManagerAddress is null");
+        }
+        if(openshiftClusterInfo.getReplicas() < 0){
+            throw new IllegalArgumentException("cluster taskmanager  replicas is less than 0");
+        }
     }
 
-    public String queryOpenshift(OpenshiftClusterInfo openshiftClusterInfo){
+    public String queryWebUrl(ClusterDTO clusterDTO) throws Exception {
+        OpenshiftClusterInfo openshiftClusterInfo = BindPropertiesUtil.bindProperties(clusterDTO.getConfig(), OpenshiftClusterInfo.class);
         HttpHeaders headers = createHeader(getToken());
         ResponseEntity<JSONObject> routerEntity = restTemplate.exchange(getRouterSpecifyUrl(openshiftClusterInfo), HttpMethod.GET, new HttpEntity<>(null, headers), JSONObject.class);
         if (routerEntity.getStatusCode() == HttpStatus.OK) {
