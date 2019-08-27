@@ -2,7 +2,6 @@ package com.dfire.platform.alchemy.service;
 
 import com.dfire.platform.alchemy.client.OpenshiftClusterInfo;
 import com.dfire.platform.alchemy.config.OpenshiftProperties;
-import com.dfire.platform.alchemy.service.dto.ClusterDTO;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.web.client.RestTemplate;
@@ -15,18 +14,19 @@ public class OpenshiftServiceIT {
 
     OpenshiftService openshiftService;
 
+
     @Before
     public void before() throws IOException, InterruptedException {
         OpenshiftProperties openshiftProperties = new OpenshiftProperties();
         openshiftProperties.setUsername("congbai");
         openshiftProperties.setPassword("jiayou1114");
-        openshiftProperties.setNamespace("flink");
-        openshiftProperties.setHadoopUserName("hdfs");
+        openshiftProperties.setNamespace("alchemy");
+        openshiftProperties.setHadoopUserName("flink");
         openshiftProperties.setHadoopVolumeName("hadoop");
         openshiftProperties.setServiceAccount("flink");
         openshiftProperties.setServiceAccountName("flink");
-        openshiftProperties.setUrl("https://cs.2dfire.tech");
-        openshiftService = new OpenshiftService(new RestTemplate(), openshiftProperties);
+        openshiftProperties.setUrl("https://cs.2dfire.com:8443");
+        openshiftService = new OpenshiftService(null, new RestTemplate(), openshiftProperties);
         long startTimestamp = System.currentTimeMillis();
         while (openshiftService.getToken() == null){
             Thread.sleep(10);
@@ -67,9 +67,9 @@ public class OpenshiftServiceIT {
         configs.put("high-availability.cluster-id", "test");
         configs.put("high-availability.zookeeper.quorum", "10.1.22.20,10.1.22.26,10.1.22.24");
         OpenshiftClusterInfo openshiftClusterInfo = new OpenshiftClusterInfo();
-        openshiftClusterInfo.setImage("dongbl1114/docker-flink:1.8.0-alchemy");
-        openshiftClusterInfo.setName("magiceye");
-        openshiftClusterInfo.setJobManagerAddress("jobmanager-magiceye");
+        openshiftClusterInfo.setImage("quay.app.2dfire.com/congbai/flink:1.8.0-alchemy");
+        openshiftClusterInfo.setName("client-cluster");
+        openshiftClusterInfo.setJobManagerAddress("jobmanager-client");
         openshiftClusterInfo.setReplicas(2);
         openshiftClusterInfo.setConfigs(configs);
         openshiftClusterInfo.setJobManagerResources(new OpenshiftClusterInfo.Resources(new OpenshiftClusterInfo.Resource("1", "3G"), new OpenshiftClusterInfo.Resource("3", "8G")));

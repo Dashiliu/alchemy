@@ -3,17 +3,18 @@ package com.dfire.platform.alchemy.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dfire.platform.alchemy.client.OpenshiftClusterInfo;
-import com.dfire.platform.alchemy.client.openshift.OpenshiftWebUrlCache;
 import com.dfire.platform.alchemy.config.OpenshiftProperties;
-import com.dfire.platform.alchemy.domain.enumeration.ClusterType;
 import com.dfire.platform.alchemy.service.dto.ClusterDTO;
 import com.dfire.platform.alchemy.util.BindPropertiesUtil;
 import com.dfire.platform.alchemy.util.JsonUtil;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import io.github.jhipster.config.JHipsterConstants;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -49,9 +50,9 @@ public class OpenshiftService {
 
     public static final String TASK_MANAGER_NAME_PREFIX = "taskmanager-";
 
-    public static final String DEPLOYMENTS_CREATE_URL = "%s/apis/apps/v1/namespaces/%s/deployments";
+    public static final String DEPLOYMENTS_CREATE_URL = "%s/apis/apps/v1beta1/namespaces/%s/deployments";
 
-    public static final String DEPLOYMENTS_SPECIFY_URL = "%s/apis/apps/v1/namespaces/%s/deployments/%s";
+    public static final String DEPLOYMENTS_SPECIFY_URL = "%s/apis/apps/v1beta1/namespaces/%s/deployments/%s";
 
     public static final String SERVICE_CREATE_URL = "%s/api/v1/namespaces/%s/services";
 
@@ -60,6 +61,8 @@ public class OpenshiftService {
     public static final String ROUTER_CREATE_URL = "%s/apis/route.openshift.io/v1/namespaces/%s/routes";
 
     public static final String ROUTER_SPECIFY_URL = "%s/apis/route.openshift.io/v1/namespaces/%s/routes/%s";
+
+    private final Environment env;
 
     private final RestTemplate restTemplate;
 
@@ -77,7 +80,8 @@ public class OpenshiftService {
 
     private volatile String token;
 
-    public OpenshiftService(RestTemplate restTemplate, OpenshiftProperties openshiftProperties) throws IOException {
+    public OpenshiftService(Environment env, RestTemplate restTemplate, OpenshiftProperties openshiftProperties) throws IOException {
+        this.env = env;
         this.restTemplate = restTemplate;
         this.openshiftProperties = openshiftProperties;
         this.jobManager = loadTemplate("node.json");
@@ -180,6 +184,7 @@ public class OpenshiftService {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + token);
         headers.add(HttpHeaders.CONTENT_TYPE, "application/json");
+        headers.add(HttpHeaders.ACCEPT, "application/json");
         return headers;
     }
 
@@ -216,6 +221,9 @@ public class OpenshiftService {
             jsonObject.getJSONObject("spec").getJSONObject("template").getJSONObject("spec").getJSONArray("containers").getJSONObject(0).getJSONArray("args").add("taskmanager");
             resources = openshiftClusterInfo.getTaskManagerResources();
             replicas = openshiftClusterInfo.getReplicas();
+        }
+        if (env !=null && env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_PRODUCTION))) {
+            jsonObject.put("apiVersion","apps/v1beta1");
         }
         OpenshiftClusterInfo.Label label = new OpenshiftClusterInfo.Label(SELECTOR_APP, name);
         //name + namespace
