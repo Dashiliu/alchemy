@@ -20,12 +20,12 @@ public class OpenshiftServiceIT {
         OpenshiftProperties openshiftProperties = new OpenshiftProperties();
         openshiftProperties.setUsername("congbai");
         openshiftProperties.setPassword("jiayou1114");
-        openshiftProperties.setNamespace("alchemy");
+        openshiftProperties.setNamespace("flink");
         openshiftProperties.setHadoopUserName("flink");
         openshiftProperties.setHadoopVolumeName("hadoop");
         openshiftProperties.setServiceAccount("flink");
         openshiftProperties.setServiceAccountName("flink");
-        openshiftProperties.setUrl("https://cs.2dfire.com:8443");
+        openshiftProperties.setUrl("https://cs.2dfire.tech");
         openshiftService = new OpenshiftService(null, new RestTemplate(), openshiftProperties);
         long startTimestamp = System.currentTimeMillis();
         while (openshiftService.getToken() == null){
@@ -66,10 +66,13 @@ public class OpenshiftServiceIT {
         configs.put("high-availability.storageDir", "/flink/ha/default");
         configs.put("high-availability.cluster-id", "test");
         configs.put("high-availability.zookeeper.quorum", "10.1.22.20,10.1.22.26,10.1.22.24");
+        configs.put("env.java.opts.taskmanager", "-XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -Xmn6G -XX:MaxDirectMemorySize=4096m  -XX:MetaspaceSize=1024m  -XX:MaxMetaspaceSize=1024m -Xss256k -XX:G1HeapRegionSize=16m -XX:G1ReservePercent=30 -XX:InitiatingHeapOccupancyPercent=30 -XX:+PrintGCDetails   -XX:+PrintGCDateStamps  -XX:+PrintHeapAtGC -XX:+PrintPromotionFailure  -Xloggc:/opt/logs/flink/gc.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/opt/logs/flink/java.hprof -XX:ErrorFile=/opt/logs/flink/hs_err_pid%p.log -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=10 -XX:GCLogFileSize=20M\n" +
+            "jobmanager.heap.mb: 4024");
+        configs.put("env.java.opts.jobmanager","-XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -Xmn4G  -XX:MetaspaceSize=1024m  -XX:MaxMetaspaceSize=1024m -Xss228k -XX:G1HeapRegionSize=16m -XX:G1ReservePercent=30 -XX:InitiatingHeapOccupancyPercent=30 -XX:+PrintGCDetails   -XX:+PrintGCDateStamps  -XX:+PrintHeapAtGC -XX:+PrintPromotionFailure");
         OpenshiftClusterInfo openshiftClusterInfo = new OpenshiftClusterInfo();
         openshiftClusterInfo.setImage("quay.app.2dfire.com/congbai/flink:1.8.0-alchemy");
         openshiftClusterInfo.setName("client-cluster");
-        openshiftClusterInfo.setJobManagerAddress("jobmanager-client");
+        openshiftClusterInfo.setJobManagerAddress("jobmanager-client-cluster");
         openshiftClusterInfo.setReplicas(2);
         openshiftClusterInfo.setConfigs(configs);
         openshiftClusterInfo.setJobManagerResources(new OpenshiftClusterInfo.Resources(new OpenshiftClusterInfo.Resource("1", "3G"), new OpenshiftClusterInfo.Resource("3", "8G")));

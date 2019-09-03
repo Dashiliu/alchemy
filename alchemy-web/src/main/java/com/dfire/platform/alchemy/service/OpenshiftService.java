@@ -42,6 +42,8 @@ public class OpenshiftService {
 
     public static final String FLINK_ADD_CONFIG = "FLINK_ADD_CONFIG";
 
+    public static final String FLINK_CONFIG_SPLIT = "|";
+
     public static final String HADOOP_USER_NAME = "HADOOP_USER_NAME";
 
     public static final String JOB_MANAGER_RPC_ADDRESS = "JOB_MANAGER_RPC_ADDRESS";
@@ -50,9 +52,13 @@ public class OpenshiftService {
 
     public static final String TASK_MANAGER_NAME_PREFIX = "taskmanager-";
 
-    public static final String DEPLOYMENTS_CREATE_URL = "%s/apis/apps/v1beta1/namespaces/%s/deployments";
+    public static final String DEPLOYMENTS_DEV_CREATE_URL = "%s/apis/apps/v1/namespaces/%s/deployments";
 
-    public static final String DEPLOYMENTS_SPECIFY_URL = "%s/apis/apps/v1beta1/namespaces/%s/deployments/%s";
+    public static final String DEPLOYMENTS_DEV_SPECIFY_URL = "%s/apis/apps/v1/namespaces/%s/deployments/%s";
+
+    public static final String DEPLOYMENTS_PROD_CREATE_URL = "%s/apis/apps/v1beta1/namespaces/%s/deployments";
+
+    public static final String DEPLOYMENTS_PROD_SPECIFY_URL = "%s/apis/apps/v1beta1/namespaces/%s/deployments/%s";
 
     public static final String SERVICE_CREATE_URL = "%s/api/v1/namespaces/%s/services";
 
@@ -61,8 +67,6 @@ public class OpenshiftService {
     public static final String ROUTER_CREATE_URL = "%s/apis/route.openshift.io/v1/namespaces/%s/routes";
 
     public static final String ROUTER_SPECIFY_URL = "%s/apis/route.openshift.io/v1/namespaces/%s/routes/%s";
-
-    private final Environment env;
 
     private final RestTemplate restTemplate;
 
@@ -78,10 +82,11 @@ public class OpenshiftService {
 
     private final ScheduledExecutorService tokenService;
 
+    private final boolean prod;
+
     private volatile String token;
 
     public OpenshiftService(Environment env, RestTemplate restTemplate, OpenshiftProperties openshiftProperties) throws IOException {
-        this.env = env;
         this.restTemplate = restTemplate;
         this.openshiftProperties = openshiftProperties;
         this.jobManager = loadTemplate("node.json");
@@ -90,6 +95,11 @@ public class OpenshiftService {
         this.router = loadTemplate("router.json");
         this.tokenService = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setDaemon(true).setNameFormat("token-service-%d").build());
         this.tokenService.scheduleAtFixedRate(new TokenTask(), 0, 86300, TimeUnit.SECONDS);
+        if (env != null && env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_PRODUCTION))) {
+            prod = true;
+        } else {
+            prod = false;
+        }
     }
 
     private String loadTemplate(String fileName) throws IOException {
@@ -119,6 +129,7 @@ public class OpenshiftService {
 
     /**
      * 创建jobmanager、taskmanager、service、router
+     *
      * @param openshiftClusterInfo
      * @return 返回router的host，作为jobmanager的weburl
      */
@@ -153,19 +164,19 @@ public class OpenshiftService {
     }
 
     private void assertParams(OpenshiftClusterInfo openshiftClusterInfo) {
-        if(openshiftClusterInfo == null){
+        if (openshiftClusterInfo == null) {
             throw new IllegalArgumentException("openshift cluster's config is null");
         }
-        if(StringUtils.isEmpty(openshiftClusterInfo.getName())){
+        if (StringUtils.isEmpty(openshiftClusterInfo.getName())) {
             throw new IllegalArgumentException("cluster name is null");
         }
-        if(StringUtils.isEmpty(openshiftClusterInfo.getImage())){
+        if (StringUtils.isEmpty(openshiftClusterInfo.getImage())) {
             throw new IllegalArgumentException("cluster image is null");
         }
-        if(StringUtils.isEmpty(openshiftClusterInfo.getJobManagerAddress())){
+        if (StringUtils.isEmpty(openshiftClusterInfo.getJobManagerAddress())) {
             throw new IllegalArgumentException("cluster jobManagerAddress is null");
         }
-        if(openshiftClusterInfo.getReplicas() < 0){
+        if (openshiftClusterInfo.getReplicas() < 0) {
             throw new IllegalArgumentException("cluster taskmanager  replicas is less than 0");
         }
     }
@@ -222,8 +233,8 @@ public class OpenshiftService {
             resources = openshiftClusterInfo.getTaskManagerResources();
             replicas = openshiftClusterInfo.getReplicas();
         }
-        if (env !=null && env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_PRODUCTION))) {
-            jsonObject.put("apiVersion","apps/v1beta1");
+        if (prod) {
+            jsonObject.put("apiVersion", "apps/v1beta1");
         }
         OpenshiftClusterInfo.Label label = new OpenshiftClusterInfo.Label(SELECTOR_APP, name);
         //name + namespace
@@ -287,7 +298,7 @@ public class OpenshiftService {
     private String createConfigs(Map<String, Object> configs) {
         StringBuilder stringBuilder = new StringBuilder();
         for (Map.Entry<String, Object> config : configs.entrySet()) {
-            stringBuilder.append(config.getKey()).append(" ").append(config.getValue()).append(" ");
+            stringBuilder.append(config.getKey()).append(FLINK_CONFIG_SPLIT).append(config.getValue()).append(FLINK_CONFIG_SPLIT);
         }
         return stringBuilder.toString();
     }
@@ -301,14 +312,25 @@ public class OpenshiftService {
     }
 
     private String getDeploymentsCreateUrl() {
-        return String.format(DEPLOYMENTS_CREATE_URL, openshiftProperties.getUrl(), openshiftProperties.getNamespace());
+        if (prod) {
+            return String.format(DEPLOYMENTS_PROD_CREATE_URL, openshiftProperties.getUrl(), openshiftProperties.getNamespace());
+        } else {
+            return String.format(DEPLOYMENTS_DEV_CREATE_URL, openshiftProperties.getUrl(), openshiftProperties.getNamespace());
+        }
+
     }
 
     private String getDeploymentsSpecifyUrl(OpenshiftClusterInfo openshiftClusterInfo, boolean jobManager) {
-        if (jobManager) {
-            return String.format(DEPLOYMENTS_SPECIFY_URL, openshiftProperties.getUrl(), openshiftProperties.getNamespace(), createJobManagerName(openshiftClusterInfo.getName()));
+        String baseUrl;
+        if (prod) {
+            baseUrl = DEPLOYMENTS_PROD_SPECIFY_URL;
         } else {
-            return String.format(DEPLOYMENTS_SPECIFY_URL, openshiftProperties.getUrl(), openshiftProperties.getNamespace(), createTaskManagerName(openshiftClusterInfo.getName()));
+            baseUrl = DEPLOYMENTS_DEV_SPECIFY_URL;
+        }
+        if (jobManager) {
+            return String.format(baseUrl, openshiftProperties.getUrl(), openshiftProperties.getNamespace(), createJobManagerName(openshiftClusterInfo.getName()));
+        } else {
+            return String.format(baseUrl, openshiftProperties.getUrl(), openshiftProperties.getNamespace(), createTaskManagerName(openshiftClusterInfo.getName()));
         }
     }
 
@@ -363,7 +385,7 @@ public class OpenshiftService {
 
 
         private String parseToken(URI uri) {
-            if(uri == null){
+            if (uri == null) {
                 return null;
             }
             String fragment = uri.getFragment();
@@ -373,7 +395,7 @@ public class OpenshiftService {
             String[] fragments = fragment.split("&");
             for (String value : fragments) {
                 String[] params = value.split("=");
-                if (params.length == 2 && TOKEN_KEY.equals(params[0]) ) {
+                if (params.length == 2 && TOKEN_KEY.equals(params[0])) {
                     return params[1];
                 }
             }
